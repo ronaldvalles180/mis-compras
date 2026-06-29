@@ -7,50 +7,46 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2c3e50">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 15px; background-color: #f4f6f9; color: #333; padding-bottom: 240px; }
-        h1 { text-align: center; color: #2c3e50; margin-bottom: 5px; font-size: 24px; }
-        .subtitle { text-align: center; color: #7f8c8d; margin-bottom: 20px; font-size: 13px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 8px; background-color: #f4f6f9; color: #333; padding-bottom: 220px; }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 2px; font-size: 20px; }
+        .subtitle { text-align: center; color: #7f8c8d; margin-bottom: 15px; font-size: 12px; }
         
-        /* Contenedor responsivo para evitar que las tablas se achiquen en el móvil */
-        .table-container { width: 100%; overflow-x: auto; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-radius: 6px; margin-bottom: 25px; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; min-width: 620px; border-collapse: collapse; overflow: hidden; }
-        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #edf2f7; font-size: 14px; }
+        /* Contenedor fluido sin desplazamiento horizontal */
+        .table-container { width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-radius: 6px; margin-bottom: 20px; }
+        
+        /* Tabla con ancho fijo ajustado al 100% de la pantalla */
+        table { width: 100%; table-layout: fixed; border-collapse: collapse; overflow: hidden; }
+        th, td { padding: 6px 3px; text-align: left; border-bottom: 1px solid #edf2f7; font-size: 11px; word-wrap: break-word; }
         th { background-color: #f8f9fa; font-weight: 600; color: #4a5568; text-align: center; }
         tr:hover { background-color: #f8fafc; }
         .center { text-align: center; }
-        .right { text-align: right; padding-right: 15px; }
+        .right { text-align: right; padding-right: 4px; }
         
-        /* Formato idéntico y fijo para los controles de toda la lista */
-        input[type="checkbox"] { transform: scale(1.3); cursor: pointer; accent-color: #27ae60; vertical-align: middle; }
-        input[type="number"] { padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 14px; text-align: center; font-weight: bold; }
-        .item-qty { width: 65px; color: #333; }
-        .item-price { width: 75px; color: #2e7d32; }
-        .est-price-cell { color: #7f8c8d; font-style: italic; font-weight: 500; }
-        .item-subtotal { font-weight: bold; color: #2c3e50; min-width: 80px; }
+        /* Inputs ultra compactos para pantallas estrechas */
+        input[type="checkbox"] { transform: scale(1.1); cursor: pointer; accent-color: #27ae60; vertical-align: middle; }
+        input[type="number"] { width: 100%; padding: 4px 2px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11px; text-align: center; font-weight: bold; box-sizing: border-box; }
+        .item-price { color: #2e7d32; }
+        .est-price-cell { color: #7f8c8d; font-style: italic; }
+        .item-subtotal { font-weight: bold; color: #2c3e50; }
         
-        h2 { background-color: #27ae60; color: white; padding: 12px; border-radius: 6px; margin-top: 25px; font-size: 16px; font-weight: 600; }
+        h2 { background-color: #27ae60; color: white; padding: 8px; border-radius: 6px; margin-top: 20px; font-size: 14px; font-weight: 600; }
         .checked-row { background-color: #e8f8f5 !important; }
 
-        /* Barra Inferior Adaptable para Móviles */
-        .summary-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2c3e50; color: white; padding: 12px 10px; box-shadow: 0 -3px 10px rgba(0,0,0,0.2); display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-around; align-items: center; z-index: 1000; box-sizing: border-box; gap: 8px; }
-        .summary-box { text-align: center; font-size: 14px; flex: 1; min-width: 140px; }
-        .summary-box span { font-weight: bold; font-size: 18px; display: block; margin-top: 2px; }
+        /* Barra Inferior Optimizada y Estrecha */
+        .summary-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2c3e50; color: white; padding: 10px 8px; box-shadow: 0 -2px 8px rgba(0,0,0,0.2); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; box-sizing: border-box; gap: 6px; }
+        .summary-row-data { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 5px; }
+        .summary-box { text-align: center; font-size: 11px; flex: 1; }
+        .summary-box span { font-weight: bold; font-size: 14px; display: block; margin-top: 1px; }
         .checked-total-style { color: #2ecc71; }
         .list-total-style { color: #bdc3c7; }
         
-        .rate-box { background: #34495e; padding: 6px 12px; border-radius: 6px; text-align: center; border: 1px solid #455a64; min-width: 120px; }
-        .rate-box label { font-weight: bold; font-size: 12px; color: #f1c40f; display: block; margin-bottom: 2px; }
-        .rate-box input { width: 80px; padding: 4px; font-size: 15px; font-weight: bold; text-align: center; border-radius: 4px; border: none; background: white; color: #333; }
+        .rate-box { background: #34495e; padding: 4px 8px; border-radius: 4px; text-align: center; border: 1px solid #455a64; }
+        .rate-box label { font-weight: bold; font-size: 10px; color: #f1c40f; display: block; }
+        .rate-box input { width: 65px; padding: 2px; font-size: 12px; font-weight: bold; text-align: center; border-radius: 3px; border: none; background: white; color: #333; }
 
-        .actions-wrapper { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
-        .btn-action { background-color: #e67e22; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; }
+        .actions-wrapper { display: flex; width: 100%; gap: 4px; justify-content: center; }
+        .btn-action { flex: 1; background-color: #e67e22; color: white; border: none; padding: 6px 4px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; text-align: center; }
         .btn-action:hover { background-color: #d35400; }
-
-        @media (max-width: 600px) {
-            body { padding-bottom: 220px; }
-            .summary-bar { flex-direction: column; padding: 10px; gap: 10px; }
-            .summary-box span { font-size: 16px; }
-        }
 
         @media print {
             body { background: white; margin: 0; padding-bottom: 0; }
@@ -59,28 +55,35 @@
             .btn-action, .rate-box label, .actions-wrapper { display: none; }
             h2 { background: #34495e !important; color: white; -webkit-print-color-adjust: exact; }
             input[type="number"], .rate-box input { border: none; background: transparent; }
-            .table-container { overflow-x: visible; }
-            table { min-width: 100%; }
+            table { table-layout: auto; }
         }
     </style>
 </head>
 <body>
 
-    <h1>📋 Mi Checklist de Compras Automático</h1>
-    <p class="subtitle">Desliza las tablas hacia los lados si estás en el móvil para ver todos los campos con su formato perfecto.</p>
+    <h1>📋 Mi Checklist de Compras</h1>
+    <p class="subtitle">Todo ajustado perfectamente al ancho de tu pantalla en una sola vista fija.</p>
 
     <!-- 1. DESPENSA Y VIVERES -->
     <h2>1. DESPENSA Y VÍVERES</h2>
     <div class="table-container">
         <table>
+            <colgroup>
+                <col style="width: 10%;">
+                <col style="width: 32%;">
+                <col style="width: 14%;">
+                <col style="width: 15%;">
+                <col style="width: 13%;">
+                <col style="width: 16%;">
+            </colgroup>
             <thead>
                 <tr>
-                    <th width="7%">¿Listo?</th>
+                    <th>✔</th>
                     <th>Artículo</th>
-                    <th width="15%">Cant. / Peso</th>
-                    <th width="16%">Precio Real ($)</th>
-                    <th width="14%">Precio Est.</th>
-                    <th width="16%">Subtotal</th>
+                    <th>Cant</th>
+                    <th>Real $</th>
+                    <th>Est.</th>
+                    <th>Total</th>
                 </tr>
             </thead>
             <tbody>
@@ -324,14 +327,22 @@
     <h2>2. CHARCUTERÍA Y PROTEÍNAS</h2>
     <div class="table-container">
         <table>
+            <colgroup>
+                <col style="width: 10%;">
+                <col style="width: 32%;">
+                <col style="width: 14%;">
+                <col style="width: 15%;">
+                <col style="width: 13%;">
+                <col style="width: 16%;">
+            </colgroup>
             <thead>
                 <tr>
-                    <th width="7%">¿Listo?</th>
+                    <th>✔</th>
                     <th>Artículo</th>
-                    <th width="15%">Cant. / Peso</th>
-                    <th width="14%">Precio Real ($)</th>
-                    <th width="12%">Precio Est.</th>
-                    <th width="18%">Subtotal</th>
+                    <th>Cant</th>
+                    <th>Real $</th>
+                    <th>Est.</th>
+                    <th>Total</th>
                 </tr>
             </thead>
             <tbody>
@@ -353,7 +364,7 @@
                 </tr>
                 <tr class="item-row">
                     <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Queso General</td>
+                    <td>Queso Blanco</td>
                     <td class="center"><input type="number" class="item-qty" value="6.00" step="any" oninput="calculateTotals()"></td>
                     <td class="center"><input type="number" class="item-price" value="8.00" step="0.01" oninput="calculateTotals()"></td>
                     <td class="center est-price-cell">$8.00</td>
@@ -567,14 +578,22 @@
     <h2>3. FRUTAS Y VERDURAS</h2>
     <div class="table-container">
         <table>
+            <colgroup>
+                <col style="width: 10%;">
+                <col style="width: 32%;">
+                <col style="width: 14%;">
+                <col style="width: 15%;">
+                <col style="width: 13%;">
+                <col style="width: 16%;">
+            </colgroup>
             <thead>
                 <tr>
-                    <th width="6%">¿Comprado?</th>
+                    <th>✔</th>
                     <th>Artículo</th>
-                    <th width="12%">Cant. / Peso</th>
-                    <th width="14%">Precio Real ($)</th>
-                    <th width="12%">Precio Est.</th>
-                    <th width="18%">Subtotal</th>
+                    <th>Cant</th>
+                    <th>Real $</th>
+                    <th>Est.</th>
+                    <th>Total</th>
                 </tr>
             </thead>
             <tbody>
@@ -596,7 +615,7 @@
                 </tr>
                 <tr class="item-row">
                     <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Ajo (Cabezas o pelado) <small>(280 gr)</small></td>
+                    <td>Ajo <small>(280 gr)</small></td>
                     <td class="center"><input type="number" class="item-qty" value="0.280" step="0.001" oninput="calculateTotals()"></td>
                     <td class="center"><input type="number" class="item-price" value="13.27" step="0.01" oninput="calculateTotals()"></td>
                     <td class="center est-price-cell">$13.27</td>
@@ -612,7 +631,7 @@
                 </tr>
                 <tr class="item-row">
                     <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Cilantro, Perejil y Albahaca <small>(550 gr)</small></td>
+                    <td>Cilantro, Perejil y Albahaca</td>
                     <td class="center"><input type="number" class="item-qty" value="0.550" step="0.001" oninput="calculateTotals()"></td>
                     <td class="center"><input type="number" class="item-price" value="1.59" step="0.01" oninput="calculateTotals()"></td>
                     <td class="center est-price-cell">$1.59</td>
@@ -628,7 +647,7 @@
                 </tr>
                 <tr class="item-row">
                     <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Cebollín / Puerro <small>(645 gr)</small></td>
+                    <td>Cebollín / Puerro</td>
                     <td class="center"><input type="number" class="item-qty" value="0.645" step="0.001" oninput="calculateTotals()"></td>
                     <td class="center"><input type="number" class="item-price" value="1.50" step="0.01" oninput="calculateTotals()"></td>
                     <td class="center est-price-cell">$1.50</td>
@@ -660,7 +679,7 @@
                 </tr>
                 <tr class="item-row">
                     <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Plátanos (Verdes o maduros)</td>
+                    <td>Plátanos</td>
                     <td class="center"><input type="number" class="item-qty" value="3.70" step="any" oninput="calculateTotals()"></td>
                     <td class="center"><input type="number" class="item-price" value="1.10" step="0.01" oninput="calculateTotals()"></td>
                     <td class="center est-price-cell">$1.10</td>
@@ -676,7 +695,7 @@
                 </tr>
                 <tr class="item-row">
                     <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Lechuga Americana <small>(625 gr)</small></td>
+                    <td>Lechuga Americana</td>
                     <td class="center"><input type="number" class="item-qty" value="0.625" step="0.001" oninput="calculateTotals()"></td>
                     <td class="center"><input type="number" class="item-price" value="1.20" step="0.01" oninput="calculateTotals()"></td>
                     <td class="center est-price-cell">$1.20</td>
@@ -684,7 +703,7 @@
                 </tr>
                 <tr class="item-row">
                     <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Repollo <small>(500 gr)</small></td>
+                    <td>Repollo</td>
                     <td class="center"><input type="number" class="item-qty" value="0.500" step="0.001" oninput="calculateTotals()"></td>
                     <td class="center"><input type="number" class="item-price" value="0.80" step="0.01" oninput="calculateTotals()"></td>
                     <td class="center est-price-cell">$0.80</td>
@@ -882,14 +901,22 @@
     <h2>4. CONDIMENTOS Y SALSAS</h2>
     <div class="table-container">
         <table>
+            <colgroup>
+                <col style="width: 10%;">
+                <col style="width: 32%;">
+                <col style="width: 14%;">
+                <col style="width: 15%;">
+                <col style="width: 13%;">
+                <col style="width: 16%;">
+            </colgroup>
             <thead>
                 <tr>
-                    <th width="6%">¿Comprado?</th>
+                    <th>✔</th>
                     <th>Artículo</th>
-                    <th width="12%">Cant. / Peso</th>
-                    <th width="14%">Precio Real ($)</th>
-                    <th width="12%">Precio Est.</th>
-                    <th width="18%">Subtotal</th>
+                    <th>Cant</th>
+                    <th>Real $</th>
+                    <th>Est.</th>
+                    <th>Total</th>
                 </tr>
             </thead>
             <tbody>
@@ -981,14 +1008,22 @@
     <h2>5. LIMPIEZA Y HOGAR</h2>
     <div class="table-container">
         <table>
+            <colgroup>
+                <col style="width: 10%;">
+                <col style="width: 32%;">
+                <col style="width: 14%;">
+                <col style="width: 15%;">
+                <col style="width: 13%;">
+                <col style="width: 16%;">
+            </colgroup>
             <thead>
                 <tr>
-                    <th width="6%">¿Comprado?</th>
+                    <th>✔</th>
                     <th>Artículo</th>
-                    <th width="12%">Cant. / Peso</th>
-                    <th width="14%">Precio Real ($)</th>
-                    <th width="12%">Precio Est.</th>
-                    <th width="18%">Subtotal</th>
+                    <th>Cant</th>
+                    <th>Real $</th>
+                    <th>Est.</th>
+                    <th>Total</th>
                 </tr>
             </thead>
             <tbody>
@@ -1120,14 +1155,22 @@
     <h2>6. CUIDADO PERSONAL Y SALUD</h2>
     <div class="table-container">
         <table>
+            <colgroup>
+                <col style="width: 10%;">
+                <col style="width: 32%;">
+                <col style="width: 14%;">
+                <col style="width: 15%;">
+                <col style="width: 13%;">
+                <col style="width: 16%;">
+            </colgroup>
             <thead>
                 <tr>
-                    <th width="6%">¿Comprado?</th>
+                    <th>✔</th>
                     <th>Artículo</th>
-                    <th width="12%">Cant. / Peso</th>
-                    <th width="14%">Precio Real ($)</th>
-                    <th width="12%">Precio Est.</th>
-                    <th width="18%">Subtotal</th>
+                    <th>Cant</th>
+                    <th>Real $</th>
+                    <th>Est.</th>
+                    <th>Total</th>
                 </tr>
             </thead>
             <tbody>
@@ -1241,25 +1284,24 @@
 
     <!-- Barra de Totales y Controles Fija -->
     <div class="summary-bar">
-        <div class="rate-box">
-            <label>💵 Tasa de Cambio (1 $)</label>
-            <input type="number" id="exchange-rate" value="40.00" step="0.01" oninput="calculateTotals()">
+        <div class="summary-row-data">
+            <div class="rate-box">
+                <label>💵 Tasa (1 $)</label>
+                <input type="number" id="exchange-rate" value="40.00" step="0.01" oninput="calculateTotals()">
+            </div>
+            <div class="summary-box">
+                🛒 REAL (Tildados):
+                <span id="checked-total" class="checked-total-style">$0.00 / Bs. 0.00</span>
+            </div>
+            <div class="summary-box">
+                📋 TOTAL LISTA:
+                <span id="list-total" class="list-total-style">$0.00 / Bs. 0.00</span>
+            </div>
         </div>
-        
-        <div class="summary-box">
-            🛒 COMPRA REAL (Tildados):
-            <span id="checked-total" class="checked-total-style">$0.00 / Bs. 0.00</span>
-        </div>
-        
-        <div class="summary-box">
-            📋 Total General Ajustado:
-            <span id="list-total" class="list-total-style">$0.00 / Bs. 0.00</span>
-        </div>
-
         <div class="actions-wrapper">
-            <button class="btn-action" onclick="toggleAll(true)">Marcar Todo</button>
+            <button class="btn-action" onclick="toggleAll(true)">Todo</button>
             <button class="btn-action" onclick="toggleAll(false)">Limpiar</button>
-            <button class="btn-action" style="background-color: #27ae60;" onclick="window.print()">Exportar PDF</button>
+            <button class="btn-action" style="background-color: #27ae60;" onclick="window.print()">PDF</button>
         </div>
     </div>
 
@@ -1299,10 +1341,10 @@
             let listTotalLocal = listTotalUSD * rate;
 
             document.getElementById("checked-total").textContent = 
-                "$" + checkedTotalUSD.toFixed(2) + " / Bs. " + checkedTotalLocal.toFixed(2);
+                "$" + checkedTotalUSD.toFixed(2) + " / " + checkedTotalLocal.toFixed(0) + " Bs.";
             
             document.getElementById("list-total").textContent = 
-                "$" + listTotalUSD.toFixed(2) + " / Bs. " + listTotalLocal.toFixed(2);
+                "$" + listTotalUSD.toFixed(2) + " / " + listTotalLocal.toFixed(0) + " Bs.";
         }
 
         function toggleAll(status) {
