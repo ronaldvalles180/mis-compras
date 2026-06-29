@@ -10,8 +10,11 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 8px; background-color: #f4f6f9; color: #333; padding-bottom: 260px; }
         h1 { text-align: center; color: #2c3e50; margin-top: 5px; margin-bottom: 2px; font-size: 20px; }
         
+        /* Buscador optimizado con botón X de limpieza rápida */
         .top-tools { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 15px; display: flex; flex-direction: column; gap: 8px; }
-        .search-box { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
+        .search-wrapper { display: flex; gap: 6px; width: 100%; }
+        .search-box { flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
+        .btn-clear-search { background: #e2e8f0; border: none; padding: 0 15px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; color: #4a5568; }
         .filter-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 500; color: #4a5568; }
         
         .view-panel { display: none; }
@@ -19,15 +22,18 @@
         
         .table-container { width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-radius: 6px; margin-bottom: 20px; }
         table { width: 100%; table-layout: fixed; border-collapse: collapse; }
-        th, td { padding: 8px 2px; text-align: left; border-bottom: 1px solid #edf2f7; font-size: 11px; word-wrap: break-word; vertical-align: middle; }
-        th { background-color: #f8f9fa; font-weight: 600; color: #4a5568; text-align: center; font-size: 11px; }
+        th, td { padding: 8px 1px; text-align: left; border-bottom: 1px solid #edf2f7; font-size: 11px; word-wrap: break-word; vertical-align: middle; }
+        th { background-color: #f8f9fa; font-weight: 600; color: #4a5568; text-align: center; font-size: 10px; }
+        tr:hover { background-color: #f8fafc; }
+        .center { text-align: center; }
+        .right { text-align: right; padding-right: 4px; }
         
         input[type="checkbox"] { transform: scale(1.1); cursor: pointer; accent-color: #27ae60; vertical-align: middle; }
         
-        /* Protección anti-zoom para iPhone (16px nativo comprimido exteriormente) */
-        input[type="number"], .edit-input { 
+        /* Inputs a 16px nativos: Detiene por completo el zoom automático de iPhone */
+        input[type="number"], .edit-input, .select-input { 
             width: 100%; 
-            padding: 4px 0; 
+            padding: 4px 2px; 
             border: 1px solid #cbd5e1; 
             border-radius: 4px; 
             font-size: 16px; 
@@ -36,19 +42,28 @@
             box-sizing: border-box; 
             display: block;
         }
+        select.select-input { text-align-last: center; padding: 6px; }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         
         .item-price { color: #2e7d32; }
         .est-price-cell { color: #7f8c8d; font-style: italic; text-align: center; font-weight: 500; }
         .item-subtotal { font-weight: bold; color: #2c3e50; }
-        h2 { background-color: #27ae60; color: white; padding: 8px; border-radius: 6px; margin-top: 20px; font-size: 14px; font-weight: 600; }
+        
+        /* Título de Categoría con Indicador de Progreso Interno */
+        h2 { background-color: #27ae60; color: white; padding: 8px; border-radius: 6px; margin-top: 20px; font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+        h2 span.progress-badge { background: rgba(255,255,255,0.25); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        
         .checked-row { background-color: #e8f8f5 !important; }
         .hidden-item { display: none !important; }
 
-        .config-box { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        textarea { width: 100%; height: 90px; font-family: monospace; font-size: 13px; box-sizing: border-box; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; resize: none; }
+        .config-box { background: white; padding: 12px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        .config-box h3 { margin-top: 0; margin-bottom: 8px; font-size: 14px; color: #2c3e50; border-bottom: 1px solid #edf2f7; padding-bottom: 4px; }
+        textarea { width: 100%; height: 70px; font-family: monospace; font-size: 12px; box-sizing: border-box; padding: 6px; border: 1px solid #cbd5e1; border-radius: 6px; resize: none; }
 
-        /* Panel Inferior de Navegación Ergonómico */
+        /* Botón de Eliminación Rápida <span> */
+        .btn-delete-row { background: none; border: none; color: #e74c3c; font-size: 14px; cursor: pointer; padding: 0; display: inline-block; width: 100%; text-align: center; }
+
+        /* Barra Inferior Organizada en una Matriz de Botones Grandes */
         .summary-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2c3e50; color: white; padding: 12px 8px; box-shadow: 0 -2px 8px rgba(0,0,0,0.2); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; box-sizing: border-box; gap: 8px; }
         .summary-row-data { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 5px; }
         .summary-box { text-align: center; font-size: 11px; flex: 1; }
@@ -56,17 +71,19 @@
         .checked-total-style { color: #2ecc71; }
         .list-total-style { color: #bdc3c7; }
         
-        .rate-box { background: #34495e; padding: 4px 8px; border-radius: 4px; text-align: center; border: 1px solid #455a64; }
-        .rate-box label { font-weight: bold; font-size: 10px; color: #f1c40f; display: block; }
-        .rate-box input { width: 65px; padding: 2px; font-size: 16px; font-weight: bold; text-align: center; border-radius: 3px; border: none; background: white; color: #333; }
+        .rate-box { background: #34495e; padding: 4px 6px; border-radius: 4px; text-align: center; border: 1px solid #455a64; }
+        .rate-box label { font-weight: bold; font-size: 9px; color: #f1c40f; display: block; }
+        .rate-box input { width: 60px; padding: 2px; font-size: 16px; font-weight: bold; text-align: center; border-radius: 3px; border: none; background: white; color: #333; }
 
-        .actions-wrapper { display: flex; width: 100%; gap: 4px; justify-content: center; }
-        .btn-action { flex: 1; color: white; border: none; padding: 12px 2px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        /* Matriz de Acciones: 2 filas de 3 botones de tamaño ideal */
+        .actions-wrapper { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: 100%; }
+        .btn-action { color: white; border: none; padding: 12px 2px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .btn-orange { background-color: #e67e22; }
         .btn-blue { background-color: #2980b9; }
         .btn-red { background-color: #c0392b; }
         .btn-green { background-color: #27ae60; }
         .btn-teal { background-color: #1abc9c; }
+        .btn-whatsapp { background-color: #128c7e; }
 
         @media print {
             body { background: white; margin: 0; padding-bottom: 0; }
@@ -76,13 +93,17 @@
             h2 { background: #34495e !important; color: white; -webkit-print-color-adjust: exact; }
             input[type="number"], .rate-box input { border: none; background: transparent; }
             table { table-layout: auto; }
+            td:last-child, th:last-child { display: none; } /* Oculta columna borrar en impresión */
         }
     </style>
 </head>
 <body>
 
     <div class="top-tools" id="global-tools">
-        <input type="text" id="search-input" class="search-box" placeholder="🔍 Buscar producto en tiempo real..." oninput="filterList()">
+        <div class="search-wrapper">
+            <input type="text" id="search-input" class="search-box" placeholder="🔍 Buscar producto en tiempo real..." oninput="filterList()">
+            <button class="btn-clear-search" onclick="clearSearch()">✕</button>
+        </div>
         <div class="filter-row">
             <label><input type="checkbox" id="hide-completed-check" onchange="filterList()"> Ocultar comprados</label>
             <span id="items-count-label">0 / 0 Productos</span>
@@ -99,18 +120,39 @@
     <div id="view-settings" class="view-panel">
         <h1>⚙️ Catálogo y Valores de Referencia</h1>
         
+        <!-- Formulario para agregar productos al vuelo -->
         <div class="config-box">
-            <h3>📦 Copia de Seguridad e Inicialización</h3>
-            <textarea id="backup-string" onclick="this.select()"></textarea>
-            <div style="display: flex; gap: 6px; margin-top: 8px;">
-                <button class="btn-action btn-blue" onclick="importBackup()">Importar Copia</button>
-                <button class="btn-action btn-teal" onclick="generateBackupString()">Generar Código</button>
-                <button class="btn-action btn-red" onclick="factoryResetCatalog()">Restablecer Fábrica</button>
+            <h3>➕ Agregar Nuevo Producto al Catálogo</h3>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <input type="text" id="new-item-name" class="edit-input" placeholder="Nombre del artículo (ej. Nutella)" style="text-align: left; padding-left: 8px;">
+                <select id="new-item-cat" class="select-input">
+                    <option value="1">1. DESPENSA Y VÍVERES</option>
+                    <option value="2">2. CHARCUTERÍA Y PROTEÍNAS</option>
+                    <option value="3">3. FRUTAS Y VERDURAS</option>
+                    <option value="4">4. CONDIMENTOS Y SALSAS</option>
+                    <option value="5">5. LIMPIEZA Y HOGAR</option>
+                    <option value="6">6. CUIDADO PERSONAL Y SALUD</option>
+                </select>
+                <div style="display: flex; gap: 6px;">
+                    <input type="number" id="new-item-qty" class="edit-input" placeholder="Cant. Ref" step="any">
+                    <input type="number" id="new-item-price" class="edit-input" placeholder="Precio Est. ($)" step="0.01">
+                </div>
+                <button class="btn-action btn-green" style="padding: 10px;" onclick="addNewItemToCatalog()">Añadir al Catálogo</button>
             </div>
         </div>
 
         <div class="config-box">
-            <h3>✏️ Editar Valores de Referencia</h3>
+            <h3>📦 Copia de Seguridad e Inicialización</h3>
+            <textarea id="backup-string" onclick="this.select()"></textarea>
+            <div style="display: flex; gap: 4px; margin-top: 6px;">
+                <button class="btn-action btn-blue" onclick="importBackup()">Importar</button>
+                <button class="btn-action btn-teal" onclick="generateBackupString()">Generar</button>
+                <button class="btn-action btn-red" onclick="factoryResetCatalog()">Fábrica</button>
+            </div>
+        </div>
+
+        <div class="config-box">
+            <h3>✏️ Editar Catálogo de Referencia</h3>
             <div id="settings-prices-container"></div>
         </div>
     </div>
@@ -137,6 +179,7 @@
             <button class="btn-action btn-orange" onclick="undoAction()">↩️ Deshacer</button>
             <button class="btn-action btn-red" onclick="resetChecklistValues()">🔄 Reset</button>
             <button class="btn-action btn-teal" style="background-color: #8e44ad;" onclick="refreshOnline()">🔄 Web</button>
+            <button class="btn-action btn-whatsapp" onclick="shareWhatsApp()">🟢 WhatsApp</button>
             <button id="btn-pdf-trigger" class="btn-action btn-green" onclick="window.print()">PDF</button>
         </div>
     </div>
@@ -308,7 +351,7 @@
         }
 
         function initApp() {
-            let savedState = localStorage.getItem('compras_app_state_v3');
+            let savedState = localStorage.getItem('compras_app_state_v4');
             let savedRate = localStorage.getItem('compras_app_rate');
             
             if (savedRate) state.rate = parseFloat(savedRate);
@@ -316,32 +359,10 @@
 
             if (savedState) {
                 state.items = JSON.parse(savedState);
-                if(state.items.length !== defaultItems.length) mergeWithDefaults();
             } else {
                 resetToDefaults();
             }
             renderAll();
-        }
-
-        function mergeWithDefaults() {
-            let merged = [];
-            defaultItems.forEach(d => {
-                let existing = state.items.find(i => i.id === d.id);
-                if (existing) {
-                    merged.push({ 
-                        ...d, 
-                        est_qty: existing.est_qty !== undefined ? existing.est_qty : d.qty,
-                        est: existing.est !== undefined ? existing.est : d.est,
-                        qty: existing.qty, 
-                        real: existing.real, 
-                        checked: existing.checked 
-                    });
-                } else {
-                    merged.push({ ...d, est_qty: d.qty, real: d.est, checked: false });
-                }
-            });
-            state.items = merged;
-            saveToLocalStorage();
         }
 
         function resetToDefaults() {
@@ -355,17 +376,17 @@
         }
 
         function factoryResetCatalog() {
-            if (confirm("¿Estás seguro de volver a los valores de fábrica? Se perderán permanentemente todas las modificaciones de precios y cantidades estimadas que hayas guardado en el catálogo.")) {
+            if (confirm("¿Estás seguro de volver a los valores de fábrica? Se perderán todas tus modificaciones del catálogo.")) {
                 saveToHistory();
                 resetToDefaults();
                 renderAll();
                 generateBackupString();
-                alert("Valores de fábrica restaurados con éxito.");
+                alert("Catálogo de fábrica restaurado.");
             }
         }
 
         function resetChecklistValues() {
-            if (confirm("¿Desmarcar todo y restablecer cantidades/precios a los valores configurados?")) {
+            if (confirm("¿Desmarcar todo y restablecer cantidades/precios reales a los valores configurados?")) {
                 saveToHistory();
                 state.items.forEach(item => {
                     item.checked = false;
@@ -378,7 +399,7 @@
         }
 
         function saveToLocalStorage() {
-            localStorage.setItem('compras_app_state_v3', JSON.stringify(state.items));
+            localStorage.setItem('compras_app_state_v4', JSON.stringify(state.items));
             localStorage.setItem('compras_app_rate', state.rate);
         }
 
@@ -426,17 +447,18 @@
 
             Object.keys(categories).forEach(catId => {
                 let catItems = state.items.filter(i => i.cat == catId);
-                let html = `<h2>${categories[catId]}</h2>
+                let html = `<h2>${categories[catId]} <span class="progress-badge" id="badge-cat-${catId}">(0/0)</span></h2>
                 <div class="table-container">
                     <table>
                         <colgroup>
                             <col style="width: 8%;">
-                            <col style="width: 28%;">
+                            <col style="width: 25%;">
                             <col style="width: 13%;">
-                            <col style="width: 11%;">
+                            <col style="width: 10%;">
                             <col style="width: 14%;">
                             <col style="width: 11%;">
-                            <col style="width: 15%;">
+                            <col style="width: 13%;">
+                            <col style="width: 6%;">
                         </colgroup>
                         <thead>
                             <tr>
@@ -447,6 +469,7 @@
                                 <th>Real $</th>
                                 <th>Est.</th>
                                 <th>Total</th>
+                                <th>🗑</th>
                             </tr>
                         </thead>
                         <tbody>`;
@@ -462,6 +485,7 @@
                         <td class="center"><input type="number" class="item-price" value="${item.real.toFixed(2)}" step="0.01" onchange="updateItemPrice(${item.id}, this.value)" onkeydown="handleEnterKey(event)"></td>
                         <td class="est-price-cell">$${item.est.toFixed(2)}</td>
                         <td class="right item-subtotal" id="subtotal-${item.id}">$0.00</td>
+                        <td class="center"><button class="btn-delete-row" onclick="deleteItem(${item.id})">✕</button></td>
                     </tr>`;
                 });
 
@@ -481,11 +505,12 @@
                 <div class="table-container">
                     <table>
                         <colgroup>
-                            <col style="width: 34%;">
-                            <col style="width: 18%;">
-                            <col style="width: 12%;">
-                            <col style="width: 21%;">
-                            <col style="width: 15%;">
+                            <col style="width: 32%;">
+                            <col style="width: 17%;">
+                            <col style="width: 11%;">
+                            <col style="width: 20%;">
+                            <col style="width: 14%;">
+                            <col style="width: 6%;">
                         </colgroup>
                         <thead>
                             <tr>
@@ -494,15 +519,15 @@
                                 <th>Fab</th>
                                 <th>Est $</th>
                                 <th>Fab</th>
+                                <th>🗑</th>
                             </tr>
                         </thead>
                         <tbody>`;
 
                 catItems.forEach(item => {
-                    // Busca los valores inmutables originales directamente de la lista nativa
                     let orig = defaultItems.find(d => d.id === item.id);
-                    let origQty = orig ? orig.qty : item.qty;
-                    let origPrice = orig ? orig.est : item.est;
+                    let origQty = orig ? orig.qty : '-';
+                    let origPrice = orig ? '$' + orig.est.toFixed(2) : '-';
 
                     html += `
                     <tr>
@@ -510,13 +535,62 @@
                         <td class="center"><input type="number" class="edit-input" value="${item.est_qty}" step="any" onchange="updateItemEstQty(${item.id}, this.value)" onkeydown="handleEnterKey(event)"></td>
                         <td class="est-price-cell">${origQty}</td>
                         <td class="center"><input type="number" class="edit-input" value="${item.est.toFixed(2)}" step="0.01" onchange="updateItemEstPrice(${item.id}, this.value)" onkeydown="handleEnterKey(event)"></td>
-                        <td class="est-price-cell">$${origPrice.toFixed(2)}</td>
+                        <td class="est-price-cell">${origPrice}</td>
+                        <td class="center"><button class="btn-delete-row" onclick="deleteItem(${item.id})">✕</button></td>
                     </tr>`;
                 });
 
                 html += `</tbody></table></div>`;
                 container.innerHTML += html;
             });
+        }
+
+        function addNewItemToCatalog() {
+            const nameField = document.getElementById("new-item-name");
+            const catField = document.getElementById("new-item-cat");
+            const qtyField = document.getElementById("new-item-qty");
+            const priceField = document.getElementById("new-item-price");
+
+            let name = nameField.value.trim();
+            let cat = parseInt(catField.value);
+            let qty = parseFloat(qtyField.value) || 1;
+            let est = parseFloat(priceField.value) || 0;
+
+            if (!name) return alert("Por favor ingresa un nombre para el artículo.");
+
+            saveToHistory();
+            let newItem = {
+                id: Date.now(), // ID dinámico inconfundible
+                cat: cat,
+                name: name,
+                qty: qty,
+                est_qty: qty,
+                est: est,
+                real: est,
+                checked: false
+            };
+
+            state.items.push(newItem);
+            saveToLocalStorage();
+            
+            nameField.value = '';
+            qtyField.value = '';
+            priceField.value = '';
+            
+            alert(`"${name}" agregado correctamente.`);
+            renderAll();
+        }
+
+        function deleteItem(id) {
+            let item = state.items.find(i => i.id === id);
+            if (!item) return;
+
+            if (confirm(`¿Quieres eliminar "${item.name}" de tu lista?`)) {
+                saveToHistory();
+                state.items = state.items.filter(i => i.id !== id);
+                saveToLocalStorage();
+                renderAll();
+            }
         }
 
         function updateItemChecked(id, isChecked) {
@@ -570,10 +644,17 @@
             if (event.key === "Enter") event.target.blur();
         }
 
-        type = "text/javascript";
+        function clearSearch() {
+            document.getElementById("search-input").value = '';
+            filterList();
+        }
+
         function calculateTotals() {
             let checkedTotalUSD = 0;
             let listTotalUSD = 0;
+
+            // Reiniciar contadores de categorías
+            let catCounters = {1: {c:0, t:0}, 2: {c:0, t:0}, 3: {c:0, t:0}, 4: {c:0, t:0}, 5: {c:0, t:0}, 6: {c:0, t:0}};
 
             state.items.forEach(item => {
                 let subtotal = item.qty * item.real;
@@ -582,6 +663,17 @@
 
                 let cell = document.getElementById(`subtotal-${item.id}`);
                 if (cell) cell.textContent = "$" + subtotal.toFixed(2);
+
+                if (catCounters[item.cat]) {
+                    catCounters[item.cat].t++;
+                    if (item.checked) catCounters[item.cat].c++;
+                }
+            });
+
+            // Actualizar contadores visuales de categorías en h2 sin refrescar DOM completo
+            Object.keys(catCounters).forEach(catId => {
+                let badge = document.getElementById(`badge-cat-${catId}`);
+                if (badge) badge.textContent = `(${catCounters[catId].c} / ${catCounters[catId].t})`;
             });
 
             let checkedTotalLocal = checkedTotalUSD * state.rate;
@@ -611,6 +703,25 @@
                 if (matchesSearch && matchesHide) row.classList.remove("hidden-item");
                 else row.classList.add("hidden-item");
             });
+        }
+
+        function shareWhatsApp() {
+            let checkedItems = state.items.filter(i => i.checked);
+            if (checkedItems.length === 0) return alert("No has tildado ningún artículo para compartir.");
+
+            let text = `📋 *RESUMEN DE COMPRA REAL*\n\n`;
+            checkedItems.forEach(i => {
+                text += `• ${i.name} (x${i.qty}) -> *$${(i.qty * i.real).toFixed(2)}*\n`;
+            });
+
+            let rateInput = parseFloat(document.getElementById('exchange-rate').value) || 1;
+            let totalUSD = checkedItems.reduce((acc, i) => acc + (i.qty * i.real), 0);
+            let totalBs = totalUSD * rateInput;
+
+            text += `\n💵 *Tasa Ref:* ${rateInput.toFixed(2)} Bs.\n`;
+            text += `🛒 *TOTAL COMPRA:* *$${totalUSD.toFixed(2)} / Bs. ${totalBs.toFixed(0)}*`;
+
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
         }
 
         function generateBackupString() {
