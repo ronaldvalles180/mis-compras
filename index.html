@@ -7,69 +7,66 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2c3e50">
     <style>
-        /* Ajustes base optimizados para evitar saltos y zoom en iOS */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 8px; background-color: #f4f6f9; color: #333; padding-bottom: 260px; }
-        h1 { text-align: center; color: #2c3e50; margin-top: 5px; margin-bottom: 2px; font-size: 22px; }
+        h1 { text-align: center; color: #2c3e50; margin-top: 5px; margin-bottom: 2px; font-size: 20px; }
         
-        /* Barra Superior de Herramientas Inteligentes */
         .top-tools { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 15px; display: flex; flex-direction: column; gap: 8px; }
         .search-box { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
         .filter-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 500; color: #4a5568; }
         
-        /* Contenedores de Vistas */
         .view-panel { display: none; }
         .view-panel.active { display: block; }
         
         .table-container { width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-radius: 6px; margin-bottom: 20px; }
         table { width: 100%; table-layout: fixed; border-collapse: collapse; }
-        th, td { padding: 8px 3px; text-align: left; border-bottom: 1px solid #edf2f7; font-size: 12px; word-wrap: break-word; vertical-align: middle; }
-        th { background-color: #f8f9fa; font-weight: 600; color: #4a5568; text-align: center; }
+        th, td { padding: 8px 2px; text-align: left; border-bottom: 1px solid #edf2f7; font-size: 11px; word-wrap: break-word; vertical-align: middle; }
+        th { background-color: #f8f9fa; font-weight: 600; color: #4a5568; text-align: center; font-size: 11px; }
         
-        /* Control total de Inputs - Fuerza 16px para bloquear el Zoom de iPhone */
-        input[type="checkbox"] { transform: scale(1.2); cursor: pointer; accent-color: #27ae60; vertical-align: middle; }
-        input[type="number"], input[type="text"].edit-price-input { 
+        input[type="checkbox"] { transform: scale(1.1); cursor: pointer; accent-color: #27ae60; vertical-align: middle; }
+        
+        /* Protección anti-zoom para iPhone (16px nativo comprimido exteriormente) */
+        input[type="number"], .edit-input { 
             width: 100%; 
-            padding: 6px 2px; 
+            padding: 4px 0; 
             border: 1px solid #cbd5e1; 
             border-radius: 4px; 
             font-size: 16px; 
             text-align: center; 
             font-weight: bold; 
             box-sizing: border-box; 
+            display: block;
         }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         
         .item-price { color: #2e7d32; }
-        .est-price-cell { color: #7f8c8d; font-style: italic; text-align: center; }
+        .est-price-cell { color: #7f8c8d; font-style: italic; text-align: center; font-weight: 500; }
         .item-subtotal { font-weight: bold; color: #2c3e50; }
-        h2 { background-color: #27ae60; color: white; padding: 10px; border-radius: 6px; margin-top: 15px; font-size: 14px; font-weight: 600; }
+        h2 { background-color: #27ae60; color: white; padding: 8px; border-radius: 6px; margin-top: 20px; font-size: 14px; font-weight: 600; }
         .checked-row { background-color: #e8f8f5 !important; }
         .hidden-item { display: none !important; }
 
-        /* Sección Configuración Avanzada */
         .config-box { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        textarea { width: 100%; height: 120px; font-family: monospace; font-size: 13px; box-sizing: border-box; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; resize: none; }
+        textarea { width: 100%; height: 90px; font-family: monospace; font-size: 13px; box-sizing: border-box; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; resize: none; }
 
-        /* BARRA INFERIOR AMPLIADA Y ERGONÓMICA */
-        .summary-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2c3e50; color: white; padding: 14px 10px; box-shadow: 0 -3px 12px rgba(0,0,0,0.25); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; box-sizing: border-box; gap: 10px; }
-        .summary-row-data { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 8px; }
-        .summary-box { text-align: center; font-size: 12px; flex: 1; }
-        .summary-box span { font-weight: bold; font-size: 16px; display: block; margin-top: 2px; }
+        /* Panel Inferior de Navegación Ergonómico */
+        .summary-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2c3e50; color: white; padding: 12px 8px; box-shadow: 0 -2px 8px rgba(0,0,0,0.2); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; box-sizing: border-box; gap: 8px; }
+        .summary-row-data { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 5px; }
+        .summary-box { text-align: center; font-size: 11px; flex: 1; }
+        .summary-box span { font-weight: bold; font-size: 14px; display: block; margin-top: 1px; }
         .checked-total-style { color: #2ecc71; }
         .list-total-style { color: #bdc3c7; }
         
-        .rate-box { background: #34495e; padding: 6px 10px; border-radius: 6px; text-align: center; border: 1px solid #455a64; }
-        .rate-box label { font-weight: bold; font-size: 10px; color: #f1c40f; display: block; margin-bottom: 2px; }
-        .rate-box input { width: 70px; padding: 4px; font-size: 16px; font-weight: bold; text-align: center; border-radius: 4px; border: none; background: white; }
+        .rate-box { background: #34495e; padding: 4px 8px; border-radius: 4px; text-align: center; border: 1px solid #455a64; }
+        .rate-box label { font-weight: bold; font-size: 10px; color: #f1c40f; display: block; }
+        .rate-box input { width: 65px; padding: 2px; font-size: 16px; font-weight: bold; text-align: center; border-radius: 3px; border: none; background: white; color: #333; }
 
-        /* Botonera Principal Grande para dedos */
-        .actions-wrapper { display: flex; width: 100%; gap: 6px; justify-content: center; }
-        .btn-action { flex: 1; color: white; border: none; padding: 12px 4px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; text-align: center; transition: background 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .btn-orange { background-color: #e67e22; } .btn-orange:hover { background-color: #d35400; }
-        .btn-blue { background-color: #2980b9; } .btn-blue:hover { background-color: #1f618d; }
-        .btn-red { background-color: #c0392b; } .btn-red:hover { background-color: #962d22; }
-        .btn-green { background-color: #27ae60; } .btn-green:hover { background-color: #219653; }
-        .btn-gray { background-color: #7f8c8d; } .btn-gray:hover { background-color: #616a6b; }
+        .actions-wrapper { display: flex; width: 100%; gap: 4px; justify-content: center; }
+        .btn-action { flex: 1; color: white; border: none; padding: 12px 2px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-orange { background-color: #e67e22; }
+        .btn-blue { background-color: #2980b9; }
+        .btn-red { background-color: #c0392b; }
+        .btn-green { background-color: #27ae60; }
+        .btn-teal { background-color: #1abc9c; }
 
         @media print {
             body { background: white; margin: 0; padding-bottom: 0; }
@@ -84,43 +81,41 @@
 </head>
 <body>
 
-    <!-- HERRAMIENTAS SUPERIORES -->
     <div class="top-tools" id="global-tools">
         <input type="text" id="search-input" class="search-box" placeholder="🔍 Buscar producto en tiempo real..." oninput="filterList()">
         <div class="filter-row">
-            <label><input type="checkbox" id="hide-completed-check" onchange="filterList()"> Ocultar artículos comprados</label>
+            <label><input type="checkbox" id="hide-completed-check" onchange="filterList()"> Ocultar comprados</label>
             <span id="items-count-label">0 / 0 Productos</span>
         </div>
     </div>
 
-    <!-- ================= VISTA 1: CHECKLIST PRINCIPAL ================= -->
+    <!-- VISTA 1: CHECKLIST DE COMPRAS -->
     <div id="view-list" class="view-panel active">
         <h1>📋 Mi Checklist de Compras</h1>
         <div id="categories-container"></div>
     </div>
 
-    <!-- ================= VISTA 2: SECCIÓN APARTE (EDITAR ESTIMADOS / BACKUP) ================= -->
+    <!-- VISTA 2: PANEL DE CONFIGURACIÓN -->
     <div id="view-settings" class="view-panel">
-        <h1>⚙️ Precios Estimados y Copia de Seguridad</h1>
-        <p class="subtitle" style="text-align: center; margin-bottom: 15px;">Modifica los valores base de referencia o exporta/importa tu configuración completa.</p>
+        <h1>⚙️ Catálogo y Valores de Referencia</h1>
         
         <div class="config-box">
-            <h3>📦 Copia de Seguridad</h3>
-            <p style="font-size: 12px; color: #555; margin-bottom: 8px;">Copia este código para guardarlo o pega uno anterior para restaurar tus datos:</p>
+            <h3>📦 Copia de Seguridad e Inicialización</h3>
             <textarea id="backup-string" onclick="this.select()"></textarea>
             <div style="display: flex; gap: 6px; margin-top: 8px;">
-                <button class="btn-action btn-blue" onclick="importBackup()">Importar Datos</button>
-                <button class="btn-action btn-gray" onclick="generateBackupString()">Generar Código</button>
+                <button class="btn-action btn-blue" onclick="importBackup()">Importar Copia</button>
+                <button class="btn-action btn-teal" onclick="generateBackupString()">Generar Código</button>
+                <button class="btn-action btn-red" onclick="factoryResetCatalog()">Restablecer Fábrica</button>
             </div>
         </div>
 
         <div class="config-box">
-            <h3>✏️ Modificar Precios Estimados</h3>
+            <h3>✏️ Editar Valores de Referencia</h3>
             <div id="settings-prices-container"></div>
         </div>
     </div>
 
-    <!-- BARRA INFERIOR MEJORADA Y MÁS GRANDE -->
+    <!-- BARRA DE ACCIONES INFERIOR -->
     <div class="summary-bar">
         <div class="summary-row-data">
             <div class="rate-box">
@@ -137,17 +132,16 @@
             </div>
         </div>
         
-        <!-- Botonera Ergonómica Ampliada -->
         <div class="actions-wrapper">
             <button id="btn-toggle-view" class="btn-action btn-blue" onclick="toggleView()">Configurar</button>
             <button class="btn-action btn-orange" onclick="undoAction()">↩️ Deshacer</button>
             <button class="btn-action btn-red" onclick="resetChecklistValues()">🔄 Reset</button>
+            <button class="btn-action btn-teal" style="background-color: #8e44ad;" onclick="refreshOnline()">🔄 Web</button>
             <button id="btn-pdf-trigger" class="btn-action btn-green" onclick="window.print()">PDF</button>
         </div>
     </div>
 
     <script>
-        // 1. BASE DE DATOS INTERNA COMPLETA CON LOS 142 ARTÍCULOS SIN OMITIR NADA
         const categories = {
             1: "1. DESPENSA Y VÍVERES",
             2: "2. CHARCUTERÍA Y PROTEÍNAS",
@@ -188,7 +182,7 @@
             { id: 27, cat: 1, name: "Guasacaca", qty: 1, est: 2.80 },
             { id: 28, cat: 1, name: "Fororo", qty: 1, est: 1.50 },
             { id: 29, cat: 1, name: "Maicena 200 gr", qty: 1, est: 1.80 },
-            // CHARCUTERIA Y PROTEINAS
+            // CHARCUTERÍA
             { id: 30, cat: 2, name: "Jamón (Pierna, pavo o espalda)", qty: 1.50, est: 11.00 },
             { id: 31, cat: 2, name: "Queso (Duro, amarillo, mozzarella)", qty: 1.50, est: 11.00 },
             { id: 32, cat: 2, name: "Queso Blanco", qty: 6.00, est: 8.00 },
@@ -239,23 +233,23 @@
             { id: 76, cat: 3, name: "Parchitas", qty: 1.50, est: 3.00 },
             { id: 77, cat: 3, name: "Tamarindo 250 g", qty: 2, est: 1.35 },
             { id: 78, cat: 3, name: "Piña", qty: 2.00, est: 1.40 },
-            { id: 79, cat: 3, name: "Melón", qty: 1.00, est: 1.00 },
-            { id: 80, cat: 3, name: "Patilla", qty: 1.56, est: 0.70 },
-            { id: 81, cat: 3, name: "Lechosa", qty: 1.00, est: 1.00 },
-            { id: 82, cat: 3, name: "Fresas", qty: 1, est: 4.00 },
-            { id: 83, cat: 3, name: "Mora", qty: 1, est: 4.00 },
-            { id: 84, cat: 3, name: "Aguacate", qty: 1, est: 1.50 },
-            { id: 85, cat: 3, name: "Pulpa de frutas", qty: 10, est: 1.50 },
-            { id: 86, cat: 3, name: "Auyama", qty: 1.20, est: 0.60 },
-            { id: 87, cat: 3, name: "Ñame", qty: 0.900, est: 1.40 },
-            { id: 88, cat: 3, name: "Ocumo", qty: 0.645, est: 1.80 },
-            { id: 89, cat: 3, name: "Yuca", qty: 1.80, est: 1.50 },
-            { id: 90, cat: 3, name: "Brócoli", qty: 0.615, est: 2.40 },
-            { id: 91, cat: 3, name: "Ají", qty: 0.145, est: 3.00 },
-            { id: 92, cat: 3, name: "Guayaba", qty: 1.17, est: 1.20 },
-            { id: 93, cat: 3, name: "Romero", qty: 0.165, est: 5.00 },
-            { id: 94, cat: 3, name: "Ruda", qty: 0.165, est: 3.00 },
-            // CONDIMENTOS Y SALSAS
+            { id: 80, cat: 3, name: "Melón", qty: 1.00, est: 1.00 },
+            { id: 81, cat: 3, name: "Patilla", qty: 1.56, est: 0.70 },
+            { id: 82, cat: 3, name: "Lechosa", qty: 1.00, est: 1.00 },
+            { id: 83, cat: 3, name: "Fresas", qty: 1, est: 4.00 },
+            { id: 84, cat: 3, name: "Mora", qty: 1, est: 4.00 },
+            { id: 85, cat: 3, name: "Aguacate", qty: 1, est: 1.50 },
+            { id: 86, cat: 3, name: "Pulpa de frutas", qty: 10, est: 1.50 },
+            { id: 87, cat: 3, name: "Auyama", qty: 1.20, est: 0.60 },
+            { id: 88, cat: 3, name: "Ñame", qty: 0.900, est: 1.40 },
+            { id: 89, cat: 3, name: "Ocumo", qty: 0.645, est: 1.80 },
+            { id: 90, cat: 3, name: "Yuca", qty: 1.80, est: 1.50 },
+            { id: 91, cat: 3, name: "Brócoli", qty: 0.615, est: 2.40 },
+            { id: 92, cat: 3, name: "Ají", qty: 0.145, est: 3.00 },
+            { id: 93, cat: 3, name: "Guayaba", qty: 1.17, est: 1.20 },
+            { id: 94, cat: 3, name: "Romero", qty: 0.165, est: 5.00 },
+            { id: 133, cat: 3, name: "Ruda", qty: 0.165, est: 3.00 },
+            // CONDIMENTOS
             { id: 95, cat: 4, name: "Mayonesa 500 gr", qty: 2, est: 4.50 },
             { id: 96, cat: 4, name: "Mostaza", qty: 1, est: 2.15 },
             { id: 97, cat: 4, name: "Salsa de tomate (Ketchup)", qty: 2, est: 2.63 },
@@ -266,7 +260,7 @@
             { id: 102, cat: 4, name: "Especias (Pimienta, comino, etc)", qty: 4, est: 1.00 },
             { id: 103, cat: 4, name: "Sopa Maggi", qty: 2, est: 1.70 },
             { id: 104, cat: 4, name: "Cubito Maggi", qty: 1, est: 3.10 },
-            // LIMPIEZA Y HOGAR
+            // LIMPIEZA
             { id: 105, cat: 5, name: "Jabón de ropa en Polvo 400 gr", qty: 10, est: 1.50 },
             { id: 106, cat: 5, name: "Suavizante de telas 180 ml", qty: 1, est: 2.50 },
             { id: 107, cat: 5, name: "Blanqueador (Cloro)", qty: 2, est: 1.60 },
@@ -282,7 +276,7 @@
             { id: 117, cat: 5, name: "Servilletas de papel", qty: 1, est: 1.50 },
             { id: 118, cat: 5, name: "Coletos", qty: 2, est: 2.50 },
             { id: 119, cat: 5, name: "Paños de Cocina", qty: 2, est: 2.00 },
-            // CUIDADO PERSONAL Y SALUD
+            // CUIDADO PERSONAL
             { id: 120, cat: 6, name: "Jabón de baño (Barra o líquida)", qty: 12, est: 2.50 },
             { id: 121, cat: 6, name: "Champú", qty: 3, est: 7.00 },
             { id: 122, cat: 6, name: "Acondicionador", qty: 1, est: 7.00 },
@@ -298,13 +292,7 @@
             { id: 132, cat: 6, name: "Protección femenina", qty: 2, est: 2.00 }
         ];
 
-        let state = {
-            items: [],
-            rate: 40.00,
-            currentView: 'list'
-        };
-
-        // Pila para controlar la función "Deshacer" (Máximo 25 movimientos)
+        let state = { items: [], rate: 40.00, currentView: 'list' };
         let undoStack = [];
 
         function saveToHistory() {
@@ -313,18 +301,14 @@
         }
 
         function undoAction() {
-            if (undoStack.length === 0) {
-                alert("No hay más acciones para deshacer.");
-                return;
-            }
+            if (undoStack.length === 0) return alert("No hay acciones por deshacer.");
             state.items = JSON.parse(undoStack.pop());
             saveToLocalStorage();
             renderAll();
         }
 
-        // Inicialización de datos y LocalStorage
         function initApp() {
-            let savedState = localStorage.getItem('compras_app_state');
+            let savedState = localStorage.getItem('compras_app_state_v3');
             let savedRate = localStorage.getItem('compras_app_rate');
             
             if (savedRate) state.rate = parseFloat(savedRate);
@@ -332,10 +316,7 @@
 
             if (savedState) {
                 state.items = JSON.parse(savedState);
-                // Validación para inyectar campos faltantes en actualizaciones
-                if(state.items.length !== defaultItems.length) {
-                    mergeWithDefaults();
-                }
+                if(state.items.length !== defaultItems.length) mergeWithDefaults();
             } else {
                 resetToDefaults();
             }
@@ -347,9 +328,16 @@
             defaultItems.forEach(d => {
                 let existing = state.items.find(i => i.id === d.id);
                 if (existing) {
-                    merged.push({ ...d, ...existing });
+                    merged.push({ 
+                        ...d, 
+                        est_qty: existing.est_qty !== undefined ? existing.est_qty : d.qty,
+                        est: existing.est !== undefined ? existing.est : d.est,
+                        qty: existing.qty, 
+                        real: existing.real, 
+                        checked: existing.checked 
+                    });
                 } else {
-                    merged.push({ ...d, real: d.est, checked: false });
+                    merged.push({ ...d, est_qty: d.qty, real: d.est, checked: false });
                 }
             });
             state.items = merged;
@@ -359,17 +347,29 @@
         function resetToDefaults() {
             state.items = defaultItems.map(item => ({
                 ...item,
+                est_qty: item.qty,
                 real: item.est,
                 checked: false
             }));
             saveToLocalStorage();
         }
 
+        function factoryResetCatalog() {
+            if (confirm("¿Estás seguro de volver a los valores de fábrica? Se perderán permanentemente todas las modificaciones de precios y cantidades estimadas que hayas guardado en el catálogo.")) {
+                saveToHistory();
+                resetToDefaults();
+                renderAll();
+                generateBackupString();
+                alert("Valores de fábrica restaurados con éxito.");
+            }
+        }
+
         function resetChecklistValues() {
-            if (confirm("¿Estás seguro de restablecer el checklist? Se desmarcarán todos los artículos y los precios reales volverán al valor estimado.")) {
+            if (confirm("¿Desmarcar todo y restablecer cantidades/precios a los valores configurados?")) {
                 saveToHistory();
                 state.items.forEach(item => {
                     item.checked = false;
+                    item.qty = item.est_qty;
                     item.real = item.est;
                 });
                 saveToLocalStorage();
@@ -378,7 +378,7 @@
         }
 
         function saveToLocalStorage() {
-            localStorage.setItem('compras_app_state', JSON.stringify(state.items));
+            localStorage.setItem('compras_app_state_v3', JSON.stringify(state.items));
             localStorage.setItem('compras_app_rate', state.rate);
         }
 
@@ -388,7 +388,6 @@
             calculateTotals();
         }
 
-        // Navegación entre Checklist y Sección Aparte
         function toggleView() {
             const btn = document.getElementById('btn-toggle-view');
             const tools = document.getElementById('global-tools');
@@ -415,13 +414,9 @@
             renderAll();
         }
 
-        // Generar renders en la pantalla
         function renderAll() {
-            if (state.currentView === 'list') {
-                renderChecklist();
-            } else {
-                renderSettingsPrices();
-            }
+            if (state.currentView === 'list') renderChecklist();
+            else renderSettingsPrices();
             calculateTotals();
         }
 
@@ -431,23 +426,24 @@
 
             Object.keys(categories).forEach(catId => {
                 let catItems = state.items.filter(i => i.cat == catId);
-                
                 let html = `<h2>${categories[catId]}</h2>
                 <div class="table-container">
                     <table>
                         <colgroup>
-                            <col style="width: 10%;">
-                            <col style="width: 32%;">
-                            <col style="width: 14%;">
-                            <col style="width: 15%;">
+                            <col style="width: 8%;">
+                            <col style="width: 28%;">
                             <col style="width: 13%;">
-                            <col style="width: 16%;">
+                            <col style="width: 11%;">
+                            <col style="width: 14%;">
+                            <col style="width: 11%;">
+                            <col style="width: 15%;">
                         </colgroup>
                         <thead>
                             <tr>
                                 <th>✔</th>
                                 <th>Artículo</th>
                                 <th>Cant</th>
+                                <th>C.Est</th>
                                 <th>Real $</th>
                                 <th>Est.</th>
                                 <th>Total</th>
@@ -462,6 +458,7 @@
                         <td class="center"><input type="checkbox" class="item-check" ${item.checked ? 'checked' : ''} onchange="updateItemChecked(${item.id}, this.checked)"></td>
                         <td>${item.name}</td>
                         <td class="center"><input type="number" class="item-qty" value="${item.qty}" step="any" onchange="updateItemQty(${item.id}, this.value)" onkeydown="handleEnterKey(event)"></td>
+                        <td class="est-price-cell">${item.est_qty}</td>
                         <td class="center"><input type="number" class="item-price" value="${item.real.toFixed(2)}" step="0.01" onchange="updateItemPrice(${item.id}, this.value)" onkeydown="handleEnterKey(event)"></td>
                         <td class="est-price-cell">$${item.est.toFixed(2)}</td>
                         <td class="right item-subtotal" id="subtotal-${item.id}">$0.00</td>
@@ -480,26 +477,40 @@
 
             Object.keys(categories).forEach(catId => {
                 let catItems = state.items.filter(i => i.cat == catId);
-                let html = `<h4 style="margin: 10px 0 5px 0; color:#27ae60;">${categories[catId]}</h4>
+                let html = `<h4 style="margin: 15px 0 5px 0; color:#27ae60;">${categories[catId]}</h4>
                 <div class="table-container">
                     <table>
                         <colgroup>
-                            <col style="width: 65%;">
-                            <col style="width: 35%;">
+                            <col style="width: 34%;">
+                            <col style="width: 18%;">
+                            <col style="width: 12%;">
+                            <col style="width: 21%;">
+                            <col style="width: 15%;">
                         </colgroup>
                         <thead>
                             <tr>
                                 <th>Artículo</th>
-                                <th>Base Estimado ($)</th>
+                                <th>Cant</th>
+                                <th>Fab</th>
+                                <th>Est $</th>
+                                <th>Fab</th>
                             </tr>
                         </thead>
                         <tbody>`;
 
                 catItems.forEach(item => {
+                    // Busca los valores inmutables originales directamente de la lista nativa
+                    let orig = defaultItems.find(d => d.id === item.id);
+                    let origQty = orig ? orig.qty : item.qty;
+                    let origPrice = orig ? orig.est : item.est;
+
                     html += `
                     <tr>
-                        <td style="font-size:13px; padding-left: 10px;">${item.name}</td>
-                        <td class="center"><input type="number" class="edit-price-input" value="${item.est.toFixed(2)}" step="0.01" onchange="updateItemEstPrice(${item.id}, this.value)" onkeydown="handleEnterKey(event)"></td>
+                        <td style="font-size:11px; padding-left: 2px;">${item.name}</td>
+                        <td class="center"><input type="number" class="edit-input" value="${item.est_qty}" step="any" onchange="updateItemEstQty(${item.id}, this.value)" onkeydown="handleEnterKey(event)"></td>
+                        <td class="est-price-cell">${origQty}</td>
+                        <td class="center"><input type="number" class="edit-input" value="${item.est.toFixed(2)}" step="0.01" onchange="updateItemEstPrice(${item.id}, this.value)" onkeydown="handleEnterKey(event)"></td>
+                        <td class="est-price-cell">$${origPrice.toFixed(2)}</td>
                     </tr>`;
                 });
 
@@ -508,7 +519,6 @@
             });
         }
 
-        // Captura de datos en inputs
         function updateItemChecked(id, isChecked) {
             saveToHistory();
             let item = state.items.find(i => i.id === id);
@@ -538,25 +548,32 @@
             calculateTotals();
         }
 
-        function updateItemEstPrice(id, val) {
+        function updateItemEstQty(id, val) {
             saveToHistory();
             let item = state.items.find(i => i.id === id);
-            item.est = parseFloat(val) || 0;
+            let parsed = parseFloat(val) || 0;
+            item.est_qty = parsed;
+            item.qty = parsed;
             saveToLocalStorage();
         }
 
-        // Procesar evento enter nativo (quita el foco y calcula inmediatamente)
-        function handleEnterKey(event) {
-            if (event.key === "Enter") {
-                event.target.blur();
-            }
+        function updateItemEstPrice(id, val) {
+            saveToHistory();
+            let item = state.items.find(i => i.id === id);
+            let parsed = parseFloat(val) || 0;
+            item.est = parsed;
+            item.real = parsed;
+            saveToLocalStorage();
         }
 
+        function handleEnterKey(event) {
+            if (event.key === "Enter") event.target.blur();
+        }
+
+        type = "text/javascript";
         function calculateTotals() {
             let checkedTotalUSD = 0;
             let listTotalUSD = 0;
-            let totalRows = state.items.length;
-            let visibleRows = totalRows;
 
             state.items.forEach(item => {
                 let subtotal = item.qty * item.real;
@@ -576,10 +593,9 @@
             document.getElementById("list-total").textContent = 
                 "$" + listTotalUSD.toFixed(2) + " / " + listTotalLocal.toFixed(0) + " Bs.";
 
-            document.getElementById("items-count-label").textContent = `${state.items.filter(i=>i.checked).length} / ${totalRows} Comprados`;
+            document.getElementById("items-count-label").textContent = `${state.items.filter(i=>i.checked).length} / ${state.items.length} Comprados`;
         }
 
-        // Filtro combinado de búsqueda y ocultación
         function filterList() {
             if (state.currentView !== 'list') return;
             let query = document.getElementById("search-input").value.toLowerCase();
@@ -592,26 +608,19 @@
                 let matchesSearch = item.name.toLowerCase().includes(query);
                 let matchesHide = !hideCompleted || !item.checked;
 
-                if (matchesSearch && matchesHide) {
-                    row.classList.remove("hidden-item");
-                } else {
-                    row.classList.add("hidden-item");
-                }
+                if (matchesSearch && matchesHide) row.classList.remove("hidden-item");
+                else row.classList.add("hidden-item");
             });
         }
 
-        // Módulo de Importación y Exportación de Backup
         function generateBackupString() {
-            let backupData = {
-                rate: state.rate,
-                items: state.items
-            };
+            let backupData = { rate: state.rate, items: state.items };
             document.getElementById("backup-string").value = btoa(unescape(encodeURIComponent(JSON.stringify(backupData))));
         }
 
         function importBackup() {
             let str = document.getElementById("backup-string").value.trim();
-            if (!str) return alert("Por favor ingresa un código válido.");
+            if (!str) return alert("Ingresa un código válido.");
             try {
                 let decrypted = JSON.parse(decodeURIComponent(escape(atob(str))));
                 if(decrypted.items && Array.isArray(decrypted.items)) {
@@ -620,13 +629,28 @@
                     state.items = decrypted.items;
                     document.getElementById('exchange-rate').value = state.rate;
                     saveToLocalStorage();
-                    alert("¡Copia de seguridad importada con éxito!");
+                    alert("¡Configuración importada!");
                     toggleView();
                 } else {
-                    alert("El formato del código de seguridad no es válido.");
+                    alert("Formato no válido.");
                 }
             } catch(err) {
-                alert("Error al procesar el código. Asegúrate de que sea el texto correcto.");
+                alert("Error al procesar el código.");
+            }
+        }
+
+        function refreshOnline() {
+            if (confirm("¿Quieres forzar la actualización online de la app para descargar cambios recientes?")) {
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistrations().then(registrations => {
+                        for (let registration of registrations) {
+                            registration.unregister();
+                        }
+                        window.location.reload(true);
+                    });
+                } else {
+                    window.location.reload(true);
+                }
             }
         }
 
