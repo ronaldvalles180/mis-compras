@@ -3,71 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compras App</title>
+    <title>Compras Pro App</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2c3e50">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 8px; background-color: #f4f6f9; color: #333; padding-bottom: 220px; }
-        h1 { text-align: center; color: #2c3e50; margin-bottom: 2px; font-size: 20px; }
-        .subtitle { text-align: center; color: #7f8c8d; margin-bottom: 15px; font-size: 12px; }
+        /* Ajustes base optimizados para evitar saltos y zoom en iOS */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 8px; background-color: #f4f6f9; color: #333; padding-bottom: 260px; }
+        h1 { text-align: center; color: #2c3e50; margin-top: 5px; margin-bottom: 2px; font-size: 22px; }
+        
+        /* Barra Superior de Herramientas Inteligentes */
+        .top-tools { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .search-box { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
+        .filter-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 500; color: #4a5568; }
+        
+        /* Contenedores de Vistas */
+        .view-panel { display: none; }
+        .view-panel.active { display: block; }
         
         .table-container { width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-radius: 6px; margin-bottom: 20px; }
+        table { width: 100%; table-layout: fixed; border-collapse: collapse; }
+        th, td { padding: 8px 3px; text-align: left; border-bottom: 1px solid #edf2f7; font-size: 12px; word-wrap: break-word; vertical-align: middle; }
+        th { background-color: #f8f9fa; font-weight: 600; color: #4a5568; text-align: center; }
         
-        table { width: 100%; table-layout: fixed; border-collapse: collapse; overflow: hidden; }
-        th, td { padding: 6px 2px; text-align: left; border-bottom: 1px solid #edf2f7; font-size: 11px; word-wrap: break-word; vertical-align: middle; }
-        th { background-color: #f8f9fa; font-weight: 600; color: #4a5568; text-align: center; font-size: 11px; }
-        tr:hover { background-color: #f8fafc; }
-        .center { text-align: center; }
-        .right { text-align: right; padding-right: 4px; }
-        
-        input[type="checkbox"] { transform: scale(1.1); cursor: pointer; accent-color: #27ae60; vertical-align: middle; }
-        
-        /* SOLUCIÓN AL ZOOM DE IOS: Se fuerza la fuente a 16px y se limpia el padding */
-        input[type="number"] { 
+        /* Control total de Inputs - Fuerza 16px para bloquear el Zoom de iPhone */
+        input[type="checkbox"] { transform: scale(1.2); cursor: pointer; accent-color: #27ae60; vertical-align: middle; }
+        input[type="number"], input[type="text"].edit-price-input { 
             width: 100%; 
-            padding: 4px 0; 
+            padding: 6px 2px; 
             border: 1px solid #cbd5e1; 
             border-radius: 4px; 
             font-size: 16px; 
             text-align: center; 
             font-weight: bold; 
             box-sizing: border-box; 
-            display: block;
         }
-        /* Eliminar las flechas internas nativas en navegadores móviles */
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
-        }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         
         .item-price { color: #2e7d32; }
         .est-price-cell { color: #7f8c8d; font-style: italic; text-align: center; }
         .item-subtotal { font-weight: bold; color: #2c3e50; }
-        
-        h2 { background-color: #27ae60; color: white; padding: 8px; border-radius: 6px; margin-top: 20px; font-size: 14px; font-weight: 600; }
+        h2 { background-color: #27ae60; color: white; padding: 10px; border-radius: 6px; margin-top: 15px; font-size: 14px; font-weight: 600; }
         .checked-row { background-color: #e8f8f5 !important; }
+        .hidden-item { display: none !important; }
 
-        .summary-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2c3e50; color: white; padding: 10px 8px; box-shadow: 0 -2px 8px rgba(0,0,0,0.2); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; box-sizing: border-box; gap: 6px; }
-        .summary-row-data { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 5px; }
-        .summary-box { text-align: center; font-size: 11px; flex: 1; }
-        .summary-box span { font-weight: bold; font-size: 14px; display: block; margin-top: 1px; }
+        /* Sección Configuración Avanzada */
+        .config-box { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        textarea { width: 100%; height: 120px; font-family: monospace; font-size: 13px; box-sizing: border-box; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; resize: none; }
+
+        /* BARRA INFERIOR AMPLIADA Y ERGONÓMICA */
+        .summary-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2c3e50; color: white; padding: 14px 10px; box-shadow: 0 -3px 12px rgba(0,0,0,0.25); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; box-sizing: border-box; gap: 10px; }
+        .summary-row-data { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 8px; }
+        .summary-box { text-align: center; font-size: 12px; flex: 1; }
+        .summary-box span { font-weight: bold; font-size: 16px; display: block; margin-top: 2px; }
         .checked-total-style { color: #2ecc71; }
         .list-total-style { color: #bdc3c7; }
         
-        .rate-box { background: #34495e; padding: 4px 8px; border-radius: 4px; text-align: center; border: 1px solid #455a64; }
-        .rate-box label { font-weight: bold; font-size: 10px; color: #f1c40f; display: block; }
-        .rate-box input { width: 65px; padding: 2px; font-size: 16px; font-weight: bold; text-align: center; border-radius: 3px; border: none; background: white; color: #333; }
+        .rate-box { background: #34495e; padding: 6px 10px; border-radius: 6px; text-align: center; border: 1px solid #455a64; }
+        .rate-box label { font-weight: bold; font-size: 10px; color: #f1c40f; display: block; margin-bottom: 2px; }
+        .rate-box input { width: 70px; padding: 4px; font-size: 16px; font-weight: bold; text-align: center; border-radius: 4px; border: none; background: white; }
 
-        .actions-wrapper { display: flex; width: 100%; gap: 4px; justify-content: center; }
-        .btn-action { flex: 1; background-color: #e67e22; color: white; border: none; padding: 6px 4px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; text-align: center; }
-        .btn-action:hover { background-color: #d35400; }
+        /* Botonera Principal Grande para dedos */
+        .actions-wrapper { display: flex; width: 100%; gap: 6px; justify-content: center; }
+        .btn-action { flex: 1; color: white; border: none; padding: 12px 4px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; text-align: center; transition: background 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-orange { background-color: #e67e22; } .btn-orange:hover { background-color: #d35400; }
+        .btn-blue { background-color: #2980b9; } .btn-blue:hover { background-color: #1f618d; }
+        .btn-red { background-color: #c0392b; } .btn-red:hover { background-color: #962d22; }
+        .btn-green { background-color: #27ae60; } .btn-green:hover { background-color: #219653; }
+        .btn-gray { background-color: #7f8c8d; } .btn-gray:hover { background-color: #616a6b; }
 
         @media print {
             body { background: white; margin: 0; padding-bottom: 0; }
             .summary-bar { position: relative; background: #34495e; margin-top: 20px; box-shadow: none; color: white; display: block; text-align: center; }
             .summary-box span { color: white !important; display: inline-block; margin-left: 5px; }
-            .btn-action, .rate-box label, .actions-wrapper { display: none; }
+            .btn-action, .rate-box label, .actions-wrapper, .top-tools { display: none; }
             h2 { background: #34495e !important; color: white; -webkit-print-color-adjust: exact; }
             input[type="number"], .rate-box input { border: none; background: transparent; }
             table { table-layout: auto; }
@@ -76,1300 +84,553 @@
 </head>
 <body>
 
-    <h1>📋 Mi Checklist de Compras</h1>
-    <p class="subtitle">Ancho adaptado al 100% y libre de zoom automático al editar en iOS.</p>
-
-    <!-- 1. DESPENSA Y VIVERES -->
-    <h2>1. DESPENSA Y VÍVERES</h2>
-    <div class="table-container">
-        <table>
-            <colgroup>
-                <col style="width: 10%;">
-                <col style="width: 32%;">
-                <col style="width: 14%;">
-                <col style="width: 15%;">
-                <col style="width: 13%;">
-                <col style="width: 16%;">
-            </colgroup>
-            <thead>
-                <tr>
-                    <th>✔</th>
-                    <th>Artículo</th>
-                    <th>Cant</th>
-                    <th>Real $</th>
-                    <th>Est.</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Arroz (Blanco y vaporizado)</td>
-                    <td class="center"><input type="number" class="item-qty" value="6.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.60" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.60</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Pasta (Larga y corta)</td>
-                    <td class="center"><input type="number" class="item-qty" value="6.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.85" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.85</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Harina de maíz</td>
-                    <td class="center"><input type="number" class="item-qty" value="20.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.30" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.30</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Harina de Dieta</td>
-                    <td class="center"><input type="number" class="item-qty" value="2.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.20" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.20</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Harina de trigo</td>
-                    <td class="center"><input type="number" class="item-qty" value="2.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.45" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.45</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Azúcar / Endulzante</td>
-                    <td class="center"><input type="number" class="item-qty" value="8.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.55" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.55</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Azúcar / Dieta</td>
-                    <td class="center"><input type="number" class="item-qty" value="2.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="4.20" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$4.20</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Sal</td>
-                    <td class="center"><input type="number" class="item-qty" value="2.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="0.70" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$0.70</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Caraotas 500 gr</td>
-                    <td class="center"><input type="number" class="item-qty" value="4" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Lentejas 400 gr</td>
-                    <td class="center"><input type="number" class="item-qty" value="2" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Caraotas rojas 400gr</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Legumbres Arvejas 400 gr</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Aceite (Vegetal, girasol, oliva)</td>
-                    <td class="center"><input type="number" class="item-qty" value="6" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="4.60" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$4.60</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Avena Hojuelas 1kg</td>
-                    <td class="center"><input type="number" class="item-qty" value="2.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.76" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.76</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Cereal Conflei</td>
-                    <td class="center"><input type="number" class="item-qty" value="2" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.20" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.20</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Café de 500 gr</td>
-                    <td class="center"><input type="number" class="item-qty" value="2" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="7.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$7.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Chocolate (Toddy) 400 gr</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="7.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$7.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Pan de Sándwich</td>
-                    <td class="center"><input type="number" class="item-qty" value="2" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.30" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.30</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Galletas (Dulces y saladas)</td>
-                    <td class="center"><input type="number" class="item-qty" value="3" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Gelatina</td>
-                    <td class="center"><input type="number" class="item-qty" value="2" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Atún en lata</td>
-                    <td class="center"><input type="number" class="item-qty" value="6" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.90" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.90</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Sardinas</td>
-                    <td class="center"><input type="number" class="item-qty" value="6" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.40" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.40</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Diablitos</td>
-                    <td class="center"><input type="number" class="item-qty" value="3" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.80" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.80</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Maíz Cotufa 500 gr</td>
-                    <td class="center"><input type="number" class="item-qty" value="2" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.30" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.30</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Pasta de tomate</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="4.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$4.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Salsa Para Pasta (Bolognesa y Napoli)</td>
-                    <td class="center"><input type="number" class="item-qty" value="2" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="4.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$4.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Guasacaca</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.80" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.80</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Fororo</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Maicena 200 gr</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.80" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.80</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- HERRAMIENTAS SUPERIORES -->
+    <div class="top-tools" id="global-tools">
+        <input type="text" id="search-input" class="search-box" placeholder="🔍 Buscar producto en tiempo real..." oninput="filterList()">
+        <div class="filter-row">
+            <label><input type="checkbox" id="hide-completed-check" onchange="filterList()"> Ocultar artículos comprados</label>
+            <span id="items-count-label">0 / 0 Productos</span>
+        </div>
     </div>
 
-    <!-- 2. CHARCUTERIA Y PROTEINAS -->
-    <h2>2. CHARCUTERÍA Y PROTEÍNAS</h2>
-    <div class="table-container">
-        <table>
-            <colgroup>
-                <col style="width: 10%;">
-                <col style="width: 32%;">
-                <col style="width: 14%;">
-                <col style="width: 15%;">
-                <col style="width: 13%;">
-                <col style="width: 16%;">
-            </colgroup>
-            <thead>
-                <tr>
-                    <th>✔</th>
-                    <th>Artículo</th>
-                    <th>Cant</th>
-                    <th>Real $</th>
-                    <th>Est.</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Jamón (Pierna, pavo o espalda)</td>
-                    <td class="center"><input type="number" class="item-qty" value="1.50" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="11.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$11.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Queso (Duro, amarillo, mozzarella)</td>
-                    <td class="center"><input type="number" class="item-qty" value="1.50" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="11.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$11.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Queso Blanco</td>
-                    <td class="center"><input type="number" class="item-qty" value="6.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="8.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$8.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Suero</td>
-                    <td class="center"><input type="number" class="item-qty" value="4" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Mantequilla</td>
-                    <td class="center"><input type="number" class="item-qty" value="2.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="6.30" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$6.30</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Rikesa</td>
-                    <td class="center"><input type="number" class="item-qty" value="2" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="7.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$7.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Mortadela</td>
-                    <td class="center"><input type="number" class="item-qty" value="1.50" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.80" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.80</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Salchichas</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="4.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$4.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Huevos</td>
-                    <td class="center"><input type="number" class="item-qty" value="6" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="8.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$8.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Leche en Polvo</td>
-                    <td class="center"><input type="number" class="item-qty" value="2.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="16.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$16.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Leche (Líquida descremada)</td>
-                    <td class="center"><input type="number" class="item-qty" value="2" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="4.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$4.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Pollo / Milanesa</td>
-                    <td class="center"><input type="number" class="item-qty" value="4.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="8.30" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$8.30</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Pollo / Chupetas</td>
-                    <td class="center"><input type="number" class="item-qty" value="2.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="5.20" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$5.20</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Pollo / Alas</td>
-                    <td class="center"><input type="number" class="item-qty" value="2.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="5.20" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$5.20</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Mollejitas de Pollo <small>(250 gr)</small></td>
-                    <td class="center"><input type="number" class="item-qty" value="0.250" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="4.20" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$4.20</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Carne de (Molida)</td>
-                    <td class="center"><input type="number" class="item-qty" value="2.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="12.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$12.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Carne de (Bistec)</td>
-                    <td class="center"><input type="number" class="item-qty" value="4.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="12.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$12.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Carne de (Guisar) <small>(500 gr)</small></td>
-                    <td class="center"><input type="number" class="item-qty" value="0.500" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="12.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$12.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Carne de (Mechar) <small>(500 gr)</small></td>
-                    <td class="center"><input type="number" class="item-qty" value="0.500" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="12.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$12.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Chuleta Ahumada</td>
-                    <td class="center"><input type="number" class="item-qty" value="1.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="9.30" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$9.30</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Chuletas Normal</td>
-                    <td class="center"><input type="number" class="item-qty" value="1.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="7.90" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$7.90</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Carne de cerdo / Pulpa</td>
-                    <td class="center"><input type="number" class="item-qty" value="3.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="9.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$9.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Huesito Ahumado <small>(250 gr)</small></td>
-                    <td class="center"><input type="number" class="item-qty" value="0.250" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="6.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$6.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Filet de pescado</td>
-                    <td class="center"><input type="number" class="item-qty" value="2.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="10.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$10.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Hígado de res <small>(500 gr)</small></td>
-                    <td class="center"><input type="number" class="item-qty" value="0.500" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="5.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$5.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Lagarto</td>
-                    <td class="center"><input type="number" class="item-qty" value="1.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="12.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$12.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Mondongo <small>(500 gr)</small></td>
-                    <td class="center"><input type="number" class="item-qty" value="0.500" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Costilla <small>(400 gr)</small></td>
-                    <td class="center"><input type="number" class="item-qty" value="0.400" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="9.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$9.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- ================= VISTA 1: CHECKLIST PRINCIPAL ================= -->
+    <div id="view-list" class="view-panel active">
+        <h1>📋 Mi Checklist de Compras</h1>
+        <div id="categories-container"></div>
     </div>
 
-    <!-- 3. FRUTAS Y VERDURAS -->
-    <h2>3. FRUTAS Y VERDURAS</h2>
-    <div class="table-container">
-        <table>
-            <colgroup>
-                <col style="width: 10%;">
-                <col style="width: 32%;">
-                <col style="width: 14%;">
-                <col style="width: 15%;">
-                <col style="width: 13%;">
-                <col style="width: 16%;">
-            </colgroup>
-            <thead>
-                <tr>
-                    <th>✔</th>
-                    <th>Artículo</th>
-                    <th>Cant</th>
-                    <th>Real $</th>
-                    <th>Est.</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Cebolla Normal</td>
-                    <td class="center"><input type="number" class="item-qty" value="1.87" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Cebolla Morada <small>(520 gr)</small></td>
-                    <td class="center"><input type="number" class="item-qty" value="0.520" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Ajo (Cabezas o pelado) <small>(280 gr)</small></td>
-                    <td class="center"><input type="number" class="item-qty" value="0.280" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="13.27" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$13.27</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Tomates</td>
-                    <td class="center"><input type="number" class="item-qty" value="2.70" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.33" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.33</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Cilantro, Perejil y Albahaca <small>(550 gr)</small></td>
-                    <td class="center"><input type="number" class="item-qty" value="0.550" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.59" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.59</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Pimentón</td>
-                    <td class="center"><input type="number" class="item-qty" value="1.13" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="5.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$5.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Cebollín / Puerro <small>(645 gr)</small></td>
-                    <td class="center"><input type="number" class="item-qty" value="0.645" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Papas</td>
-                    <td class="center"><input type="number" class="item-qty" value="3.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.10" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.10</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Zanahorias</td>
-                    <td class="center"><input type="number" class="item-qty" value="1.50" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.85" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.85</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Remolacha</td>
-                    <td class="center"><input type="number" class="item-qty" value="1.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Plátanos (Verdes o maduros)</td>
-                    <td class="center"><input type="number" class="item-qty" value="3.70" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.10" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.10</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Pepino <small>(630 gr)</small></td>
-                    <td class="center"><input type="number" class="item-qty" value="0.630" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.10" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.10</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Lechuga Americana</td>
-                    <td class="center"><input type="number" class="item-qty" value="0.625" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.20" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.20</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Repollo</td>
-                    <td class="center"><input type="number" class="item-qty" value="0.500" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="0.80" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$0.80</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Cambur</td>
-                    <td class="center"><input type="number" class="item-qty" value="3.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.25" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.25</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Manzanas</td>
-                    <td class="center"><input type="number" class="item-qty" value="6" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.30" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.30</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Limones</td>
-                    <td class="center"><input type="number" class="item-qty" value="1.80" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Naranjas</td>
-                    <td class="center"><input type="number" class="item-qty" value="2.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Parchitas</td>
-                    <td class="center"><input type="number" class="item-qty" value="1.50" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Tamarindo 250 g</td>
-                    <td class="center"><input type="number" class="item-qty" value="2" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.35" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.35</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Piña</td>
-                    <td class="center"><input type="number" class="item-qty" value="2.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.40" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.40</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Melón</td>
-                    <td class="center"><input type="number" class="item-qty" value="1.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Patilla</td>
-                    <td class="center"><input type="number" class="item-qty" value="1.56" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="0.70" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$0.70</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Lechosa</td>
-                    <td class="center"><input type="number" class="item-qty" value="1.00" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Fresas</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="4.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$4.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Mora</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="4.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$4.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Aguacate</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Pulpa de frutas</td>
-                    <td class="center"><input type="number" class="item-qty" value="10" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Auyama</td>
-                    <td class="center"><input type="number" class="item-qty" value="1.20" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="0.60" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$0.60</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Ñame <small>(900 gr)</small></td>
-                    <td class="center"><input type="number" class="item-qty" value="0.900" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.40" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.40</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Ocumo <small>(645 gr)</small></td>
-                    <td class="center"><input type="number" class="item-qty" value="0.645" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.80" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.80</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Yuca</td>
-                    <td class="center"><input type="number" class="item-qty" value="1.80" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Brócoli <small>(615 gr)</small></td>
-                    <td class="center"><input type="number" class="item-qty" value="0.615" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.40" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.40</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Ají <small>(145 gr)</small></td>
-                    <td class="center"><input type="number" class="item-qty" value="0.145" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Guayaba</td>
-                    <td class="center"><input type="number" class="item-qty" value="1.17" step="any" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.20" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.20</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Romero <small>(165 gr)</small></td>
-                    <td class="center"><input type="number" class="item-qty" value="0.165" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="5.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$5.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Ruda <small>(165 gr)</small></td>
-                    <td class="center"><input type="number" class="item-qty" value="0.165" step="0.001" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- ================= VISTA 2: SECCIÓN APARTE (EDITAR ESTIMADOS / BACKUP) ================= -->
+    <div id="view-settings" class="view-panel">
+        <h1>⚙️ Precios Estimados y Copia de Seguridad</h1>
+        <p class="subtitle" style="text-align: center; margin-bottom: 15px;">Modifica los valores base de referencia o exporta/importa tu configuración completa.</p>
+        
+        <div class="config-box">
+            <h3>📦 Copia de Seguridad</h3>
+            <p style="font-size: 12px; color: #555; margin-bottom: 8px;">Copia este código para guardarlo o pega uno anterior para restaurar tus datos:</p>
+            <textarea id="backup-string" onclick="this.select()"></textarea>
+            <div style="display: flex; gap: 6px; margin-top: 8px;">
+                <button class="btn-action btn-blue" onclick="importBackup()">Importar Datos</button>
+                <button class="btn-action btn-gray" onclick="generateBackupString()">Generar Código</button>
+            </div>
+        </div>
+
+        <div class="config-box">
+            <h3>✏️ Modificar Precios Estimados</h3>
+            <div id="settings-prices-container"></div>
+        </div>
     </div>
 
-    <!-- 4. CONDIMENTOS Y SALSAS -->
-    <h2>4. CONDIMENTOS Y SALSAS</h2>
-    <div class="table-container">
-        <table>
-            <colgroup>
-                <col style="width: 10%;">
-                <col style="width: 32%;">
-                <col style="width: 14%;">
-                <col style="width: 15%;">
-                <col style="width: 13%;">
-                <col style="width: 16%;">
-            </colgroup>
-            <thead>
-                <tr>
-                    <th>✔</th>
-                    <th>Artículo</th>
-                    <th>Cant</th>
-                    <th>Real $</th>
-                    <th>Est.</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Mayonesa 500 gr</td>
-                    <td class="center"><input type="number" class="item-qty" value="2" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="4.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$4.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Mostaza</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.15" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.15</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Salsa de tomate (Ketchup)</td>
-                    <td class="center"><input type="number" class="item-qty" value="2" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.63" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.63</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Vinagre</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Salsa de Soya</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.60" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.60</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Salsa Inglesa</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.60" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.60</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Salsa de Ajo</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.60" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.60</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Especias (Pimienta, comino, etc)</td>
-                    <td class="center"><input type="number" class="item-qty" value="4" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Sopa Maggi</td>
-                    <td class="center"><input type="number" class="item-qty" value="2" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.70" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.70</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Cubito Maggi</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.10" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.10</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- 5. LIMPIEZA Y HOGAR -->
-    <h2>5. LIMPIEZA Y HOGAR</h2>
-    <div class="table-container">
-        <table>
-            <colgroup>
-                <col style="width: 10%;">
-                <col style="width: 32%;">
-                <col style="width: 14%;">
-                <col style="width: 15%;">
-                <col style="width: 13%;">
-                <col style="width: 16%;">
-            </colgroup>
-            <thead>
-                <tr>
-                    <th>✔</th>
-                    <th>Artículo</th>
-                    <th>Cant</th>
-                    <th>Real $</th>
-                    <th>Est.</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Jabón de ropa en Polvo 400 gr</td>
-                    <td class="center"><input type="number" class="item-qty" value="10" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Suavizante de telas 180 ml</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Blanqueador (Cloro)</td>
-                    <td class="center"><input type="number" class="item-qty" value="2" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.60" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.60</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Jabón azul (en barra)</td>
-                    <td class="center"><input type="number" class="item-qty" value="4" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.10" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.10</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Lavaplatos Crema</td>
-                    <td class="center"><input type="number" class="item-qty" value="3" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="5.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$5.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Desinfectante para pisos</td>
-                    <td class="center"><input type="number" class="item-qty" value="4" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Jabón líquido</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Cera de piso</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Esponjas de cocina</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.80" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.80</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Brillo de alambre</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Bolsas de basura</td>
-                    <td class="center"><input type="number" class="item-qty" value="4" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Limpiador de inodoros ciclón</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="5.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$5.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Servilletas de papel</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Coletos</td>
-                    <td class="center"><input type="number" class="item-qty" value="2" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Paños de Cocina</td>
-                    <td class="center"><input type="number" class="item-qty" value="2" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- 6. CUIDADO PERSONAL Y SALUD -->
-    <h2>6. CUIDADO PERSONAL Y SALUD</h2>
-    <div class="table-container">
-        <table>
-            <colgroup>
-                <col style="width: 10%;">
-                <col style="width: 32%;">
-                <col style="width: 14%;">
-                <col style="width: 15%;">
-                <col style="width: 13%;">
-                <col style="width: 16%;">
-            </colgroup>
-            <thead>
-                <tr>
-                    <th>✔</th>
-                    <th>Artículo</th>
-                    <th>Cant</th>
-                    <th>Real $</th>
-                    <th>Est.</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Jabón de baño (Barra o líquida)</td>
-                    <td class="center"><input type="number" class="item-qty" value="12" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Champú</td>
-                    <td class="center"><input type="number" class="item-qty" value="3" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="7.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$7.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Acondicionador</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="7.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$7.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Crema dental</td>
-                    <td class="center"><input type="number" class="item-qty" value="3" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="6.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$6.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Crema dental Niño</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Enjuague bucal</td>
-                    <td class="center"><input type="number" class="item-qty" value="1" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="4.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$4.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Desodorante</td>
-                    <td class="center"><input type="number" class="item-qty" value="4" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Papel higiénico</td>
-                    <td class="center"><input type="number" class="item-qty" value="2" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="3.66" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$3.66</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Toallitas húmedas / Pañuelos</td>
-                    <td class="center"><input type="number" class="item-qty" value="10" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="1.30" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$1.30</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Pañales</td>
-                    <td class="center"><input type="number" class="item-qty" value="3" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="6.60" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$6.60</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Máquinas de afeitar</td>
-                    <td class="center"><input type="number" class="item-qty" value="3" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="4.50" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$4.50</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Crema corporal / Protector solar</td>
-                    <td class="center"><input type="number" class="item-qty" value="3" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="7.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$7.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-                <tr class="item-row">
-                    <td class="center"><input type="checkbox" class="item-check" onchange="calculateTotals()"></td>
-                    <td>Protección femenina</td>
-                    <td class="center"><input type="number" class="item-qty" value="2" oninput="calculateTotals()"></td>
-                    <td class="center"><input type="number" class="item-price" value="2.00" step="0.01" oninput="calculateTotals()"></td>
-                    <td class="est-price-cell">$2.00</td>
-                    <td class="right item-subtotal">$0.00</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Barra de Totales y Controles Fija -->
+    <!-- BARRA INFERIOR MEJORADA Y MÁS GRANDE -->
     <div class="summary-bar">
         <div class="summary-row-data">
             <div class="rate-box">
                 <label>💵 Tasa (1 $)</label>
-                <input type="number" id="exchange-rate" value="40.00" step="0.01" oninput="calculateTotals()">
+                <input type="number" id="exchange-rate" value="40.00" step="0.01" oninput="handleRateChange()">
             </div>
             <div class="summary-box">
-                🛒 REAL (Tildados):
-                <span id="checked-total" class="checked-total-style">$0.00 / Bs. 0.00</span>
+                🛒 COMPRA REAL:
+                <span id="checked-total" class="checked-total-style">$0.00 / 0 Bs.</span>
             </div>
             <div class="summary-box">
                 📋 TOTAL LISTA:
-                <span id="list-total" class="list-total-style">$0.00 / Bs. 0.00</span>
+                <span id="list-total" class="list-total-style">$0.00 / 0 Bs.</span>
             </div>
         </div>
+        
+        <!-- Botonera Ergonómica Ampliada -->
         <div class="actions-wrapper">
-            <button class="btn-action" onclick="toggleAll(true)">Todo</button>
-            <button class="btn-action" onclick="toggleAll(false)">Limpiar</button>
-            <button class="btn-action" style="background-color: #27ae60;" onclick="window.print()">PDF</button>
+            <button id="btn-toggle-view" class="btn-action btn-blue" onclick="toggleView()">Configurar</button>
+            <button class="btn-action btn-orange" onclick="undoAction()">↩️ Deshacer</button>
+            <button class="btn-action btn-red" onclick="resetChecklistValues()">🔄 Reset</button>
+            <button id="btn-pdf-trigger" class="btn-action btn-green" onclick="window.print()">PDF</button>
         </div>
     </div>
 
     <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
+        // 1. BASE DE DATOS INTERNA COMPLETA CON LOS 142 ARTÍCULOS SIN OMITIR NADA
+        const categories = {
+            1: "1. DESPENSA Y VÍVERES",
+            2: "2. CHARCUTERÍA Y PROTEÍNAS",
+            3: "3. FRUTAS Y VERDURAS",
+            4: "4. CONDIMENTOS Y SALSAS",
+            5: "5. LIMPIEZA Y HOGAR",
+            6: "6. CUIDADO PERSONAL Y SALUD"
+        };
+
+        let defaultItems = [
+            // DESPENSA
+            { id: 1, cat: 1, name: "Arroz (Blanco y vaporizado)", qty: 6.00, est: 2.60 },
+            { id: 2, cat: 1, name: "Pasta (Larga y corta)", qty: 6.00, est: 1.85 },
+            { id: 3, cat: 1, name: "Harina de maíz", qty: 20.00, est: 1.30 },
+            { id: 4, cat: 1, name: "Harina de Dieta", qty: 2.00, est: 3.20 },
+            { id: 5, cat: 1, name: "Harina de trigo", qty: 2.00, est: 1.45 },
+            { id: 6, cat: 1, name: "Azúcar / Endulzante", qty: 8.00, est: 1.55 },
+            { id: 7, cat: 1, name: "Azúcar / Dieta", qty: 2.00, est: 4.20 },
+            { id: 8, cat: 1, name: "Sal", qty: 2.00, est: 0.70 },
+            { id: 9, cat: 1, name: "Caraotas 500 gr", qty: 4, est: 1.50 },
+            { id: 10, cat: 1, name: "Lentejas 400 gr", qty: 2, est: 1.50 },
+            { id: 11, cat: 1, name: "Caraotas rojas 400gr", qty: 1, est: 1.50 },
+            { id: 12, cat: 1, name: "Legumbres Arvejas 400 gr", qty: 1, est: 1.50 },
+            { id: 13, cat: 1, name: "Aceite (Vegetal, girasol, oliva)", qty: 6, est: 4.60 },
+            { id: 14, cat: 1, name: "Avena Hojuelas 1kg", qty: 2.00, est: 2.76 },
+            { id: 15, cat: 1, name: "Cereal Conflei", qty: 2, est: 3.20 },
+            { id: 16, cat: 1, name: "Café de 500 gr", qty: 2, est: 7.50 },
+            { id: 17, cat: 1, name: "Chocolate (Toddy) 400 gr", qty: 1, est: 7.00 },
+            { id: 18, cat: 1, name: "Pan de Sándwich", qty: 2, est: 1.30 },
+            { id: 19, cat: 1, name: "Galletas (Dulces y saladas)", qty: 3, est: 2.00 },
+            { id: 20, cat: 1, name: "Gelatina", qty: 2, est: 3.00 },
+            { id: 21, cat: 1, name: "Atún en lata", qty: 6, est: 2.90 },
+            { id: 22, cat: 1, name: "Sardinas", qty: 6, est: 1.40 },
+            { id: 23, cat: 1, name: "Diablitos", qty: 3, est: 2.80 },
+            { id: 24, cat: 1, name: "Maíz Cotufa 500 gr", qty: 2, est: 1.30 },
+            { id: 25, cat: 1, name: "Pasta de tomate", qty: 1, est: 4.00 },
+            { id: 26, cat: 1, name: "Salsa Para Pasta (Bolognesa y Napoli)", qty: 2, est: 4.00 },
+            { id: 27, cat: 1, name: "Guasacaca", qty: 1, est: 2.80 },
+            { id: 28, cat: 1, name: "Fororo", qty: 1, est: 1.50 },
+            { id: 29, cat: 1, name: "Maicena 200 gr", qty: 1, est: 1.80 },
+            // CHARCUTERIA Y PROTEINAS
+            { id: 30, cat: 2, name: "Jamón (Pierna, pavo o espalda)", qty: 1.50, est: 11.00 },
+            { id: 31, cat: 2, name: "Queso (Duro, amarillo, mozzarella)", qty: 1.50, est: 11.00 },
+            { id: 32, cat: 2, name: "Queso Blanco", qty: 6.00, est: 8.00 },
+            { id: 33, cat: 2, name: "Suero", qty: 4, est: 3.00 },
+            { id: 34, cat: 2, name: "Mantequilla", qty: 2.00, est: 6.30 },
+            { id: 35, cat: 2, name: "Rikesa", qty: 2, est: 7.00 },
+            { id: 36, cat: 2, name: "Mortadela", qty: 1.50, est: 3.80 },
+            { id: 37, cat: 2, name: "Salchichas", qty: 1, est: 4.00 },
+            { id: 38, cat: 2, name: "Huevos", qty: 6, est: 8.00 },
+            { id: 39, cat: 2, name: "Leche en Polvo", qty: 2.00, est: 16.00 },
+            { id: 40, cat: 2, name: "Leche (Líquida descremada)", qty: 2, est: 4.00 },
+            { id: 41, cat: 2, name: "Pollo / Milanesa", qty: 4.00, est: 8.30 },
+            { id: 42, cat: 2, name: "Pollo / Chupetas", qty: 2.00, est: 5.20 },
+            { id: 43, cat: 2, name: "Pollo / Alas", qty: 2.00, est: 5.20 },
+            { id: 44, cat: 2, name: "Mollejitas de Pollo", qty: 0.250, est: 4.20 },
+            { id: 45, cat: 2, name: "Carne de (Molida)", qty: 2.00, est: 12.00 },
+            { id: 46, cat: 2, name: "Carne de (Bistec)", qty: 4.00, est: 12.00 },
+            { id: 47, cat: 2, name: "Carne de (Guisar)", qty: 0.500, est: 12.00 },
+            { id: 48, cat: 2, name: "Carne de (Mechar)", qty: 0.500, est: 12.00 },
+            { id: 49, cat: 2, name: "Chuleta Ahumada", qty: 1.00, est: 9.30 },
+            { id: 50, cat: 2, name: "Chuletas Normal", qty: 1.00, est: 7.90 },
+            { id: 51, cat: 2, name: "Carne de cerdo / Pulpa", qty: 3.00, est: 9.00 },
+            { id: 52, cat: 2, name: "Huesito Ahumado", qty: 0.250, est: 6.00 },
+            { id: 53, cat: 2, name: "Filet de pescado", qty: 2.00, est: 10.00 },
+            { id: 54, cat: 2, name: "Hígado de res", qty: 0.500, est: 5.00 },
+            { id: 55, cat: 2, name: "Lagarto", qty: 1.00, est: 12.00 },
+            { id: 56, cat: 2, name: "Mondongo", qty: 0.500, est: 3.00 },
+            { id: 57, cat: 2, name: "Costilla", qty: 0.400, est: 9.00 },
+            // FRUTAS Y VERDURAS
+            { id: 58, cat: 3, name: "Cebolla Normal", qty: 1.87, est: 1.00 },
+            { id: 59, cat: 3, name: "Cebolla Morada", qty: 0.520, est: 3.00 },
+            { id: 60, cat: 3, name: "Ajo (Cabezas o pelado)", qty: 0.280, est: 13.27 },
+            { id: 61, cat: 3, name: "Tomates", qty: 2.70, est: 3.33 },
+            { id: 62, cat: 3, name: "Cilantro, Perejil y Albahaca", qty: 0.550, est: 1.59 },
+            { id: 63, cat: 3, name: "Pimentón", qty: 1.13, est: 5.00 },
+            { id: 64, cat: 3, name: "Cebollín / Puerro", qty: 0.645, est: 1.50 },
+            { id: 65, cat: 3, name: "Papas", qty: 3.00, est: 2.10 },
+            { id: 66, cat: 3, name: "Zanahorias", qty: 1.50, est: 1.85 },
+            { id: 67, cat: 3, name: "Remolacha", qty: 1.00, est: 2.00 },
+            { id: 68, cat: 3, name: "Plátanos (Verdes o maduros)", qty: 3.70, est: 1.10 },
+            { id: 69, cat: 3, name: "Pepino", qty: 0.630, est: 1.10 },
+            { id: 70, cat: 3, name: "Lechuga Americana", qty: 0.625, est: 1.20 },
+            { id: 71, cat: 3, name: "Repollo", qty: 0.500, est: 0.80 },
+            { id: 72, cat: 3, name: "Cambur", qty: 3.00, est: 1.25 },
+            { id: 73, cat: 3, name: "Manzanas", qty: 6, est: 1.30 },
+            { id: 74, cat: 3, name: "Limones", qty: 1.80, est: 3.00 },
+            { id: 75, cat: 3, name: "Naranjas", qty: 2.00, est: 2.00 },
+            { id: 76, cat: 3, name: "Parchitas", qty: 1.50, est: 3.00 },
+            { id: 77, cat: 3, name: "Tamarindo 250 g", qty: 2, est: 1.35 },
+            { id: 78, cat: 3, name: "Piña", qty: 2.00, est: 1.40 },
+            { id: 79, cat: 3, name: "Melón", qty: 1.00, est: 1.00 },
+            { id: 80, cat: 3, name: "Patilla", qty: 1.56, est: 0.70 },
+            { id: 81, cat: 3, name: "Lechosa", qty: 1.00, est: 1.00 },
+            { id: 82, cat: 3, name: "Fresas", qty: 1, est: 4.00 },
+            { id: 83, cat: 3, name: "Mora", qty: 1, est: 4.00 },
+            { id: 84, cat: 3, name: "Aguacate", qty: 1, est: 1.50 },
+            { id: 85, cat: 3, name: "Pulpa de frutas", qty: 10, est: 1.50 },
+            { id: 86, cat: 3, name: "Auyama", qty: 1.20, est: 0.60 },
+            { id: 87, cat: 3, name: "Ñame", qty: 0.900, est: 1.40 },
+            { id: 88, cat: 3, name: "Ocumo", qty: 0.645, est: 1.80 },
+            { id: 89, cat: 3, name: "Yuca", qty: 1.80, est: 1.50 },
+            { id: 90, cat: 3, name: "Brócoli", qty: 0.615, est: 2.40 },
+            { id: 91, cat: 3, name: "Ají", qty: 0.145, est: 3.00 },
+            { id: 92, cat: 3, name: "Guayaba", qty: 1.17, est: 1.20 },
+            { id: 93, cat: 3, name: "Romero", qty: 0.165, est: 5.00 },
+            { id: 94, cat: 3, name: "Ruda", qty: 0.165, est: 3.00 },
+            // CONDIMENTOS Y SALSAS
+            { id: 95, cat: 4, name: "Mayonesa 500 gr", qty: 2, est: 4.50 },
+            { id: 96, cat: 4, name: "Mostaza", qty: 1, est: 2.15 },
+            { id: 97, cat: 4, name: "Salsa de tomate (Ketchup)", qty: 2, est: 2.63 },
+            { id: 98, cat: 4, name: "Vinagre", qty: 1, est: 3.00 },
+            { id: 99, cat: 4, name: "Salsa de Soya", qty: 1, est: 3.60 },
+            { id: 100, cat: 4, name: "Salsa Inglesa", qty: 1, est: 3.60 },
+            { id: 101, cat: 4, name: "Salsa de Ajo", qty: 1, est: 3.60 },
+            { id: 102, cat: 4, name: "Especias (Pimienta, comino, etc)", qty: 4, est: 1.00 },
+            { id: 103, cat: 4, name: "Sopa Maggi", qty: 2, est: 1.70 },
+            { id: 104, cat: 4, name: "Cubito Maggi", qty: 1, est: 3.10 },
+            // LIMPIEZA Y HOGAR
+            { id: 105, cat: 5, name: "Jabón de ropa en Polvo 400 gr", qty: 10, est: 1.50 },
+            { id: 106, cat: 5, name: "Suavizante de telas 180 ml", qty: 1, est: 2.50 },
+            { id: 107, cat: 5, name: "Blanqueador (Cloro)", qty: 2, est: 1.60 },
+            { id: 108, cat: 5, name: "Jabón azul (en barra)", qty: 4, est: 1.10 },
+            { id: 109, cat: 5, name: "Lavaplatos Crema", qty: 3, est: 5.00 },
+            { id: 110, cat: 5, name: "Desinfectante para pisos", qty: 4, est: 2.00 },
+            { id: 111, cat: 5, name: "Jabón líquido", qty: 1, est: 2.50 },
+            { id: 112, cat: 5, name: "Cera de piso", qty: 1, est: 3.50 },
+            { id: 113, cat: 5, name: "Esponjas de cocina", qty: 1, est: 3.80 },
+            { id: 114, cat: 5, name: "Brillo de alambre", qty: 1, est: 1.50 },
+            { id: 115, cat: 5, name: "Bolsas de basura", qty: 4, est: 1.50 },
+            { id: 116, cat: 5, name: "Limpiador de inodoros ciclón", qty: 1, est: 5.00 },
+            { id: 117, cat: 5, name: "Servilletas de papel", qty: 1, est: 1.50 },
+            { id: 118, cat: 5, name: "Coletos", qty: 2, est: 2.50 },
+            { id: 119, cat: 5, name: "Paños de Cocina", qty: 2, est: 2.00 },
+            // CUIDADO PERSONAL Y SALUD
+            { id: 120, cat: 6, name: "Jabón de baño (Barra o líquida)", qty: 12, est: 2.50 },
+            { id: 121, cat: 6, name: "Champú", qty: 3, est: 7.00 },
+            { id: 122, cat: 6, name: "Acondicionador", qty: 1, est: 7.00 },
+            { id: 123, cat: 6, name: "Crema dental", qty: 3, est: 6.00 },
+            { id: 124, cat: 6, name: "Crema dental Niño", qty: 1, est: 2.00 },
+            { id: 125, cat: 6, name: "Enjuague bucal", qty: 1, est: 4.50 },
+            { id: 126, cat: 6, name: "Desodorante", qty: 4, est: 3.00 },
+            { id: 127, cat: 6, name: "Papel higiénico", qty: 2, est: 3.66 },
+            { id: 128, cat: 6, name: "Toallitas húmedas / Pañuelos", qty: 10, est: 1.30 },
+            { id: 129, cat: 6, name: "Pañales", qty: 3, est: 6.60 },
+            { id: 130, cat: 6, name: "Máquinas de afeitar", qty: 3, est: 4.50 },
+            { id: 131, cat: 6, name: "Crema corporal / Protector solar", qty: 3, est: 7.00 },
+            { id: 132, cat: 6, name: "Protección femenina", qty: 2, est: 2.00 }
+        ];
+
+        let state = {
+            items: [],
+            rate: 40.00,
+            currentView: 'list'
+        };
+
+        // Pila para controlar la función "Deshacer" (Máximo 25 movimientos)
+        let undoStack = [];
+
+        function saveToHistory() {
+            undoStack.push(JSON.stringify(state.items));
+            if (undoStack.length > 25) undoStack.shift();
+        }
+
+        function undoAction() {
+            if (undoStack.length === 0) {
+                alert("No hay más acciones para deshacer.");
+                return;
+            }
+            state.items = JSON.parse(undoStack.pop());
+            saveToLocalStorage();
+            renderAll();
+        }
+
+        // Inicialización de datos y LocalStorage
+        function initApp() {
+            let savedState = localStorage.getItem('compras_app_state');
+            let savedRate = localStorage.getItem('compras_app_rate');
+            
+            if (savedRate) state.rate = parseFloat(savedRate);
+            document.getElementById('exchange-rate').value = state.rate;
+
+            if (savedState) {
+                state.items = JSON.parse(savedState);
+                // Validación para inyectar campos faltantes en actualizaciones
+                if(state.items.length !== defaultItems.length) {
+                    mergeWithDefaults();
+                }
+            } else {
+                resetToDefaults();
+            }
+            renderAll();
+        }
+
+        function mergeWithDefaults() {
+            let merged = [];
+            defaultItems.forEach(d => {
+                let existing = state.items.find(i => i.id === d.id);
+                if (existing) {
+                    merged.push({ ...d, ...existing });
+                } else {
+                    merged.push({ ...d, real: d.est, checked: false });
+                }
+            });
+            state.items = merged;
+            saveToLocalStorage();
+        }
+
+        function resetToDefaults() {
+            state.items = defaultItems.map(item => ({
+                ...item,
+                real: item.est,
+                checked: false
+            }));
+            saveToLocalStorage();
+        }
+
+        function resetChecklistValues() {
+            if (confirm("¿Estás seguro de restablecer el checklist? Se desmarcarán todos los artículos y los precios reales volverán al valor estimado.")) {
+                saveToHistory();
+                state.items.forEach(item => {
+                    item.checked = false;
+                    item.real = item.est;
+                });
+                saveToLocalStorage();
+                renderAll();
+            }
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('compras_app_state', JSON.stringify(state.items));
+            localStorage.setItem('compras_app_rate', state.rate);
+        }
+
+        function handleRateChange() {
+            state.rate = parseFloat(document.getElementById('exchange-rate').value) || 1;
+            saveToLocalStorage();
+            calculateTotals();
+        }
+
+        // Navegación entre Checklist y Sección Aparte
+        function toggleView() {
+            const btn = document.getElementById('btn-toggle-view');
+            const tools = document.getElementById('global-tools');
+            const pdfBtn = document.getElementById('btn-pdf-trigger');
+
+            if (state.currentView === 'list') {
+                state.currentView = 'settings';
+                document.getElementById('view-list').classList.remove('active');
+                document.getElementById('view-settings').classList.add('active');
+                btn.textContent = "Checklist";
+                btn.className = "btn-action btn-orange";
+                tools.style.display = "none";
+                pdfBtn.style.display = "none";
+                generateBackupString();
+            } else {
+                state.currentView = 'list';
+                document.getElementById('view-settings').classList.remove('active');
+                document.getElementById('view-list').classList.add('active');
+                btn.textContent = "Configurar";
+                btn.className = "btn-action btn-blue";
+                tools.style.display = "flex";
+                pdfBtn.style.display = "block";
+            }
+            renderAll();
+        }
+
+        // Generar renders en la pantalla
+        function renderAll() {
+            if (state.currentView === 'list') {
+                renderChecklist();
+            } else {
+                renderSettingsPrices();
+            }
+            calculateTotals();
+        }
+
+        function renderChecklist() {
+            const container = document.getElementById('categories-container');
+            container.innerHTML = '';
+
+            Object.keys(categories).forEach(catId => {
+                let catItems = state.items.filter(i => i.cat == catId);
+                
+                let html = `<h2>${categories[catId]}</h2>
+                <div class="table-container">
+                    <table>
+                        <colgroup>
+                            <col style="width: 10%;">
+                            <col style="width: 32%;">
+                            <col style="width: 14%;">
+                            <col style="width: 15%;">
+                            <col style="width: 13%;">
+                            <col style="width: 16%;">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>✔</th>
+                                <th>Artículo</th>
+                                <th>Cant</th>
+                                <th>Real $</th>
+                                <th>Est.</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+                catItems.forEach(item => {
+                    let rowClass = item.checked ? 'checked-row' : '';
+                    html += `
+                    <tr class="item-row ${rowClass}" id="item-row-${item.id}">
+                        <td class="center"><input type="checkbox" class="item-check" ${item.checked ? 'checked' : ''} onchange="updateItemChecked(${item.id}, this.checked)"></td>
+                        <td>${item.name}</td>
+                        <td class="center"><input type="number" class="item-qty" value="${item.qty}" step="any" onchange="updateItemQty(${item.id}, this.value)" onkeydown="handleEnterKey(event)"></td>
+                        <td class="center"><input type="number" class="item-price" value="${item.real.toFixed(2)}" step="0.01" onchange="updateItemPrice(${item.id}, this.value)" onkeydown="handleEnterKey(event)"></td>
+                        <td class="est-price-cell">$${item.est.toFixed(2)}</td>
+                        <td class="right item-subtotal" id="subtotal-${item.id}">$0.00</td>
+                    </tr>`;
+                });
+
+                html += `</tbody></table></div>`;
+                container.innerHTML += html;
+            });
+            filterList();
+        }
+
+        function renderSettingsPrices() {
+            const container = document.getElementById('settings-prices-container');
+            container.innerHTML = '';
+
+            Object.keys(categories).forEach(catId => {
+                let catItems = state.items.filter(i => i.cat == catId);
+                let html = `<h4 style="margin: 10px 0 5px 0; color:#27ae60;">${categories[catId]}</h4>
+                <div class="table-container">
+                    <table>
+                        <colgroup>
+                            <col style="width: 65%;">
+                            <col style="width: 35%;">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>Artículo</th>
+                                <th>Base Estimado ($)</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+                catItems.forEach(item => {
+                    html += `
+                    <tr>
+                        <td style="font-size:13px; padding-left: 10px;">${item.name}</td>
+                        <td class="center"><input type="number" class="edit-price-input" value="${item.est.toFixed(2)}" step="0.01" onchange="updateItemEstPrice(${item.id}, this.value)" onkeydown="handleEnterKey(event)"></td>
+                    </tr>`;
+                });
+
+                html += `</tbody></table></div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        // Captura de datos en inputs
+        function updateItemChecked(id, isChecked) {
+            saveToHistory();
+            let item = state.items.find(i => i.id === id);
+            item.checked = isChecked;
+            let row = document.getElementById(`item-row-${id}`);
+            if(row) {
+                if(isChecked) row.classList.add('checked-row');
+                else row.classList.remove('checked-row');
+            }
+            saveToLocalStorage();
+            calculateTotals();
+        }
+
+        function updateItemQty(id, val) {
+            saveToHistory();
+            let item = state.items.find(i => i.id === id);
+            item.qty = parseFloat(val) || 0;
+            saveToLocalStorage();
+            calculateTotals();
+        }
+
+        function updateItemPrice(id, val) {
+            saveToHistory();
+            let item = state.items.find(i => i.id === id);
+            item.real = parseFloat(val) || 0;
+            saveToLocalStorage();
+            calculateTotals();
+        }
+
+        function updateItemEstPrice(id, val) {
+            saveToHistory();
+            let item = state.items.find(i => i.id === id);
+            item.est = parseFloat(val) || 0;
+            saveToLocalStorage();
+        }
+
+        // Procesar evento enter nativo (quita el foco y calcula inmediatamente)
+        function handleEnterKey(event) {
+            if (event.key === "Enter") {
+                event.target.blur();
+            }
         }
 
         function calculateTotals() {
-            let rows = document.querySelectorAll(".item-row");
-            let rate = parseFloat(document.getElementById("exchange-rate").value) || 1;
             let checkedTotalUSD = 0;
             let listTotalUSD = 0;
+            let totalRows = state.items.length;
+            let visibleRows = totalRows;
 
-            rows.forEach(row => {
-                let checkbox = row.querySelector(".item-check");
-                let qtyInput = row.querySelector(".item-qty");
-                let priceInput = row.querySelector(".item-price");
-                let subtotalCell = row.querySelector(".item-subtotal");
+            state.items.forEach(item => {
+                let subtotal = item.qty * item.real;
+                listTotalUSD += subtotal;
+                if (item.checked) checkedTotalUSD += subtotal;
 
-                let qty = parseFloat(qtyInput.value) || 0;
-                let price = parseFloat(priceInput.value) || 0;
-                let subtotalUSD = qty * price;
-
-                subtotalCell.textContent = "$" + subtotalUSD.toFixed(2);
-                listTotalUSD += subtotalUSD;
-
-                if (checkbox.checked) {
-                    checkedTotalUSD += subtotalUSD;
-                    row.classList.add("checked-row");
-                } else {
-                    row.classList.remove("checked-row");
-                }
+                let cell = document.getElementById(`subtotal-${item.id}`);
+                if (cell) cell.textContent = "$" + subtotal.toFixed(2);
             });
 
-            let checkedTotalLocal = checkedTotalUSD * rate;
-            let listTotalLocal = listTotalUSD * rate;
+            let checkedTotalLocal = checkedTotalUSD * state.rate;
+            let listTotalLocal = listTotalUSD * state.rate;
 
             document.getElementById("checked-total").textContent = 
                 "$" + checkedTotalUSD.toFixed(2) + " / " + checkedTotalLocal.toFixed(0) + " Bs.";
             
             document.getElementById("list-total").textContent = 
                 "$" + listTotalUSD.toFixed(2) + " / " + listTotalLocal.toFixed(0) + " Bs.";
+
+            document.getElementById("items-count-label").textContent = `${state.items.filter(i=>i.checked).length} / ${totalRows} Comprados`;
         }
 
-        // Función para marcar o desmarcar todo de golpe de forma interactiva
-        function toggleAll(status) {
-            let checkboxes = document.querySelectorAll(".item-check");
-            checkboxes.forEach(cb => cb.checked = status);
-            calculateTotals();
+        // Filtro combinado de búsqueda y ocultación
+        function filterList() {
+            if (state.currentView !== 'list') return;
+            let query = document.getElementById("search-input").value.toLowerCase();
+            let hideCompleted = document.getElementById("hide-completed-check").checked;
+
+            state.items.forEach(item => {
+                let row = document.getElementById(`item-row-${item.id}`);
+                if (!row) return;
+
+                let matchesSearch = item.name.toLowerCase().includes(query);
+                let matchesHide = !hideCompleted || !item.checked;
+
+                if (matchesSearch && matchesHide) {
+                    row.classList.remove("hidden-item");
+                } else {
+                    row.classList.add("hidden-item");
+                }
+            });
         }
 
-        window.onload = calculateTotals;
+        // Módulo de Importación y Exportación de Backup
+        function generateBackupString() {
+            let backupData = {
+                rate: state.rate,
+                items: state.items
+            };
+            document.getElementById("backup-string").value = btoa(unescape(encodeURIComponent(JSON.stringify(backupData))));
+        }
+
+        function importBackup() {
+            let str = document.getElementById("backup-string").value.trim();
+            if (!str) return alert("Por favor ingresa un código válido.");
+            try {
+                let decrypted = JSON.parse(decodeURIComponent(escape(atob(str))));
+                if(decrypted.items && Array.isArray(decrypted.items)) {
+                    saveToHistory();
+                    state.rate = decrypted.rate || 40.00;
+                    state.items = decrypted.items;
+                    document.getElementById('exchange-rate').value = state.rate;
+                    saveToLocalStorage();
+                    alert("¡Copia de seguridad importada con éxito!");
+                    toggleView();
+                } else {
+                    alert("El formato del código de seguridad no es válido.");
+                }
+            } catch(err) {
+                alert("Error al procesar el código. Asegúrate de que sea el texto correcto.");
+            }
+        }
+
+        window.onload = initApp;
     </script>
 </body>
 </html>
