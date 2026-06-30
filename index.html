@@ -3,313 +3,339 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Compras Pro App</title>
+    <title>Compras Pro</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2c3e50">
     <style>
-        /* === VARIABLES DEL SISTEMA (MODO CLARO Y OSCURO) === */
+        /* === VARIABLES DE TEMA CLARO Y OSCURO === */
         :root {
-            --bg-body: #f2f4f8; --bg-surface: #ffffff; --text-main: #2d3436; --text-muted: #636e72;
-            --primary: #0984e3; --success: #00b894; --danger: #d63031; --warning: #f1c40f;
-            --border: #dfe6e9; --nav-bg: #ffffff; --card-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            --checked-bg: #e8f8f5; --cat-bg: #27ae60; --sum-bg: #2c3e50;
-        }
-        [data-theme="dark"] {
-            --bg-body: #121212; --bg-surface: #1e1e1e; --text-main: #dfe6e9; --text-muted: #b2bec3;
-            --primary: #74b9ff; --success: #55efc4; --danger: #ff7675; --warning: #ffeaa7;
-            --border: #2d3436; --nav-bg: #1e1e1e; --card-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            --checked-bg: #0f291e; --cat-bg: #1e8449; --sum-bg: #111820;
+            --bg-color: #f0f2f5;
+            --text-color: #1d1d1f;
+            --text-muted: #65676b;
+            --card-bg: #ffffff;
+            --border-color: #e4e6eb;
+            --primary: #27ae60;
+            --primary-hover: #219653;
+            --secondary: #2980b9;
+            --danger: #e74c3c;
+            --alert-bg: #fadbd8;
+            --nav-bg: #ffffff;
+            --nav-active: #27ae60;
+            --nav-inactive: #8e8e93;
+            --input-bg: #f0f2f5;
+            --input-border: #ced4da;
+            --toast-bg: #333333;
+            --toast-text: #ffffff;
         }
 
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; background-color: var(--bg-body); color: var(--text-main); padding-bottom: 160px; transition: background-color 0.3s, color 0.3s; -webkit-tap-highlight-color: transparent; }
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --text-color: #e4e6eb;
+            --text-muted: #b0b3b8;
+            --card-bg: #1e1e1e;
+            --border-color: #333333;
+            --primary: #2ecc71;
+            --primary-hover: #27ae60;
+            --secondary: #3498db;
+            --danger: #ff6b6b;
+            --alert-bg: #4a1919;
+            --nav-bg: #1e1e1e;
+            --nav-active: #2ecc71;
+            --nav-inactive: #8e8e93;
+            --input-bg: #2d2d2d;
+            --input-border: #444444;
+            --toast-bg: #e4e6eb;
+            --toast-text: #121212;
+        }
+
+        /* === ESTILOS BASE === */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; padding-top: 60px; padding-bottom: 140px; background-color: var(--bg-color); color: var(--text-color); transition: background-color 0.3s; -webkit-tap-highlight-color: transparent; }
         * { box-sizing: border-box; }
         
-        /* === TOP BAR Y PESTAÑAS === */
-        .top-header { background: var(--bg-surface); padding: 12px 10px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; display: flex; flex-direction: column; gap: 10px; }
-        .tabs-wrapper { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-        .tabs-scroll { display: flex; overflow-x: auto; gap: 8px; flex: 1; scrollbar-width: none; }
-        .tabs-scroll::-webkit-scrollbar { display: none; }
-        .tab-btn { background: var(--bg-body); color: var(--text-muted); border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: 0.2s; }
-        .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-        .btn-icon { background: none; border: none; font-size: 20px; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; color: var(--text-main); }
-        
-        /* Buscador */
-        .search-container { display: flex; gap: 8px; background: var(--bg-body); border-radius: 8px; padding: 4px 8px; border: 1px solid var(--border); align-items: center; }
-        .search-container input { border: none; background: transparent; padding: 8px; font-size: 16px; flex: 1; color: var(--text-main); outline: none; }
-        .search-container button { background: none; border: none; font-size: 14px; color: var(--text-muted); padding: 5px; }
+        /* === PESTAÑAS SUPERIORES (TABS) === */
+        .tabs-header { position: fixed; top: 0; left: 0; width: 100%; height: 55px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; padding: 0 15px; gap: 10px; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .tabs-container { display: flex; overflow-x: auto; gap: 10px; flex: 1; padding-bottom: 2px; scrollbar-width: none; }
+        .tabs-container::-webkit-scrollbar { display: none; }
+        .tab-btn { background: var(--input-bg); color: var(--text-muted); border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: 0.2s; }
+        .tab-btn.active { background: var(--primary); color: white; }
+        .btn-add-list { background: transparent; color: var(--primary); font-size: 24px; font-weight: bold; border: none; cursor: pointer; padding: 0 5px; }
 
-        /* === CONTENEDORES DE VISTA === */
-        .view-panel { display: none; padding: 10px; }
-        .view-panel.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        /* === CONTENEDORES Y BUSCADOR === */
+        .container { padding: 0 15px; }
+        .view-panel { display: none; animation: fadeIn 0.3s; }
+        .view-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* === DISEÑO DE TARJETAS (CARDS) === */
-        .cat-header { display: flex; justify-content: space-between; align-items: center; background: var(--cat-bg); color: white; padding: 8px 12px; border-radius: 8px; margin: 15px 0 10px 0; font-size: 14px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .cat-badge { background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 12px; font-size: 12px; }
+        .search-card { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border: 1px solid var(--border-color); }
+        .search-row { display: flex; gap: 8px; }
+        .search-input { flex: 1; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-color); padding: 10px 15px; border-radius: 8px; font-size: 16px; outline: none; }
+        .btn-clear { background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-muted); width: 42px; border-radius: 8px; font-size: 16px; font-weight: bold; }
+        .filter-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-muted); font-weight: 500; }
 
-        .item-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 8px; display: flex; gap: 10px; align-items: center; box-shadow: var(--card-shadow); transition: 0.2s; }
-        .item-card.checked { background: var(--checked-bg); border-color: var(--success); }
+        /* === TARJETAS DE PRODUCTOS (CHECKLIST) === */
+        h2 { font-size: 16px; color: var(--primary); margin: 25px 0 10px 5px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 5px; }
+        h2 .badge { background: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
+
+        .item-card { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.04); display: flex; align-items: center; gap: 12px; border: 1px solid var(--border-color); transition: background 0.2s; }
+        .item-card.checked { background: var(--checked-bg); border-color: var(--primary); }
+        .hidden-item { display: none !important; }
         
         /* Checkbox Custom */
-        .checkbox-wrapper { position: relative; width: 24px; height: 24px; flex-shrink: 0; }
-        .checkbox-wrapper input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
-        .checkmark { position: absolute; top: 0; left: 0; height: 24px; width: 24px; background-color: var(--bg-body); border: 2px solid var(--input-border); border-radius: 6px; transition: 0.2s; }
-        .checkbox-wrapper input:checked ~ .checkmark { background-color: var(--success); border-color: var(--success); }
-        .checkmark:after { content: ""; position: absolute; display: none; left: 7px; top: 3px; width: 5px; height: 10px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
-        .checkbox-wrapper input:checked ~ .checkmark:after { display: block; }
+        .check-container { position: relative; width: 28px; height: 28px; flex-shrink: 0; }
+        .check-container input { opacity: 0; width: 0; height: 0; }
+        .checkmark { position: absolute; top: 0; left: 0; width: 28px; height: 28px; background-color: var(--input-bg); border: 2px solid var(--input-border); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .check-container input:checked ~ .checkmark { background-color: var(--primary); border-color: var(--primary); }
+        .checkmark:after { content: "✓"; color: white; display: none; font-weight: bold; font-size: 16px; }
+        .check-container input:checked ~ .checkmark:after { display: block; }
 
-        .item-details { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-        .item-title { font-size: 14px; font-weight: bold; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* Contenido Tarjeta */
+        .item-content { flex: 1; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
+        .item-name { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-color); }
+        .item-inputs { display: flex; gap: 8px; align-items: center; }
         
-        .item-inputs { display: flex; align-items: center; gap: 4px; }
-        .mini-input { background: var(--bg-body); border: 1px solid var(--border); color: var(--text-main); border-radius: 6px; padding: 4px; font-size: 16px !important; font-weight: bold; text-align: center; height: 32px; }
-        .qty-input { width: 50px; }
-        .price-input { width: 70px; color: var(--success); }
+        .input-group { display: flex; align-items: center; background: var(--input-bg); border-radius: 6px; padding: 2px 6px; border: 1px solid var(--input-border); flex: 1;}
+        .input-group label { font-size: 10px; color: var(--text-muted); font-weight: 600; width: 35px; }
+        .input-group input { border: none; background: transparent; color: var(--text-color); width: 100%; font-size: 16px; font-weight: bold; text-align: center; outline: none; padding: 4px 0; }
         
-        /* Alerta de Precio Olvidado */
-        .price-alert { border: 2px solid var(--danger) !important; background-color: rgba(214, 48, 49, 0.1) !important; color: var(--danger) !important; animation: pulseRed 2s infinite; }
-        @keyframes pulseRed { 0% { box-shadow: 0 0 0 0 rgba(214, 48, 49, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(214, 48, 49, 0); } 100% { box-shadow: 0 0 0 0 rgba(214, 48, 49, 0); } }
+        /* Alerta de Precio Cero */
+        .price-alert-box { border: 2px solid var(--danger) !important; background-color: var(--alert-bg) !important; }
 
-        .item-totals { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; min-width: 65px; }
-        .subtotal-val { font-size: 15px; font-weight: 900; color: var(--text-main); }
-        .est-ref { font-size: 10px; color: var(--text-muted); font-style: italic; margin-top: 2px; }
+        .item-totals { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; flex-shrink: 0; min-width: 50px; }
+        .item-subtotal { font-size: 14px; font-weight: 800; color: var(--text-color); }
+        .item-est-total { font-size: 10px; color: var(--text-muted); }
 
-        /* === TARJETAS DE CATÁLOGO (SETTINGS) === */
-        .cat-setting-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 12px; box-shadow: var(--card-shadow); }
-        .cat-setting-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 8px; }
-        .cat-setting-header h4 { margin: 0; color: var(--primary); font-size: 15px; display: flex; align-items: center; gap: 8px; }
+        /* === TARJETAS DE CONFIGURACIÓN === */
+        .config-card { background: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border: 1px solid var(--border-color); }
+        .config-card h3 { margin: 0 0 10px 0; font-size: 15px; color: var(--text-color); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center;}
         
-        .item-setting-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--bg-body); }
-        .item-setting-row:last-child { border-bottom: none; }
-        .item-setting-info { flex: 1; font-size: 13px; font-weight: 500; }
-        .item-setting-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-        .btn-edit { background: var(--bg-body); border: 1px solid var(--border); color: var(--text-main); border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .list-setting-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
+        .list-setting-item:last-child { border-bottom: none; }
+        
+        .edit-item-row { display: flex; align-items: center; padding: 10px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .arrows-col { display: flex; flex-direction: column; gap: 2px; }
+        .btn-arrow { background: var(--input-bg); border: none; color: var(--text-muted); font-size: 10px; padding: 4px; border-radius: 4px; }
+        .edit-item-info { flex: 1; }
+        .edit-item-info p { margin: 0; font-size: 14px; font-weight: 600; color: var(--text-color); }
+        .edit-item-info span { font-size: 11px; color: var(--text-muted); }
+        
+        /* Botones Generales */
+        .btn { padding: 10px 15px; border-radius: 8px; font-size: 14px; font-weight: bold; border: none; cursor: pointer; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+        .btn-full { width: 100%; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--input-border); color: var(--text-color); }
+        .btn-outline-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+        .btn-icon { padding: 8px; font-size: 16px; border-radius: 8px; background: var(--input-bg); border: none; color: var(--text-color); }
 
-        /* === RESUMEN FLOTANTE Y BOTTOM NAV === */
-        .bottom-area { position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1000; }
-        .summary-panel { background: var(--sum-bg); color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -4px 10px rgba(0,0,0,0.15); border-top-left-radius: 16px; border-top-right-radius: 16px; margin: 0 5px; }
-        .rate-block { display: flex; flex-direction: column; gap: 2px; }
-        .rate-block label { font-size: 9px; color: var(--warning); font-weight: bold; }
-        .rate-inputs { display: flex; align-items: center; gap: 4px; }
-        .rate-inputs input { width: 60px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 4px; padding: 4px; font-size: 14px; font-weight: bold; text-align: center; }
-        .btn-bcv { background: var(--success); border: none; color: white; padding: 5px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
-        .totals-block { display: flex; gap: 15px; text-align: right; }
-        .total-item span { display: block; font-size: 9px; color: #b2bec3; }
-        .total-item strong { display: block; font-size: 14px; color: white; }
-        .total-item .real-val { color: var(--success); font-size: 16px; }
+        /* Campos de Entrada Generales */
+        .form-input, .form-select { width: 100%; padding: 10px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); border-radius: 8px; font-size: 16px; margin-bottom: 10px; outline: none; }
 
-        .bottom-nav { background: var(--nav-bg); display: flex; justify-content: space-around; padding: 8px 5px 20px 5px; border-top: 1px solid var(--border); }
-        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: none; border: none; color: var(--text-muted); font-size: 10px; font-weight: 600; width: 25%; cursor: pointer; transition: 0.2s; }
-        .nav-item.active { color: var(--primary); }
-        .nav-icon { font-size: 22px; }
+        /* === BARRA INFERIOR DE TOTALES Y NAVEGACIÓN === */
+        .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--nav-bg); border-top: 1px solid var(--border-color); z-index: 1000; padding-bottom: env(safe-area-inset-bottom); box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+        
+        .totals-row { display: flex; padding: 10px 15px; background: var(--input-bg); border-bottom: 1px solid var(--border-color); align-items: center; gap: 10px; }
+        .rate-widget { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; display: flex; align-items: center; padding: 2px; }
+        .rate-widget span { font-size: 10px; font-weight: bold; color: var(--text-muted); padding: 0 4px; }
+        .rate-widget input { width: 50px; border: none; background: transparent; color: var(--text-color); font-weight: bold; font-size: 14px; text-align: center; outline: none; }
+        .rate-widget button { background: var(--primary); border: none; color: white; font-size: 10px; font-weight: bold; border-radius: 4px; padding: 4px 6px; }
+        
+        .totals-info { flex: 1; display: flex; justify-content: space-around; text-align: center; }
+        .total-box { display: flex; flex-direction: column; }
+        .total-box label { font-size: 9px; color: var(--text-muted); font-weight: bold; }
+        .total-box span { font-size: 14px; font-weight: 900; color: var(--text-color); }
+        .total-box .real-val { color: var(--primary); }
 
-        /* === MODALS Y ACTION SHEETS === */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .nav-row { display: flex; justify-content: space-around; padding: 10px 0; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--nav-inactive); background: transparent; border: none; font-size: 10px; font-weight: 600; cursor: pointer; flex: 1; }
+        .nav-item.active { color: var(--nav-active); }
+        .nav-icon { font-size: 22px; margin-bottom: 2px; }
+
+        /* === MENÚ FLOTANTE (BOTTOM SHEET) === */
+        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: none; opacity: 0; transition: 0.3s; }
+        .sheet-overlay.show { display: block; opacity: 1; }
+        .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: var(--card-bg); border-radius: 20px 20px 0 0; z-index: 2001; padding: 20px 15px calc(20px + env(safe-area-inset-bottom)); transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .bottom-sheet.show { bottom: 0; }
+        .sheet-handle { width: 40px; height: 5px; background: var(--input-border); border-radius: 5px; margin: 0 auto 15px auto; }
+        .sheet-menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        
+        /* === VENTANA FLOTANTE PARA EDITAR (MODAL) === */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 20px; opacity: 0; transition: 0.2s; }
         .modal-overlay.show { display: flex; opacity: 1; }
-        .modal-content { background: var(--bg-surface); width: 90%; max-width: 400px; border-radius: 16px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: translateY(20px); transition: transform 0.3s; border: 1px solid var(--border); }
-        .modal-overlay.show .modal-content { transform: translateY(0); }
-        
-        .action-sheet { align-items: flex-end; }
-        .action-sheet .modal-content { width: 100%; max-width: 100%; border-radius: 20px 20px 0 0; padding: 20px 15px 40px 15px; transform: translateY(100%); margin: 0; }
-        .action-sheet.show .modal-content { transform: translateY(0); }
-        
-        .modal-title { margin: 0 0 15px 0; font-size: 18px; color: var(--text-main); text-align: center; }
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; font-weight: bold; }
-        .form-input { width: 100%; padding: 10px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-main); border-radius: 8px; font-size: 16px !important; }
-        
-        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-modal { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; color: white; }
-        
-        /* Lista de botones del menú Más */
-        .sheet-btn { width: 100%; background: var(--bg-body); border: 1px solid var(--border); color: var(--text-main); padding: 15px; border-radius: 10px; margin-bottom: 8px; font-size: 15px; font-weight: 600; text-align: left; display: flex; align-items: center; gap: 12px; }
-        
-        /* === TOAST NOTIFICATIONS === */
-        #toast { position: fixed; top: 20px; left: 50%; transform: translate(-50%, -100px); background: var(--success); color: white; padding: 12px 20px; border-radius: 30px; font-size: 14px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 3000; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 8px; }
-        #toast.show { transform: translate(-50%, 0); }
-        #toast.error { background: var(--danger); }
-        #toast.info { background: var(--primary); }
+        .modal-card { background: var(--card-bg); width: 100%; max-width: 400px; border-radius: 16px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: scale(0.9); transition: 0.2s; }
+        .modal-overlay.show .modal-card { transform: scale(1); }
+        .modal-header { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: var(--text-color); }
+        .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
 
-        .hidden { display: none !important; }
+        /* === TOAST NOTIFICATIONS === */
+        .toast-container { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); z-index: 4000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: var(--toast-bg); color: var(--toast-text); padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transform: translateY(20px); transition: 0.3s; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.error { background: var(--danger); color: white; }
+
+        @media print {
+            body { padding: 0; background: white; color: black; }
+            .tabs-header, .search-card, .bottom-bar, .config-box, .sheet-overlay, .bottom-sheet, .modal-overlay, .toast-container { display: none !important; }
+            .item-card { border: none; box-shadow: none; border-bottom: 1px solid #ccc; border-radius: 0; margin: 0; padding: 5px 0; }
+            .item-inputs { display: none; }
+            .check-container { display: none; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- TOAST DE NOTIFICACIÓN -->
-    <div id="toast">✔️ Acción completada</div>
+    <!-- PESTAÑAS (LISTAS) -->
+    <div class="tabs-header">
+        <div class="tabs-container" id="tabs-container"></div>
+        <button class="btn-add-list" onclick="createNewList()">+</button>
+    </div>
 
-    <!-- TOP BAR (PESTAÑAS Y BUSCADOR) -->
-    <div class="top-header">
-        <div class="tabs-wrapper">
-            <div class="tabs-scroll" id="tabs-container">
-                <!-- Pestañas dinámicas -->
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="container">
+        <!-- VISTA 1: CHECKLIST -->
+        <div id="view-list" class="view-panel active">
+            <div class="search-card" id="search-container">
+                <div class="search-row">
+                    <input type="text" id="search-input" class="search-input" placeholder="🔍 Buscar producto..." oninput="filterList()">
+                    <button class="btn-clear" onclick="clearSearch()">✕</button>
+                </div>
+                <div class="filter-row">
+                    <label style="display:flex; align-items:center; gap:5px;">
+                        <input type="checkbox" id="hide-completed-check" checked onchange="filterList()" style="margin:0;"> Ocultar comprados
+                    </label>
+                    <span id="items-count-label">0 / 0</span>
+                </div>
             </div>
-            <button class="btn-icon" onclick="createNewList()">➕</button>
-            <button class="btn-icon" id="btn-dark-mode" onclick="toggleDarkMode()">🌙</button>
+            <div id="categories-container"></div>
         </div>
-        <div class="search-container">
-            <span style="font-size:16px;">🔍</span>
-            <input type="text" id="search-input" placeholder="Buscar producto..." oninput="filterList()">
-            <button onclick="clearSearch()">✕</button>
-        </div>
-        <div class="filter-row">
-            <label style="display:flex; align-items:center; gap:6px;">
-                <input type="checkbox" id="hide-completed-check" checked onchange="filterList()"> Ocultar comprados
-            </label>
-            <span id="items-count-label">0 / 0</span>
+
+        <!-- VISTA 2: CONFIGURACIÓN -->
+        <div id="view-settings" class="view-panel">
+            <div class="config-card">
+                <h3>👁️ Pasillos a Comprar Hoy</h3>
+                <div id="settings-categories-visibility" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                <div style="display: flex; gap: 6px; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color);">
+                    <input type="text" id="new-cat-name" class="form-input" placeholder="Nuevo pasillo" style="margin:0; padding:6px 10px;">
+                    <button class="btn btn-secondary" onclick="addNewCategory()">Crear</button>
+                </div>
+            </div>
+
+            <div class="config-card">
+                <h3>✏️ Catálogo (Toca para editar)</h3>
+                <div id="settings-prices-container"></div>
+            </div>
+
+            <div class="config-card">
+                <h3>➕ Agregar Producto</h3>
+                <input type="text" id="new-item-name" class="form-input" placeholder="Nombre del artículo">
+                <select id="new-item-cat" class="form-select"></select>
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="new-item-qty" class="form-input" placeholder="Cant. Ref" step="any">
+                    <input type="number" id="new-item-price" class="form-input" placeholder="Precio ($)" step="0.01">
+                </div>
+                <button class="btn btn-primary btn-full" onclick="addNewItemToCatalog()">Añadir al Catálogo</button>
+            </div>
         </div>
     </div>
 
-    <!-- VISTA 1: CHECKLIST -->
-    <div id="view-list" class="view-panel active">
-        <div id="categories-container"></div>
-    </div>
-
-    <!-- VISTA 2: CATÁLOGO (CONFIGURACIÓN) -->
-    <div id="view-settings" class="view-panel">
-        
-        <div class="cat-setting-card">
-            <div class="cat-setting-header">
-                <h4>👁️ Pasillos Activos</h4>
+    <!-- BARRA INFERIOR NATIVA -->
+    <div class="bottom-bar">
+        <div class="totals-row">
+            <div class="rate-widget">
+                <span>BCV</span>
+                <input type="number" id="exchange-rate" value="40.00" step="0.01" onchange="handleRateChange()">
+                <button onclick="fetchBCVRate()" id="btn-fetch-bcv">↻</button>
             </div>
-            <p style="font-size: 11px; color: var(--text-muted); margin-top:0;">Activa solo los pasillos que recorrerás hoy:</p>
-            <div id="settings-categories-visibility" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px;"></div>
-            
-            <div style="display: flex; gap: 8px; border-top: 1px solid var(--border); padding-top: 12px;">
-                <input type="text" id="new-cat-name" class="form-input" placeholder="Nueva Categoría" style="padding:6px; font-size:14px!important;">
-                <button type="button" class="btn-modal" style="background:var(--primary); padding:6px 12px; flex:none;" onclick="addNewCategory()">Crear</button>
-            </div>
-        </div>
-
-        <button class="btn-modal" style="background:var(--success); width:100%; margin-bottom:15px;" onclick="openItemModal(null)">➕ Crear Nuevo Producto</button>
-
-        <h3 style="margin-bottom: 10px; font-size: 16px; padding-left: 5px;">✏️ Catálogo de Referencia</h3>
-        <p style="font-size: 11px; color: var(--text-muted); margin:0 0 15px 5px;">Toca un producto para editarlo. Usa ▲/▼ para reordenar.</p>
-        <div id="settings-prices-container"></div>
-    </div>
-
-    <!-- BARRA INFERIOR -->
-    <div class="bottom-area">
-        <div class="summary-panel">
-            <div class="rate-block">
-                <label>Tasa BCV</label>
-                <div class="rate-inputs">
-                    <input type="number" id="exchange-rate" value="40.00" step="0.01" oninput="handleRateChange()">
-                    <button class="btn-bcv" id="btn-fetch-bcv" onclick="fetchBCVRate()">🔄</button>
+            <div class="totals-info">
+                <div class="total-box">
+                    <label>COMPRA REAL</label>
+                    <span class="real-val" id="checked-total-usd">$0.00</span>
+                    <span id="checked-total-bs" style="font-size:10px; color:var(--text-muted); font-weight:normal;">0 Bs</span>
                 </div>
-            </div>
-            <div class="totals-block">
-                <div class="total-item">
-                    <span>Estimado Ref.</span>
-                    <strong id="list-total">$0.00</strong>
-                </div>
-                <div class="total-item">
-                    <span>Total Compra</span>
-                    <strong class="real-val" id="checked-total">$0.00</strong>
+                <div class="total-box">
+                    <label>TOTAL LISTA</label>
+                    <span id="list-total-usd">$0.00</span>
+                    <span id="list-total-bs" style="font-size:10px; color:var(--text-muted); font-weight:normal;">0 Bs</span>
                 </div>
             </div>
         </div>
-        
-        <div class="bottom-nav">
-            <button class="nav-item active" id="nav-btn-list" onclick="switchView('list')">
-                <span class="nav-icon">📋</span> Lista
+        <div class="nav-row">
+            <button class="nav-item active" id="nav-list" onclick="switchView('list')">
+                <span class="nav-icon">📋</span><span>Lista</span>
             </button>
-            <button class="nav-item" id="nav-btn-settings" onclick="switchView('settings')">
-                <span class="nav-icon">⚙️</span> Catálogo
+            <button class="nav-item" id="nav-settings" onclick="switchView('settings')">
+                <span class="nav-icon">⚙️</span><span>Ajustes</span>
             </button>
             <button class="nav-item" onclick="shareWhatsApp()">
-                <span class="nav-icon" style="color:var(--success);">💬</span> Enviar
+                <span class="nav-icon">🟢</span><span>Enviar</span>
             </button>
-            <button class="nav-item" onclick="openActionSheet()">
-                <span class="nav-icon">⋮</span> Más
+            <button class="nav-item" onclick="toggleMenu()">
+                <span class="nav-icon">⠇</span><span>Menú</span>
             </button>
         </div>
     </div>
 
-    <!-- MODAL DE EDICIÓN / NUEVO PRODUCTO -->
-    <div class="modal-overlay" id="item-modal">
-        <div class="modal-content">
-            <h3 class="modal-title" id="item-modal-title">Editar Producto</h3>
-            <input type="hidden" id="modal-item-id">
-            
-            <div class="form-group">
-                <label>Nombre del Artículo</label>
-                <input type="text" id="modal-item-name" class="form-input" placeholder="Ej: Arroz Mary">
-            </div>
-            
-            <div class="form-group">
-                <label>Categoría</label>
-                <select id="modal-item-cat" class="form-input select-input"></select>
-            </div>
-            
-            <div style="display: flex; gap: 10px;">
-                <div class="form-group" style="flex:1;">
-                    <label>Cant. Fija (Ref)</label>
-                    <input type="number" id="modal-item-qty" class="form-input" step="any">
-                </div>
-                <div class="form-group" style="flex:1;">
-                    <label>Precio Ref ($)</label>
-                    <input type="number" id="modal-item-price" class="form-input" step="0.01">
-                </div>
-            </div>
+    <!-- MENÚ FLOTANTE (BOTTOM SHEET) -->
+    <div class="sheet-overlay" id="sheet-overlay" onclick="toggleMenu()"></div>
+    <div class="bottom-sheet" id="bottom-sheet">
+        <div class="sheet-handle"></div>
+        <h3 style="margin-top:0; text-align:center; font-size:16px;">Opciones Avanzadas</h3>
+        <div class="sheet-menu">
+            <button class="btn btn-outline" onclick="toggleDarkMode(); toggleMenu();"><span id="dark-icon">🌙</span> Tema Oscuro</button>
+            <button class="btn btn-outline" onclick="undoAction(); toggleMenu();">↩️ Deshacer</button>
+            <button class="btn btn-outline" onclick="resetChecklistValues(); toggleMenu();">🧹 Limpiar Carrito</button>
+            <button class="btn btn-outline-danger" onclick="deleteCurrentList(); toggleMenu();">🗑️ Borrar Lista</button>
+            <button class="btn btn-primary" onclick="createNewBackup(); toggleMenu();">💾 Backup Hoy</button>
+            <button class="btn btn-secondary" onclick="openBackupModal(); toggleMenu();">📦 Historial Backups</button>
+            <button class="btn btn-outline-danger" style="grid-column: span 2;" onclick="factoryResetCatalog(); toggleMenu();">⚠️ Restaurar Catálogo de Fábrica</button>
+        </div>
+    </div>
 
+    <!-- MODAL DE EDICIÓN DE PRODUCTO -->
+    <div class="modal-overlay" id="edit-modal">
+        <div class="modal-card">
+            <div class="modal-header">Editar Producto</div>
+            <input type="hidden" id="edit-id">
+            <label style="font-size:12px; font-weight:bold; color:var(--text-muted);">Nombre</label>
+            <input type="text" id="edit-name" class="form-input" style="text-align:left;">
+            <label style="font-size:12px; font-weight:bold; color:var(--text-muted);">Pasillo</label>
+            <select id="edit-cat" class="form-select" style="text-align-last:left;"></select>
+            <div style="display:flex; gap:10px;">
+                <div style="flex:1;">
+                    <label style="font-size:12px; font-weight:bold; color:var(--text-muted);">Cant. Ref</label>
+                    <input type="number" id="edit-qty" class="form-input" step="any">
+                </div>
+                <div style="flex:1;">
+                    <label style="font-size:12px; font-weight:bold; color:var(--text-muted);">Precio ($)</label>
+                    <input type="number" id="edit-price" class="form-input" step="0.01">
+                </div>
+            </div>
             <div class="modal-actions">
-                <button class="btn-modal" style="background:#b2bec3;" onclick="closeModals()">Cancelar</button>
-                <button class="btn-modal" style="background:var(--primary);" onclick="saveItemModal()">Guardar</button>
+                <button class="btn btn-outline" style="flex:1;" onclick="closeModals()">Cancelar</button>
+                <button class="btn btn-primary" style="flex:1;" onclick="saveItemEdits()">Guardar</button>
             </div>
-            <button id="modal-btn-delete" class="btn-modal" style="background:var(--danger); width:100%; margin-top:10px; display:none;" onclick="deleteItemFromModal()">🗑️ Eliminar Producto</button>
+            <button class="btn btn-outline-danger btn-full" style="margin-top:10px;" onclick="deleteItemFromModal()">🗑️ Eliminar Producto</button>
         </div>
     </div>
 
-    <!-- ACTION SHEET (MENÚ MÁS) -->
-    <div class="modal-overlay action-sheet" id="action-sheet">
-        <div class="modal-content">
-            <div style="width: 40px; height: 5px; background: var(--border); border-radius: 5px; margin: 0 auto 15px auto;"></div>
-            
-            <button class="sheet-btn" onclick="undoAction(); closeModals();">
-                <span>↩️</span> Deshacer Último Cambio
-            </button>
-            <button class="sheet-btn" onclick="resetChecklistValues(); closeModals();">
-                <span>🔄</span> Limpiar Carrito (Nuevo Día)
-            </button>
-            <button class="sheet-btn" onclick="openBackupModal();">
-                <span>📦</span> Copias de Seguridad
-            </button>
-            <button class="sheet-btn" onclick="window.print(); closeModals();">
-                <span>📄</span> Exportar a PDF
-            </button>
-            <button class="sheet-btn" style="color:var(--danger);" onclick="deleteCurrentList(); closeModals();">
-                <span>🗑️</span> Borrar Lista Actual
-            </button>
-            
-            <button class="sheet-btn" style="justify-content:center; background:var(--bg-body); margin-top:20px; border:none;" onclick="closeModals()">Cerrar</button>
-        </div>
-    </div>
-
-    <!-- MODAL DE BACKUPS -->
+    <!-- MODAL DE HISTORIAL DE BACKUPS -->
     <div class="modal-overlay" id="backup-modal">
-        <div class="modal-content" style="max-height:80vh; overflow-y:auto;">
-            <h3 class="modal-title">📦 Backups y Restauración</h3>
-            
-            <button class="btn-modal" style="background:var(--success); width:100%; margin-bottom:15px;" onclick="createNewBackup()">💾 Crear Copia General (Hoy)</button>
-            
-            <div id="backups-history-list" style="margin-bottom: 15px; border: 1px solid var(--border); border-radius: 8px; padding: 5px; background: var(--bg-body); max-height: 200px; overflow-y: auto;"></div>
-
-            <div class="form-group" style="border-top: 1px solid var(--border); padding-top: 15px;">
-                <label>Importar desde otro dispositivo:</label>
-                <div style="display:flex; gap:6px;">
-                    <input type="text" id="manual-import-string" class="form-input" placeholder="Pega el código...">
-                    <button class="btn-modal" style="background:var(--primary); padding:10px; margin:0; flex:none;" onclick="importManualBackup()">📥</button>
-                </div>
+        <div class="modal-card" style="max-height: 80vh; overflow-y: auto;">
+            <div class="modal-header">📦 Historial de Backups</div>
+            <div id="backups-list-container" style="display:flex; flex-direction:column; gap:10px; margin-bottom:15px;"></div>
+            <div style="border-top:1px solid var(--border-color); padding-top:15px; margin-top:15px;">
+                <label style="font-size:12px; font-weight:bold; color:var(--text-muted);">Importar Código</label>
+                <input type="text" id="manual-import-string" class="form-input" placeholder="Pegar código..." style="text-align:left;">
+                <button class="btn btn-primary btn-full" onclick="importManualBackup()">Importar</button>
             </div>
-
-            <button class="btn-modal" style="background:var(--danger); width:100%; margin-bottom:10px;" onclick="factoryResetCatalog()">⚠️ Restaurar Valores de Fábrica</button>
-            <button class="btn-modal" style="background:#b2bec3; width:100%; margin:0;" onclick="closeModals()">Cerrar</button>
+            <button class="btn btn-outline btn-full" style="margin-top:10px;" onclick="closeModals()">Cerrar</button>
         </div>
     </div>
+
+    <!-- CONTENEDOR DE TOASTS -->
+    <div class="toast-container" id="toast-container"></div>
 
     <script>
-        // --- ESTRUCTURA BASE INTACTA ---
+        // --- CONSTANTES Y LISTADO ORIGINAL (132 Artículos Intactos) ---
         const defaultCategories = [
             { id: 1, name: "1. DESPENSA Y VÍVERES", active: true },
             { id: 2, name: "2. CHARCUTERÍA Y PROTEÍNAS", active: true },
@@ -454,17 +480,19 @@
             { id: 132, cat: 6, name: "Protección femenina", qty: 2, est: 2.00 }
         ];
 
+        // --- SISTEMA BASE ---
         let appData = { lists: [], currentListId: 1, backups: [], rate: 40.00, darkMode: false };
         let state = { items: [], categories: [], currentView: 'list' };
         let undoStack = [];
 
-        // TOAST NOTIFICATIONS
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.innerHTML = (type === 'error' ? '❌ ' : '✔️ ') + message;
-            toast.className = type;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+        function showToast(message, isError = false) {
+            const container = document.getElementById("toast-container");
+            const toast = document.createElement('div');
+            toast.className = `toast ${isError ? 'error' : ''}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
         }
 
         function saveToHistory() {
@@ -473,10 +501,13 @@
         }
 
         function undoAction() {
-            if (undoStack.length === 0) return showToast("No hay acciones por deshacer.", "error");
+            if (undoStack.length === 0) return showToast("No hay acciones por deshacer", true);
             let parsed = JSON.parse(undoStack.pop());
-            state.items = parsed.items; state.categories = parsed.categories;
-            saveToLocalStorage(); renderAll(); showToast("Cambio deshecho");
+            state.items = parsed.items;
+            state.categories = parsed.categories;
+            saveToLocalStorage();
+            renderAll();
+            showToast("Acción deshecha");
         }
 
         function initApp() {
@@ -485,6 +516,7 @@
             if (savedAppData) {
                 appData = JSON.parse(savedAppData);
             } else {
+                // Instancia inicial
                 appData.lists = [{ 
                     id: 1, name: "Mercado Principal", 
                     items: JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false})), 
@@ -500,7 +532,7 @@
         function applyDarkMode(isDark) {
             if(isDark) document.documentElement.setAttribute('data-theme', 'dark');
             else document.documentElement.removeAttribute('data-theme');
-            document.getElementById('btn-dark-mode').textContent = isDark ? '☀️' : '🌙';
+            document.getElementById('dark-icon').textContent = isDark ? '☀️' : '🌙';
         }
 
         function toggleDarkMode() {
@@ -519,59 +551,73 @@
 
         function saveToLocalStorage() {
             let listIdx = appData.lists.findIndex(l => l.id === appData.currentListId);
-            if(listIdx > -1) { appData.lists[listIdx].items = state.items; appData.lists[listIdx].categories = state.categories; }
+            if(listIdx > -1) {
+                appData.lists[listIdx].items = state.items;
+                appData.lists[listIdx].categories = state.categories;
+            }
             appData.rate = parseFloat(document.getElementById('exchange-rate').value) || 1;
             localStorage.setItem('compras_pro_appData_v10', JSON.stringify(appData));
         }
 
-        // TABS LISTS
+        // --- PESTAÑAS (LISTAS) ---
         function renderTabs() {
             const container = document.getElementById("tabs-container");
             container.innerHTML = appData.lists.map(l => `
-                <button class="tab-btn ${l.id === appData.currentListId ? 'active' : ''}" onclick="switchList(${l.id})">${l.name}</button>
+                <button type="button" class="tab-btn ${l.id === appData.currentListId ? 'active' : ''}" onclick="switchList(${l.id})">
+                    ${l.name}
+                </button>
             `).join('');
         }
 
         function switchList(id) {
             if(id === appData.currentListId) return;
-            saveToLocalStorage(); appData.currentListId = id; loadCurrentList();
+            saveToLocalStorage();
+            appData.currentListId = id;
+            loadCurrentList();
         }
 
         function createNewList() {
-            let name = prompt("Nombre de la nueva lista:");
+            let name = prompt("Nombre de la nueva lista (ej. Viaje, Repuestos):");
             if(!name) return;
-            let useCatalog = confirm("¿Quieres iniciar con el catálogo base de supermercado?");
+            let useCatalog = confirm("¿Iniciar con el catálogo del supermercado?\n(Cancela para lista vacía)");
             let newItems = useCatalog ? JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false})) : [];
             let newCats = JSON.parse(JSON.stringify(defaultCategories));
             saveToLocalStorage();
             let newList = { id: Date.now(), name: name, items: newItems, categories: newCats };
-            appData.lists.push(newList); appData.currentListId = newList.id;
-            loadCurrentList(); showToast("Lista creada");
+            appData.lists.push(newList);
+            appData.currentListId = newList.id;
+            loadCurrentList();
+            showToast("Lista creada");
         }
 
         function deleteCurrentList() {
-            if(appData.lists.length <= 1) return showToast("No puedes eliminar la única lista.", "error");
-            if(confirm("¿Eliminar esta lista por completo?")) {
+            if(appData.lists.length <= 1) return showToast("No puedes eliminar tu única lista", true);
+            if(confirm("¿Eliminar esta lista completa?")) {
                 appData.lists = appData.lists.filter(l => l.id !== appData.currentListId);
                 appData.currentListId = appData.lists[0].id;
-                loadCurrentList(); switchView('list'); showToast("Lista eliminada");
+                loadCurrentList();
+                if(state.currentView === 'settings') switchView('list');
+                showToast("Lista eliminada");
             }
         }
 
+        // --- MANEJO DE ACCIONES ---
         function resetToDefaults() {
             state.categories = JSON.parse(JSON.stringify(defaultCategories));
-            state.items = JSON.parse(JSON.stringify(defaultItems)).map(item => ({ ...item, est_qty: item.qty, real: item.est, checked: false }));
+            state.items = JSON.parse(JSON.stringify(defaultItems)).map(item => ({
+                ...item, est_qty: item.qty, real: item.est, checked: false
+            }));
             saveToLocalStorage();
         }
 
         function factoryResetCatalog() {
-            if (confirm("¿Restaurar categorías y productos originales para ESTA LISTA?")) {
-                saveToHistory(); resetToDefaults(); renderAll(); closeModals(); showToast("Fábrica Restaurada");
+            if (confirm("¿Restaurar valores de fábrica para ESTA LISTA? Borrará todo lo personalizado.")) {
+                saveToHistory(); resetToDefaults(); renderAll(); showToast("Fábrica restaurada");
             }
         }
 
         function resetChecklistValues() {
-            if (confirm("¿Desmarcar todo el carrito para un nuevo día?")) {
+            if (confirm("¿Limpiar carrito para una nueva compra?")) {
                 saveToHistory();
                 state.items.forEach(item => { item.checked = false; item.qty = item.est_qty; item.real = item.est; });
                 saveToLocalStorage(); renderAll(); showToast("Carrito limpio");
@@ -585,10 +631,9 @@
 
         function fetchBCVRate() {
             const btn = document.getElementById("btn-fetch-bcv");
-            const originalText = btn.textContent; btn.textContent = "⏳"; btn.disabled = true;
-
+            btn.innerHTML = "⏳"; btn.disabled = true;
             fetch('https://bcv-api.rafnixg.dev/rates/')
-            .then(res => res.json())
+            .then(res => { if (!res.ok) throw new Error(); return res.json(); })
             .then(data => {
                 let bcvUSD = data?.rates?.USD || data?.USD || data?.usd;
                 if (bcvUSD) {
@@ -596,33 +641,44 @@
                     handleRateChange(); showToast(`Tasa BCV: ${parseFloat(bcvUSD).toFixed(2)} Bs.`);
                 } else throw new Error();
             })
-            .catch(() => {
+            .catch(err => {
                 fetch('https://pydolarvenezuela-api.vercel.io/api/v1/dollar?page=bcv')
-                .then(res => res.json())
-                .then(data => {
+                .then(res => res.json()).then(data => {
                     let price = data?.monitors?.bcv?.price;
-                    if (price) {
-                        document.getElementById('exchange-rate').value = parseFloat(price).toFixed(2);
-                        handleRateChange(); showToast(`Tasa (Espejo): ${parseFloat(price).toFixed(2)} Bs.`);
-                    } else showToast("Error al obtener tasa.", "error");
-                }).catch(() => showToast("Sin conexión a servidores.", "error"));
-            })
-            .finally(() => { btn.textContent = originalText; btn.disabled = false; });
+                    if (price) { document.getElementById('exchange-rate').value = parseFloat(price).toFixed(2); handleRateChange(); showToast(`Tasa (Espejo): ${parseFloat(price).toFixed(2)}`); } 
+                    else showToast("Fallo BCV automático", true);
+                }).catch(() => showToast("Sin conexión BCV", true));
+            }).finally(() => { btn.innerHTML = "↻"; btn.disabled = false; });
         }
 
+        // --- NAVEGACIÓN UI ---
         function switchView(view) {
             state.currentView = view;
-            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('view-list').classList.remove('active');
+            document.getElementById('view-settings').classList.remove('active');
             document.getElementById(`view-${view}`).classList.add('active');
             
-            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`nav-btn-${view}`).classList.add('active');
+            document.getElementById('nav-list').classList.remove('active');
+            document.getElementById('nav-settings').classList.remove('active');
+            document.getElementById(`nav-${view}`).classList.add('active');
             
-            closeModals();
+            document.getElementById('search-container').style.display = view === 'list' ? 'flex' : 'none';
             renderAll();
         }
 
-        // --- RENDERIZADO GENERAL ---
+        function toggleMenu() {
+            const overlay = document.getElementById('sheet-overlay');
+            const sheet = document.getElementById('bottom-sheet');
+            overlay.classList.toggle('show');
+            sheet.classList.toggle('show');
+        }
+
+        function closeModals() {
+            document.getElementById('edit-modal').classList.remove('show');
+            document.getElementById('backup-modal').classList.remove('show');
+        }
+
+        // --- RENDERIZADO VISUAL ---
         function renderAll() {
             renderTabs();
             renderDynamicSelects();
@@ -633,9 +689,16 @@
 
         function renderDynamicSelects() {
             const visibilityContainer = document.getElementById("settings-categories-visibility");
+            const newCatSelect = document.getElementById("new-item-cat");
+            const editCatSelect = document.getElementById("edit-cat");
+            
+            let options = state.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            if (newCatSelect) newCatSelect.innerHTML = options;
+            if (editCatSelect) editCatSelect.innerHTML = options;
+
             if (visibilityContainer) {
                 visibilityContainer.innerHTML = state.categories.map(c => `
-                    <label style="display:flex; align-items:center; gap:8px; font-size:14px; border-bottom:1px solid var(--border); padding-bottom:4px;">
+                    <label style="display:flex; align-items:center; gap:8px; font-size:14px; border-bottom:1px solid var(--border-color); padding-bottom:4px;">
                         <input type="checkbox" style="transform: scale(1.3); margin:0;" ${c.active ? 'checked' : ''} onchange="toggleCategoryActive(${c.id}, this.checked)">
                         ${c.name}
                     </label>
@@ -644,27 +707,22 @@
         }
 
         function toggleCategoryActive(id, isActive) {
-            saveToHistory(); let cat = state.categories.find(c => c.id === id);
-            if (cat) cat.active = isActive; saveToLocalStorage();
+            saveToHistory();
+            let cat = state.categories.find(c => c.id === id);
+            if (cat) cat.active = isActive;
+            saveToLocalStorage();
         }
 
         function addNewCategory() {
-            let input = document.getElementById("new-cat-name"); let name = input.value.trim();
-            if(!name) return; saveToHistory();
+            let input = document.getElementById("new-cat-name");
+            let name = input.value.trim();
+            if(!name) return;
+            saveToHistory();
             state.categories.push({ id: Date.now(), name: name, active: true });
-            saveToLocalStorage(); input.value = ''; renderAll(); showToast("Categoría Creada");
+            saveToLocalStorage(); input.value = ''; renderAll(); showToast("Categoría creada");
         }
 
-        function deleteCategory(id) {
-            let cat = state.categories.find(c => c.id === id); if (!cat) return;
-            if (confirm(`¿Eliminar la categoría "${cat.name}" y todos sus productos?`)) {
-                saveToHistory();
-                state.categories = state.categories.filter(c => c.id !== id);
-                state.items = state.items.filter(i => i.cat !== id);
-                saveToLocalStorage(); renderAll(); showToast("Categoría Eliminada");
-            }
-        }
-
+        // --- ORDENAMIENTO (FLECHAS) ---
         function moveCategoryUp(id) {
             let idx = state.categories.findIndex(c => c.id === id);
             if (idx > 0) { saveToHistory(); let temp = state.categories[idx]; state.categories[idx] = state.categories[idx - 1]; state.categories[idx - 1] = temp; saveToLocalStorage(); renderAll(); }
@@ -673,8 +731,22 @@
             let idx = state.categories.findIndex(c => c.id === id);
             if (idx > -1 && idx < state.categories.length - 1) { saveToHistory(); let temp = state.categories[idx]; state.categories[idx] = state.categories[idx + 1]; state.categories[idx + 1] = temp; saveToLocalStorage(); renderAll(); }
         }
+        function moveItemUp(id, e) {
+            e.stopPropagation();
+            let item = state.items.find(i => i.id === id);
+            let catItems = state.items.filter(i => i.cat === item.cat);
+            let localIdx = catItems.findIndex(i => i.id === id);
+            if(localIdx > 0) { saveToHistory(); let prevItem = catItems[localIdx - 1]; let g1 = state.items.findIndex(i => i.id === item.id); let g2 = state.items.findIndex(i => i.id === prevItem.id); let temp = state.items[g1]; state.items[g1] = state.items[g2]; state.items[g2] = temp; saveToLocalStorage(); renderAll(); }
+        }
+        function moveItemDown(id, e) {
+            e.stopPropagation();
+            let item = state.items.find(i => i.id === id);
+            let catItems = state.items.filter(i => i.cat === item.cat);
+            let localIdx = catItems.findIndex(i => i.id === id);
+            if(localIdx > -1 && localIdx < catItems.length - 1) { saveToHistory(); let nextItem = catItems[localIdx + 1]; let g1 = state.items.findIndex(i => i.id === item.id); let g2 = state.items.findIndex(i => i.id === nextItem.id); let temp = state.items[g1]; state.items[g1] = state.items[g2]; state.items[g2] = temp; saveToLocalStorage(); renderAll(); }
+        }
 
-        // RENDER CHECKLIST EN CARDS
+        // --- CHECKLIST PRINCIPAL (TARJETAS) ---
         function renderChecklist() {
             const container = document.getElementById('categories-container');
             container.innerHTML = '';
@@ -683,31 +755,33 @@
                 let catItems = state.items.filter(i => i.cat == category.id);
                 if (catItems.length === 0) return;
 
-                let html = `<div class="cat-header"><span>${category.name}</span><span class="cat-badge" id="badge-cat-${category.id}">0/0</span></div>`;
+                let html = `<h2>${category.name} <span class="badge" id="badge-cat-${category.id}">0/0</span></h2>`;
 
                 catItems.forEach(item => {
-                    let isChecked = item.checked ? 'checked' : '';
-                    let isPriceZero = (item.checked && item.real == 0) ? 'price-alert' : '';
-                    let subtotal = (item.qty * item.real).toFixed(2);
-
+                    let rowClass = item.checked ? 'checked' : '';
+                    let priceAlertClass = (item.checked && item.real === 0) ? 'price-alert-box' : '';
+                    
                     html += `
-                    <div class="item-card ${isChecked}" id="item-row-${item.id}">
-                        <div class="checkbox-wrapper">
+                    <div class="item-card ${rowClass}" id="item-row-${item.id}">
+                        <label class="check-container">
                             <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="updateItemChecked(${item.id}, this.checked)">
                             <span class="checkmark"></span>
-                        </div>
-                        <div class="item-details">
-                            <div class="item-title">${item.name}</div>
+                        </label>
+                        <div class="item-content">
+                            <div class="item-name">${item.name}</div>
                             <div class="item-inputs">
-                                <input type="number" class="mini-input qty-input" value="${item.qty}" step="any" onchange="updateItemQty(${item.id}, this.value)" onblur="handleEnterKey(event)">
-                                <span style="font-size:12px; color:var(--text-muted);">x</span>
-                                <input type="number" class="mini-input price-input ${isPriceZero}" value="${item.real.toFixed(2)}" step="0.01" onchange="updateItemPrice(${item.id}, this.value)" onblur="handleEnterKey(event)">
-                                <span style="font-size:12px; font-weight:bold;">$</span>
+                                <div class="input-group">
+                                    <label>Cant</label>
+                                    <input type="number" value="${item.qty}" step="any" onchange="updateItemQty(${item.id}, this.value)" onkeydown="handleEnterKey(event)">
+                                </div>
+                                <div class="input-group ${priceAlertClass}" id="price-box-${item.id}">
+                                    <label>$</label>
+                                    <input type="number" class="item-price" value="${item.real.toFixed(2)}" step="0.01" onchange="updateItemPrice(${item.id}, this.value)" onkeydown="handleEnterKey(event)">
+                                </div>
                             </div>
                         </div>
                         <div class="item-totals">
-                            <div class="subtotal-val" id="subtotal-${item.id}">$${subtotal}</div>
-                            <div class="est-ref">Ref: $${item.est.toFixed(2)}</div>
+                            <div class="item-subtotal" id="subtotal-${item.id}">$0.00</div>
                         </div>
                     </div>`;
                 });
@@ -716,111 +790,141 @@
             filterList();
         }
 
-        // RENDER CATALOGO EN CARDS LIMPIAS
+        // --- CONFIGURACIÓN LISTA (TARJETAS LIMPIAS) ---
         function renderSettingsPrices() {
             const container = document.getElementById('settings-prices-container');
             container.innerHTML = '';
 
             state.categories.forEach(category => {
                 let catItems = state.items.filter(i => i.cat == category.id);
+                
                 let html = `
-                <div class="cat-setting-card">
-                    <div class="cat-setting-header">
-                        <h4>
-                            <div style="display:flex; flex-direction:column; gap:2px;">
-                                <button class="btn-move" onclick="moveCategoryUp(${category.id})">▲</button>
-                                <button class="btn-move" onclick="moveCategoryDown(${category.id})">▼</button>
-                            </div>
-                            ${category.name}
-                        </h4>
-                        <button class="btn-delete-cat" onclick="deleteCategory(${category.id})">🗑 Borrar Toda</button>
-                    </div>`;
+                <div style="display:flex; justify-content:space-between; align-items:center; margin: 15px 0 10px 0; border-bottom: 2px solid var(--border-color); padding-bottom:5px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="display:flex; flex-direction:column; gap:2px;">
+                            <button class="btn-move" onclick="moveCategoryUp(${category.id})">▲</button>
+                            <button class="btn-move" onclick="moveCategoryDown(${category.id})">▼</button>
+                        </div>
+                        <h4 style="margin:0; color:var(--primary); font-size:15px;">${category.name}</h4>
+                    </div>
+                    <button class="btn-delete-cat" onclick="deleteCategory(${category.id})">🗑 Borrar</button>
+                </div>`;
 
                 catItems.forEach(item => {
                     html += `
-                    <div class="item-setting-row" id="item-row-${item.id}">
-                        <div class="item-setting-info" onclick="openItemModal(${item.id})">
-                            <div style="color:var(--text-main);">${item.name}</div>
-                            <div class="item-setting-meta">Cant: ${item.est_qty} | Precio Est: $${item.est.toFixed(2)}</div>
+                    <div class="edit-item-row" onclick="openEditModal(${item.id})">
+                        <div class="arrows-col">
+                            <button class="btn-arrow" onclick="moveItemUp(${item.id}, event)">▲</button>
+                            <button class="btn-arrow" onclick="moveItemDown(${item.id}, event)">▼</button>
                         </div>
-                        <button class="btn-edit" onclick="openItemModal(${item.id})">Editar ✏️</button>
+                        <div class="edit-item-info">
+                            <p>${item.name}</p>
+                            <span>Ref: ${item.est_qty} | Est: $${item.est.toFixed(2)}</span>
+                        </div>
+                        <div style="color:var(--text-muted); font-size:12px;">✏️ Editar</div>
                     </div>`;
                 });
-                html += `</div>`;
                 container.innerHTML += html;
             });
-            filterList();
         }
 
-        // --- MODALES DE EDICIÓN ---
-        function openItemModal(id = null) {
-            const selectCat = document.getElementById("modal-item-cat");
-            selectCat.innerHTML = state.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        // --- VENTANA MODAL PARA EDITAR ---
+        function openEditModal(id) {
+            let item = state.items.find(i => i.id === id);
+            if(!item) return;
+            document.getElementById("edit-id").value = item.id;
+            document.getElementById("edit-name").value = item.name;
+            document.getElementById("edit-cat").value = item.cat;
+            document.getElementById("edit-qty").value = item.est_qty;
+            document.getElementById("edit-price").value = item.est.toFixed(2);
+            document.getElementById("edit-modal").classList.add("show");
+        }
+
+        function saveItemEdits() {
+            let id = parseInt(document.getElementById("edit-id").value);
+            let item = state.items.find(i => i.id === id);
+            if(!item) return;
             
-            document.getElementById("modal-item-id").value = id || '';
-            document.getElementById("item-modal-title").textContent = id ? "Editar Producto" : "Nuevo Producto";
-            document.getElementById("modal-btn-delete").style.display = id ? "block" : "none";
-
-            if (id) {
-                let item = state.items.find(i => i.id === id);
-                document.getElementById("modal-item-name").value = item.name;
-                document.getElementById("modal-item-cat").value = item.cat;
-                document.getElementById("modal-item-qty").value = item.est_qty;
-                document.getElementById("modal-item-price").value = item.est;
-            } else {
-                document.getElementById("modal-item-name").value = '';
-                document.getElementById("modal-item-qty").value = '';
-                document.getElementById("modal-item-price").value = '';
-            }
-
-            document.getElementById("item-modal").classList.add("show");
-        }
-
-        function saveItemModal() {
-            let id = document.getElementById("modal-item-id").value;
-            let name = document.getElementById("modal-item-name").value.trim();
-            let cat = parseInt(document.getElementById("modal-item-cat").value);
-            let qty = parseFloat(document.getElementById("modal-item-qty").value) || 1;
-            let est = parseFloat(document.getElementById("modal-item-price").value) || 0;
-
-            if (!name) return showToast("Falta el nombre", "error");
-
             saveToHistory();
-            if (id) {
-                let item = state.items.find(i => i.id == id);
-                item.name = name; item.cat = cat; item.est_qty = qty; item.qty = qty; item.est = est; item.real = est;
-                showToast("Producto Actualizado");
-            } else {
-                state.items.push({ id: Date.now(), cat: cat, name: name, qty: qty, est_qty: qty, est: est, real: est, checked: false });
-                showToast("Producto Creado");
-            }
-            saveToLocalStorage(); renderAll(); closeModals();
+            item.name = document.getElementById("edit-name").value.trim() || item.name;
+            item.cat = parseInt(document.getElementById("edit-cat").value);
+            
+            let nQty = parseFloat(document.getElementById("edit-qty").value) || 0;
+            let nPrice = parseFloat(document.getElementById("edit-price").value) || 0;
+            
+            item.est_qty = nQty; item.qty = nQty;
+            item.est = nPrice; item.real = nPrice;
+            
+            saveToLocalStorage();
+            closeModals();
+            renderAll();
+            showToast("Producto actualizado");
         }
 
         function deleteItemFromModal() {
-            let id = document.getElementById("modal-item-id").value;
-            if(confirm("¿Eliminar este producto permanentemente?")) {
+            let id = parseInt(document.getElementById("edit-id").value);
+            if (confirm(`¿Eliminar este producto?`)) {
                 saveToHistory();
-                state.items = state.items.filter(i => i.id != id);
-                saveToLocalStorage(); renderAll(); closeModals(); showToast("Producto Eliminado");
+                state.items = state.items.filter(i => i.id !== id);
+                saveToLocalStorage();
+                closeModals();
+                renderAll();
+                showToast("Producto eliminado");
             }
         }
 
-        function openActionSheet() { document.getElementById("action-sheet").classList.add("show"); }
-        function openBackupModal() { closeModals(); renderBackupList(); document.getElementById("backup-modal").classList.add("show"); }
-        function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('show')); }
-
-        function updateItemChecked(id, isChecked) {
-            saveToHistory(); let item = state.items.find(i => i.id === id); item.checked = isChecked;
-            saveToLocalStorage(); calculateTotals(); filterList();
+        // --- FUNCIONES LÓGICAS INTERNAS ---
+        function deleteCategory(id) {
+            let cat = state.categories.find(c => c.id === id);
+            if (confirm(`¿Eliminar pasillo "${cat.name}" y todo lo que contiene?`)) {
+                saveToHistory();
+                state.categories = state.categories.filter(c => c.id !== id);
+                state.items = state.items.filter(i => i.cat !== id);
+                saveToLocalStorage(); renderAll(); showToast("Pasillo eliminado");
+            }
         }
 
-        function updateItemQty(id, val) { saveToHistory(); state.items.find(i => i.id === id).qty = parseFloat(val) || 0; saveToLocalStorage(); calculateTotals(); }
-        function updateItemPrice(id, val) { saveToHistory(); state.items.find(i => i.id === id).real = parseFloat(val) || 0; saveToLocalStorage(); calculateTotals(); renderAll(); }
+        function addNewItemToCatalog() {
+            const name = document.getElementById("new-item-name").value.trim();
+            const cat = parseInt(document.getElementById("new-item-cat").value);
+            const qty = parseFloat(document.getElementById("new-item-qty").value) || 1;
+            const est = parseFloat(document.getElementById("new-item-price").value) || 0;
+            if (!name) return showToast("Falta nombre", true);
+            saveToHistory();
+            state.items.push({ id: Date.now(), cat, name, qty, est_qty: qty, est, real: est, checked: false });
+            saveToLocalStorage();
+            document.getElementById("new-item-name").value = '';
+            renderAll(); showToast("Añadido al catálogo");
+        }
+
+        function updateItemChecked(id, isChecked) {
+            saveToHistory();
+            let item = state.items.find(i => i.id === id);
+            item.checked = isChecked;
+            saveToLocalStorage();
+            renderAll(); // Forza validación visual de la alerta de precio 0
+        }
+
+        function updateItemQty(id, val) {
+            saveToHistory();
+            let item = state.items.find(i => i.id === id);
+            item.qty = parseFloat(val) || 0;
+            saveToLocalStorage(); calculateTotals();
+        }
+
+        function updateItemPrice(id, val) {
+            saveToHistory();
+            let item = state.items.find(i => i.id === id);
+            item.real = parseFloat(val) || 0;
+            saveToLocalStorage();
+            renderAll(); // Refresca color de alerta
+        }
+
         function handleEnterKey(event) { if (event.key === "Enter") event.target.blur(); }
         function clearSearch() { document.getElementById("search-input").value = ''; filterList(); }
 
         function filterList() {
+            if (state.currentView !== 'list') return;
             let query = document.getElementById("search-input").value.toLowerCase();
             let hideCompleted = document.getElementById("hide-completed-check").checked;
 
@@ -836,7 +940,8 @@
 
         function calculateTotals() {
             let checkedTotalUSD = 0; let listTotalUSD = 0;
-            let catCounters = {}; state.categories.forEach(c => catCounters[c.id] = {c:0, t:0});
+            let catCounters = {};
+            state.categories.forEach(c => catCounters[c.id] = {c:0, t:0});
 
             state.items.forEach(item => {
                 let subtotal = item.qty * item.real;
@@ -846,9 +951,14 @@
                     listTotalUSD += subtotal;
                     if (item.checked) checkedTotalUSD += subtotal;
                 }
+
                 let cell = document.getElementById(`subtotal-${item.id}`);
                 if (cell) cell.textContent = "$" + subtotal.toFixed(2);
-                if (catCounters[item.cat]) { catCounters[item.cat].t++; if (item.checked) catCounters[item.cat].c++; }
+
+                if (catCounters[item.cat]) {
+                    catCounters[item.cat].t++;
+                    if (item.checked) catCounters[item.cat].c++;
+                }
             });
 
             Object.keys(catCounters).forEach(catId => {
@@ -856,58 +966,85 @@
                 if (badge) badge.textContent = `${catCounters[catId].c}/${catCounters[catId].t}`;
             });
 
-            let checkedTotalLocal = checkedTotalUSD * appData.rate;
-            let listTotalLocal = listTotalUSD * appData.rate;
-
-            document.getElementById("checked-total").textContent = "$" + checkedTotalUSD.toFixed(2) + " / " + checkedTotalLocal.toFixed(0) + " Bs.";
-            document.getElementById("list-total").textContent = "$" + listTotalUSD.toFixed(2) + " / " + listTotalLocal.toFixed(0) + " Bs.";
+            document.getElementById("checked-total-usd").textContent = "$" + checkedTotalUSD.toFixed(2);
+            document.getElementById("checked-total-bs").textContent = (checkedTotalUSD * appData.rate).toFixed(0) + " Bs";
+            
+            document.getElementById("list-total-usd").textContent = "$" + listTotalUSD.toFixed(2);
+            document.getElementById("list-total-bs").textContent = (listTotalUSD * appData.rate).toFixed(0) + " Bs";
             
             let activeItemsCount = state.items.filter(i => state.categories.find(c => c.id === i.cat)?.active).length;
             let checkedItemsCount = state.items.filter(i => i.checked && state.categories.find(c => c.id === i.cat)?.active).length;
-            document.getElementById("items-count-label").textContent = `${checkedItemsCount} / ${activeItemsCount} Prod.`;
+            document.getElementById("items-count-label").textContent = `${checkedItemsCount}/${activeItemsCount}`;
         }
 
-        // --- BACKUPS GLOBALES ---
+        // --- BACKUPS AVANZADOS ---
+        function openBackupModal() {
+            renderBackupList();
+            document.getElementById('backup-modal').classList.add('show');
+        }
+
         function createNewBackup() {
             saveToLocalStorage();
             let code = btoa(unescape(encodeURIComponent(JSON.stringify(appData))));
-            let now = new Date(); let dateStr = now.toLocaleString('es-VE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            let now = new Date();
+            let dateStr = now.toLocaleString('es-VE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             appData.backups.push({ id: Date.now(), date: dateStr, code: code });
-            saveToLocalStorage(); renderBackupList(); showToast("Copia Guardada");
+            saveToLocalStorage(); openBackupModal(); showToast("Backup Global creado");
         }
 
-        function restoreFromCode(str, confirmRequired) {
-            if (confirmRequired && !confirm("¿Sobrescribir TODO en la App con esta copia?")) return false;
+        function renderBackupList() {
+            const container = document.getElementById("backups-list-container");
+            if (appData.backups.length === 0) { container.innerHTML = `<p style="text-align:center; font-size:12px; color:var(--text-muted);">No hay respaldos.</p>`; return; }
+            let html = "";
+            for (let i = appData.backups.length - 1; i >= 0; i--) {
+                let b = appData.backups[i];
+                html += `<div style="display:flex; justify-content:space-between; align-items:center; background:var(--input-bg); padding:10px; border-radius:8px;">
+                    <span style="font-size:12px; font-weight:bold;">${b.date}</span>
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn-icon" onclick="copyCodeToClipboard('${b.code}')">📋</button>
+                        <button class="btn-icon" style="color:var(--secondary);" onclick="restoreFromCode('${b.code}', true)">🔄</button>
+                        <button class="btn-icon" style="color:var(--danger);" onclick="deleteLocalBackup(${b.id})">✕</button>
+                    </div>
+                </div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function copyCodeToClipboard(code) {
+            navigator.clipboard.writeText(code).then(() => showToast("Código copiado")).catch(() => {
+                let el = document.createElement('textarea'); el.value = code; document.body.appendChild(el); el.select(); document.execCommand('copy'); el.remove(); showToast("Código copiado");
+            });
+        }
+
+        function deleteLocalBackup(id) {
+            if(confirm("¿Eliminar este respaldo?")) { appData.backups = appData.backups.filter(b => b.id !== id); saveToLocalStorage(); renderBackupList(); }
+        }
+
+        function restoreFromCode(str, confirmReq) {
+            if (confirmReq && !confirm("¿Restaurar App Completa? Reemplazará todas las listas actuales.")) return false;
             try {
                 let decrypted = JSON.parse(decodeURIComponent(escape(atob(str))));
-                if(decrypted.lists && Array.isArray(decrypted.lists)) {
-                    appData = decrypted; saveToLocalStorage(); loadCurrentList();
-                    closeModals(); showToast("Restauración Completa"); return true;
-                } else { showToast("Formato incompatible", "error"); return false; }
-            } catch(err) { showToast("Código inválido", "error"); return false; }
+                if(decrypted.lists) { appData = decrypted; saveToLocalStorage(); loadCurrentList(); closeModals(); showToast("Sistema Restaurado"); return true; }
+                else { showToast("Código Inválido", true); return false; }
+            } catch(err) { showToast("Error de código", true); return false; }
         }
 
         function importManualBackup() {
             let str = document.getElementById("manual-import-string").value.trim();
-            if (!str) return showToast("Ingresa código", "error");
-            if(restoreFromCode(str, false)) document.getElementById("manual-import-string").value = '';
+            if (!str) return showToast("Pega un código", true);
+            restoreFromCode(str, true);
+            document.getElementById("manual-import-string").value = '';
         }
 
         function shareWhatsApp() {
             let checkedItems = state.items.filter(i => i.checked && state.categories.find(c=>c.id===i.cat)?.active);
-            if (checkedItems.length === 0) return showToast("No hay artículos para enviar", "error");
-            let text = `📋 *COMPRA: ${appData.lists.find(l=>l.id===appData.currentListId).name}*\n\n`;
+            if (checkedItems.length === 0) return showToast("No hay compras marcadas", true);
+            let listName = appData.lists.find(l=>l.id===appData.currentListId).name;
+            let text = `📋 *COMPRA: ${listName}*\n\n`;
             checkedItems.forEach(i => { text += `• ${i.name} (x${i.qty}) -> *$${(i.qty * i.real).toFixed(2)}*\n`; });
             let totalUSD = checkedItems.reduce((acc, i) => acc + (i.qty * i.real), 0);
             text += `\n💵 *Tasa Ref:* ${appData.rate.toFixed(2)} Bs.\n🛒 *TOTAL:* *$${totalUSD.toFixed(2)} / Bs. ${(totalUSD * appData.rate).toFixed(0)}*`;
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-        }
-
-        function refreshOnline() {
-            if (confirm("¿Actualizar App desde la nube?")) {
-                if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(regs => { for (let r of regs) r.unregister(); window.location.reload(true); });
-                else window.location.reload(true);
-            }
         }
 
         window.onload = initApp;
