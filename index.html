@@ -81,9 +81,15 @@
         /* === BUSCADOR Y PÍLDORAS FLOTANTES === */
         .sticky-header { position: sticky; top: 55px; z-index: 90; background: var(--bg-color); padding: 10px 0 5px 0; margin-top: -5px; }
         .search-card { background: var(--card-bg); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--border-color); }
+        
+        .filter-tabs { display: flex; background: var(--input-bg); border-radius: 10px; padding: 4px; gap: 4px; }
+        .ftab { flex: 1; background: transparent; border: none; padding: 8px 4px; font-size: 13px; font-weight: 700; color: var(--text-muted); border-radius: 8px; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+        .ftab.active { background: var(--card-bg); color: var(--text-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
         .search-row { display: flex; gap: 8px; align-items: center; }
         .search-input { flex: 1; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-color); padding: 10px 15px; border-radius: 10px; font-size: 16px; outline: none; }
         .btn-clear { background: var(--chip-bg); border: none; color: var(--chip-text); width: 42px; height: 42px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;}
+        
         .filter-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-muted); font-weight: 500; padding: 0 5px; }
 
         .category-chips { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 2px; scrollbar-width: none; }
@@ -133,7 +139,7 @@
         .config-card { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid var(--border-color); }
         .config-card h3 { margin: 0 0 12px 0; font-size: 16px; font-weight: 800; color: var(--text-color); border-bottom: 1px solid var(--border-color); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
         
-        .edit-item-row { display: flex; align-items: center; padding: 12px 10px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 8px; gap: 12px; }
+        .edit-item-row { display: flex; align-items: center; padding: 12px 10px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 8px; gap: 12px; transition: 0.2s;}
         .drag-handle { color: var(--text-muted); cursor: grab; font-size: 20px; padding: 0 5px; touch-action: none;}
         .drag-handle:active { cursor: grabbing; color: var(--primary); }
         
@@ -145,9 +151,9 @@
         .btn { padding: 12px 16px; border-radius: 10px; font-size: 15px; font-weight: 700; border: none; cursor: pointer; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s;}
         .btn:active { transform: scale(0.97); }
         .btn-full { width: 100%; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-secondary { background: var(--secondary); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
+        .btn-primary { background: var(--primary); color: white; border: 1px solid var(--primary); }
+        .btn-secondary { background: var(--secondary); color: white; border: 1px solid var(--secondary); }
+        .btn-danger { background: var(--danger); color: white; border: 1px solid var(--danger); }
         .btn-outline { background: transparent; border: 1px solid var(--input-border); color: var(--text-color); }
         .btn-outline-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
         .btn-icon { padding: 8px; font-size: 16px; border-radius: 8px; background: var(--input-bg); border: none; color: var(--text-color); cursor: pointer; }
@@ -191,7 +197,7 @@
         .sheet-handle { width: 40px; height: 5px; background: var(--border-color); border-radius: 5px; margin: 0 auto 20px auto; }
         .sheet-menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
         
-        .modal-card { background: var(--card-bg); width: 100%; max-width: 400px; border-radius: 20px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transform: scale(0.95); transition: 0.2s; max-height: 90vh; overflow-y: auto;}
+        .modal-card { background: var(--card-bg); width: 100%; max-width: 450px; border-radius: 20px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transform: scale(0.95); transition: 0.2s; max-height: 90vh; overflow-y: auto;}
         .modal-overlay.show .modal-card { transform: scale(1); }
         .modal-header { font-size: 20px; font-weight: 800; margin-bottom: 20px; color: var(--text-color); }
         .modal-actions { display: flex; gap: 12px; margin-top: 20px; }
@@ -199,6 +205,10 @@
         /* Barras de Analítica */
         .analytics-bar-bg { width: 100%; background: var(--input-bg); border-radius: 6px; height: 14px; margin-top: 6px; overflow: hidden; }
         .analytics-bar-fill { height: 100%; background: var(--primary); border-radius: 6px; }
+        
+        /* Wizard Chips */
+        .wizard-chip { background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 4px; }
+        .wizard-chip.selected { background: var(--primary); color: white; border-color: var(--primary); }
 
         /* === TOAST NOTIFICATIONS === */
         .toast-container { position: fixed; bottom: 130px; left: 50%; transform: translateX(-50%); z-index: 4000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: 90%; max-width: 350px;}
@@ -222,7 +232,7 @@
         <div class="tabs-container" id="tabs-container"></div>
         <div class="header-actions">
             <button class="btn-header green" onclick="openItemModal(null)">+ Prod</button>
-            <button class="btn-header blue" onclick="createNewList()">+ Lista</button>
+            <button class="btn-header blue" onclick="openWizardModal()">+ Lista</button>
         </div>
     </div>
 
@@ -233,16 +243,21 @@
         <div id="view-list" class="view-panel active">
             <div class="sticky-header">
                 <div class="search-card">
+                    <div class="filter-tabs">
+                        <button class="ftab active" id="ftab-all" onclick="setListFilter('all')">📑 Todos</button>
+                        <button class="ftab" id="ftab-missing" onclick="setListFilter('missing')">⏳ Faltan</button>
+                        <button class="ftab" id="ftab-bought" onclick="setListFilter('bought')">✅ Comprados</button>
+                    </div>
+
                     <div class="search-row">
                         <input type="text" id="search-input" class="search-input" placeholder="🔍 Buscar en esta lista..." onfocus="this.select()" oninput="filterList()">
                         <button class="btn-clear" onclick="clearSearch()">✕</button>
                     </div>
-                    <div class="filter-row">
-                        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
-                            <input type="checkbox" id="hide-completed-check" checked onchange="filterList()" style="margin:0; width:16px; height:16px;"> Ocultar comprados
-                        </label>
+                    
+                    <div class="filter-row" style="justify-content: flex-end;">
                         <span id="items-count-label">0 / 0</span>
                     </div>
+                    
                     <div class="category-chips" id="category-chips-list"></div>
                 </div>
             </div>
@@ -254,7 +269,7 @@
         <div id="view-settings" class="view-panel">
             <div class="config-card">
                 <h3>👁️ Pasillos Visibles</h3>
-                <div id="settings-categories-visibility" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                <div id="settings-categories-visibility"></div>
                 <div style="display: flex; gap: 8px; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color);">
                     <input type="text" id="new-cat-name" class="form-input" placeholder="Nuevo pasillo" onfocus="this.select()" style="margin:0;">
                     <button class="btn btn-secondary" onclick="addNewCategory()">Crear</button>
@@ -274,7 +289,10 @@
             </div>
 
             <div class="config-card" style="margin-top: 5px;">
-                <p style="font-size: 12px; color: var(--text-muted); text-align:center; margin-top:0; font-weight: 500;">💡 Mantén pulsado <b>☰</b> para ordenar.</p>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <p style="font-size: 12px; color: var(--text-muted); margin:0; font-weight: 500;">💡 Mantén pulsado <b>☰</b> para ordenar.</p>
+                    <button class="btn btn-outline" style="padding: 6px 12px; font-size:13px;" onclick="toggleQuickEdit()" id="btn-quick-edit">✏️ Edición Masiva</button>
+                </div>
                 <div id="settings-prices-container"></div>
             </div>
         </div>
@@ -292,12 +310,12 @@
                 <div class="total-box">
                     <label>COMPRA REAL</label>
                     <span class="real-val" id="checked-total-usd">$0.00</span>
-                    <span id="checked-total-bs" style="font-size:11px; color:var(--text-muted); font-weight:600;">0 Bs</span>
+                    <span id="checked-total-bs" style="font-size:11px; color:var(--text-muted); font-weight:600;">0.00 Bs</span>
                 </div>
                 <div class="total-box">
                     <label>TOTAL LISTA</label>
                     <span id="list-total-usd">$0.00</span>
-                    <span id="list-total-bs" style="font-size:11px; color:var(--text-muted); font-weight:600;">0 Bs</span>
+                    <span id="list-total-bs" style="font-size:11px; color:var(--text-muted); font-weight:600;">0.00 Bs</span>
                 </div>
             </div>
         </div>
@@ -326,7 +344,7 @@
             <button class="btn btn-primary" style="grid-column: span 2;" onclick="openClosePurchaseModal(); toggleMenu();">✅ Cerrar Compra (Archivar)</button>
             <button class="btn btn-outline" style="border-color:var(--primary); color:var(--primary);" onclick="openAnalytics(); toggleMenu();">📊 Analítica de Gastos</button>
             <button class="btn btn-outline" onclick="openPurchaseHistory(); toggleMenu();">📚 Compras Pasadas</button>
-            <button class="btn btn-outline" onclick="shareListWhatsApp(); toggleMenu();">📤 Exportar Lista (Para otra App)</button>
+            <button class="btn btn-outline" onclick="shareListWhatsApp(); toggleMenu();">📤 Exportar Lista (A otra App)</button>
             <button class="btn btn-outline" onclick="toggleDarkMode(); toggleMenu();"><span id="dark-icon">🌙</span> Tema Oscuro</button>
             <button class="btn btn-outline" onclick="undoAction(); toggleMenu();">↩️ Deshacer</button>
             <button class="btn btn-outline" onclick="openBackupModal(); toggleMenu();">📦 Backups Técnicos</button>
@@ -336,7 +354,34 @@
         </div>
     </div>
 
-    <!-- MODAL DE CIERRE DE COMPRA -->
+    <!-- MODAL WIZARD: NUEVA LISTA -->
+    <div class="modal-overlay" id="wizard-modal">
+        <div class="modal-card" style="display:flex; flex-direction:column; height: 85vh;">
+            <div class="modal-header" style="margin-bottom:10px;">📝 Nueva Lista de Compras</div>
+            <input type="text" id="wizard-list-name" class="form-input" placeholder="Nombre de la lista (Ej: Quincena)" style="margin-bottom:15px;">
+            
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <button class="btn btn-outline" style="flex:1; font-size:12px; padding:8px;" onclick="wizardSelectAll()">Seleccionar Todo</button>
+                <button class="btn btn-outline" style="flex:1; font-size:12px; padding:8px;" onclick="wizardClearAll()">Ninguno</button>
+            </div>
+            
+            <input type="text" id="wizard-search" class="form-input" placeholder="🔍 Buscar o escribir uno nuevo..." oninput="renderWizardChips()">
+            
+            <button class="btn btn-secondary btn-full" id="wizard-add-btn" style="display:none; margin-bottom:10px;" onclick="wizardAddNewInline()">+ Crear nuevo: "<span id="wizard-new-name"></span>"</button>
+            
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 5px;">Toca los productos que necesitas:</p>
+            <div id="wizard-chips-container" style="flex:1; overflow-y:auto; display:flex; flex-wrap:wrap; gap:6px; align-content: flex-start; padding-bottom:10px;">
+                <!-- Chips se renderizan aquí -->
+            </div>
+            
+            <div class="modal-actions" style="margin-top:10px;">
+                <button class="btn btn-outline" style="flex:1;" onclick="closeModals()">Cancelar</button>
+                <button class="btn btn-primary" style="flex:2;" onclick="executeCreateWizardList()">Crear Lista (<span id="wizard-count">0</span>)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CIERRE DE COMPRA (PAGOS MÚLTIPLES) -->
     <div class="modal-overlay" id="close-purchase-modal">
         <div class="modal-card">
             <div class="modal-header">✅ Cerrar Compra</div>
@@ -344,30 +389,30 @@
             <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Lugar / Supermercado</label>
             <input type="text" id="close-location" class="form-input" placeholder="Ej: Central Madeirense, Farmatodo...">
             
-            <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Método de Pago</label>
-            <select id="close-payment-method" class="form-select">
-                <option value="Pago Móvil">📱 Pago Móvil</option>
-                <option value="Transferencia">🏦 Transferencia Bs</option>
-                <option value="Efectivo Divisas">💵 Efectivo Divisas</option>
-                <option value="Efectivo Bs">💸 Efectivo Bs</option>
-                <option value="Zelle">🟣 Zelle</option>
-                <option value="Zinli">🟠 Zinli</option>
-                <option value="Binance">🟡 Binance (USDT)</option>
-                <option value="Tarjeta">💳 Tarjeta de Débito/Crédito</option>
-            </select>
-
-            <div style="display:flex; gap:12px; align-items:center;">
-                <div style="flex:1;">
-                    <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Monto Final ($)</label>
-                    <input type="number" inputmode="decimal" id="close-total-usd" class="form-input" step="0.01" oninput="syncCloseTotals('usd')">
+            <div style="background:var(--bg-color); padding:10px; border-radius:10px; margin-bottom:15px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <span style="font-size:12px; font-weight:bold;">Total a pagar:</span>
+                    <span style="font-size:14px; font-weight:900;" id="close-total-target-usd">$0.00</span>
                 </div>
-                <div style="flex:1;">
-                    <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Monto Final (Bs)</label>
-                    <input type="number" inputmode="decimal" id="close-total-bs" class="form-input" step="0.01" oninput="syncCloseTotals('bs')">
+                <div style="display:flex; justify-content:space-between; color:var(--text-muted);">
+                    <span style="font-size:11px;">En bolívares:</span>
+                    <span style="font-size:12px; font-weight:bold;" id="close-total-target-bs">0.00 Bs</span>
                 </div>
             </div>
 
-            <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:8px; display:block; margin-top:10px;">¿Qué hacer con los productos FALTANTES?</label>
+            <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:8px; display:block;">Métodos de Pago Utilizados</label>
+            
+            <div id="close-payments-container" style="display:flex; flex-direction:column; gap:10px; margin-bottom:10px;">
+                <!-- Filas dinámicas de pago -->
+            </div>
+            
+            <button class="btn btn-outline btn-full" style="font-size:13px; padding:8px; border-style:dashed;" onclick="addPaymentRow()">+ Añadir otro método de pago</button>
+
+            <div style="text-align:right; font-size:13px; font-weight:800; margin-top:10px; color:var(--danger);" id="close-remaining-text">
+                Falta por asignar: $0.00
+            </div>
+
+            <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:8px; display:block; margin-top:20px;">¿Qué hacer con los productos FALTANTES?</label>
             <select id="close-action-pending" class="form-select">
                 <option value="keep">Mantenerlos en la lista actual (No resetear)</option>
                 <option value="reset">Resetear todo el carrito a 0</option>
@@ -384,7 +429,7 @@
     <div class="modal-overlay" id="reset-modal">
         <div class="modal-card">
             <div class="modal-header">⚠️ Restablecer Catálogo</div>
-            <p style="font-size:14px; color:var(--text-muted); margin-top:-10px; margin-bottom: 20px; line-height: 1.4;">Elige cómo deseas restablecer <b>esta lista</b>. Los productos nuevos que hayas creado se mantendrán con sus precios previos.</p>
+            <p style="font-size:14px; color:var(--text-muted); margin-top:-10px; margin-bottom: 20px; line-height: 1.4;">Elige cómo deseas restablecer <b>esta lista</b>. Los productos y pasillos nuevos que hayas creado se mantendrán con sus precios previos.</p>
             <div style="display:flex; flex-direction:column; gap:12px;">
                 <button class="btn btn-primary" onclick="executeFactoryReset('default')">Restaurar con Cantidades Originales</button>
                 <button class="btn btn-secondary" onclick="executeFactoryReset('zero')">Restaurar Todo con 0 Unidades</button>
@@ -412,13 +457,7 @@
                 </div>
                 <div style="flex:1;">
                     <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Etiqueta</label>
-                    <select id="edit-tag" class="form-select" style="text-align-last:left;">
-                        <option value="🛒">🛒 Supermercado</option>
-                        <option value="🏪">🏪 Farmacia/Local</option>
-                        <option value="📦">📦 Mercado Libre</option>
-                        <option value="✈️">✈️ Casillero Miami</option>
-                        <option value="🔧">🔧 Repuestos</option>
-                    </select>
+                    <select id="edit-tag" class="form-select" style="text-align-last:left;" onchange="handleTagChange(this)"></select>
                 </div>
             </div>
 
@@ -517,6 +556,14 @@
             { id: 4, name: "🧂 CONDIMENTOS Y SALSAS", active: true },
             { id: 5, name: "🧹 LIMPIEZA Y HOGAR", active: true },
             { id: 6, name: "🧴 CUIDADO PERSONAL Y SALUD", active: true }
+        ];
+
+        const defaultTags = [
+            { val: "🛒 Supermercado", label: "🛒 Supermercado" },
+            { val: "🏪 Farmacia/Local", label: "🏪 Farmacia/Local" },
+            { val: "📦 Mercado Libre", label: "📦 Mercado Libre" },
+            { val: "✈️ Casillero Miami", label: "✈️ Casillero Miami" },
+            { val: "🔧 Repuestos", label: "🔧 Repuestos" }
         ];
 
         const defaultItems = [
@@ -654,52 +701,53 @@
             { id: 132, cat: 6, name: "Protección femenina", qty: 2, est: 2.00 }
         ];
 
-        // --- CATÁLOGO EXTENDIDO (OCULTO EN EL DICCIONARIO) ---
         const extendedDictionaryItems = [
-            { cat: 1, name: "Garbanzos 400 gr", est: 1.80, tag: '🛒', iva: false },
-            { cat: 1, name: "Aceite de Oliva", est: 8.00, tag: '🛒', iva: false },
-            { cat: 1, name: "Cereal de Chocolate", est: 4.50, tag: '🛒', iva: false },
-            { cat: 1, name: "Casabe", est: 1.50, tag: '🛒', iva: false },
-            { cat: 1, name: "Sopa en Sobre (Maggi/Knorr)", est: 1.20, tag: '🛒', iva: false },
-            { cat: 1, name: "Miel", est: 5.00, tag: '🛒', iva: false },
-            { cat: 1, name: "Quinoa", est: 3.50, tag: '🛒', iva: false },
-            { cat: 2, name: "Queso Guayanés / Telita", est: 6.50, tag: '🛒', iva: false },
-            { cat: 2, name: "Chorizo de Ajo / Ahumado", est: 5.50, tag: '🛒', iva: false },
-            { cat: 2, name: "Salchichón", est: 7.00, tag: '🛒', iva: false },
-            { cat: 2, name: "Tocino / Tocineta", est: 6.00, tag: '🛒', iva: false },
-            { cat: 2, name: "Carne Molida Especial / Magra", est: 14.00, tag: '🛒', iva: false },
-            { cat: 3, name: "Célery (Apio España)", est: 2.00, tag: '🛒', iva: false },
-            { cat: 3, name: "Berenjena", est: 1.50, tag: '🛒', iva: false },
-            { cat: 3, name: "Mandarinas", est: 2.50, tag: '🛒', iva: false },
-            { cat: 3, name: "Durazno / Melocotón", est: 3.50, tag: '🛒', iva: false },
-            { cat: 3, name: "Mango", est: 1.00, tag: '🛒', iva: false },
-            { cat: 3, name: "Uvas", est: 6.00, tag: '🛒', iva: false },
-            { cat: 3, name: "Champiñones", est: 4.50, tag: '🛒', iva: false },
-            { cat: 3, name: "Jengibre", est: 3.00, tag: '🛒', iva: false },
-            { cat: 4, name: "Salsa Teriyaki / BBQ", est: 4.50, tag: '🛒', iva: false },
-            { cat: 4, name: "Orégano / Laurel", est: 1.00, tag: '🛒', iva: false },
-            { cat: 4, name: "Curry / Paprika", est: 1.50, tag: '🛒', iva: false },
-            { cat: 4, name: "Adobo / Cubito", est: 1.50, tag: '🛒', iva: false },
-            { cat: 5, name: "Cloro Jabonoso", est: 2.00, tag: '🛒', iva: true },
-            { cat: 5, name: "Desengrasante", est: 3.50, tag: '🛒', iva: true },
-            { cat: 5, name: "Ambientador en Spray", est: 3.00, tag: '🛒', iva: true },
-            { cat: 5, name: "Bolsas Herméticas (Ziploc)", est: 2.50, tag: '🛒', iva: true },
-            { cat: 5, name: "Papel de Aluminio / Envoplast", est: 3.00, tag: '🛒', iva: true },
-            { cat: 5, name: "Envases Plásticos", est: 1.00, tag: '🛒', iva: true },
-            { cat: 5, name: "Escoba / Recogedor", est: 4.00, tag: '🛒', iva: true },
-            { cat: 6, name: "Enjuague bucal Infantil", est: 3.50, tag: '🛒', iva: true },
-            { cat: 6, name: "Hilo Dental", est: 2.00, tag: '🛒', iva: true },
-            { cat: 6, name: "Hisopos", est: 1.00, tag: '🛒', iva: true },
-            { cat: 6, name: "Gel Fijador / Cera", est: 4.00, tag: '🛒', iva: true },
-            { cat: 6, name: "Crema de Peinar", est: 5.00, tag: '🛒', iva: true },
-            { cat: 6, name: "Protector Solar / Labial", est: 8.00, tag: '🛒', iva: true }
+            { cat: 1, name: "Garbanzos 400 gr", est: 1.80, tag: '🛒 Supermercado', iva: false },
+            { cat: 1, name: "Aceite de Oliva", est: 8.00, tag: '🛒 Supermercado', iva: false },
+            { cat: 1, name: "Cereal de Chocolate", est: 4.50, tag: '🛒 Supermercado', iva: false },
+            { cat: 1, name: "Casabe", est: 1.50, tag: '🛒 Supermercado', iva: false },
+            { cat: 1, name: "Sopa en Sobre (Maggi/Knorr)", est: 1.20, tag: '🛒 Supermercado', iva: false },
+            { cat: 1, name: "Miel", est: 5.00, tag: '🛒 Supermercado', iva: false },
+            { cat: 1, name: "Quinoa", est: 3.50, tag: '🛒 Supermercado', iva: false },
+            { cat: 2, name: "Queso Guayanés / Telita", est: 6.50, tag: '🛒 Supermercado', iva: false },
+            { cat: 2, name: "Chorizo de Ajo / Ahumado", est: 5.50, tag: '🛒 Supermercado', iva: false },
+            { cat: 2, name: "Salchichón", est: 7.00, tag: '🛒 Supermercado', iva: false },
+            { cat: 2, name: "Tocino / Tocineta", est: 6.00, tag: '🛒 Supermercado', iva: false },
+            { cat: 2, name: "Carne Molida Especial / Magra", est: 14.00, tag: '🛒 Supermercado', iva: false },
+            { cat: 3, name: "Célery (Apio España)", est: 2.00, tag: '🛒 Supermercado', iva: false },
+            { cat: 3, name: "Berenjena", est: 1.50, tag: '🛒 Supermercado', iva: false },
+            { cat: 3, name: "Mandarinas", est: 2.50, tag: '🛒 Supermercado', iva: false },
+            { cat: 3, name: "Durazno / Melocotón", est: 3.50, tag: '🛒 Supermercado', iva: false },
+            { cat: 3, name: "Mango", est: 1.00, tag: '🛒 Supermercado', iva: false },
+            { cat: 3, name: "Uvas", est: 6.00, tag: '🛒 Supermercado', iva: false },
+            { cat: 3, name: "Champiñones", est: 4.50, tag: '🛒 Supermercado', iva: false },
+            { cat: 3, name: "Jengibre", est: 3.00, tag: '🛒 Supermercado', iva: false },
+            { cat: 4, name: "Salsa Teriyaki / BBQ", est: 4.50, tag: '🛒 Supermercado', iva: false },
+            { cat: 4, name: "Orégano / Laurel", est: 1.00, tag: '🛒 Supermercado', iva: false },
+            { cat: 4, name: "Curry / Paprika", est: 1.50, tag: '🛒 Supermercado', iva: false },
+            { cat: 4, name: "Adobo / Cubito", est: 1.50, tag: '🛒 Supermercado', iva: false },
+            { cat: 5, name: "Cloro Jabonoso", est: 2.00, tag: '🛒 Supermercado', iva: true },
+            { cat: 5, name: "Desengrasante", est: 3.50, tag: '🛒 Supermercado', iva: true },
+            { cat: 5, name: "Ambientador en Spray", est: 3.00, tag: '🛒 Supermercado', iva: true },
+            { cat: 5, name: "Bolsas Herméticas (Ziploc)", est: 2.50, tag: '🛒 Supermercado', iva: true },
+            { cat: 5, name: "Papel de Aluminio / Envoplast", est: 3.00, tag: '🛒 Supermercado', iva: true },
+            { cat: 5, name: "Envases Plásticos", est: 1.00, tag: '🛒 Supermercado', iva: true },
+            { cat: 5, name: "Escoba / Recogedor", est: 4.00, tag: '🛒 Supermercado', iva: true },
+            { cat: 6, name: "Enjuague bucal Infantil", est: 3.50, tag: '🛒 Supermercado', iva: true },
+            { cat: 6, name: "Hilo Dental", est: 2.00, tag: '🛒 Supermercado', iva: true },
+            { cat: 6, name: "Hisopos", est: 1.00, tag: '🛒 Supermercado', iva: true },
+            { cat: 6, name: "Gel Fijador / Cera", est: 4.00, tag: '🛒 Supermercado', iva: true },
+            { cat: 6, name: "Crema de Peinar", est: 5.00, tag: '🛒 Supermercado', iva: true },
+            { cat: 6, name: "Protector Solar / Labial", est: 8.00, tag: '🛒 Supermercado', iva: true }
         ];
 
         // --- SISTEMA BASE Y ESTADOS ---
-        let appData = { lists: [], currentListId: 1, backups: [], purchaseHistory: [], customDictionary: [], userAddedDefaults: [], rate: 40.00, darkMode: false };
-        let state = { items: [], categories: [], currentView: 'list', selectedCatFilter: 'all' };
+        let appData = { lists: [], currentListId: 1, backups: [], purchaseHistory: [], customDictionary: [], userAddedDefaults: [], userAddedCategories: [], customTags: [], rate: 40.00, darkMode: false };
+        let state = { items: [], categories: [], currentView: 'list', selectedCatFilter: 'all', listFilterMode: 'all', isQuickEditMode: false };
         let undoStack = [];
         let globalDictionary = [];
+        let closePayments = []; 
+        let wizardSelectedItems = [];
 
         function showToast(message, isError = false) {
             const container = document.getElementById("toast-container");
@@ -728,31 +776,37 @@
                 let savedAppData = localStorage.getItem('compras_pro_appData_v19');
                 if (savedAppData) {
                     let parsed = JSON.parse(savedAppData);
-                    appData = { ...appData, ...parsed }; // Merge to preserve new keys if any
+                    appData = { ...appData, ...parsed };
                     appData.purchaseHistory = appData.purchaseHistory || [];
                     appData.customDictionary = appData.customDictionary || [];
                     appData.userAddedDefaults = appData.userAddedDefaults || [];
+                    appData.userAddedCategories = appData.userAddedCategories || [];
+                    appData.customTags = appData.customTags || [];
                 } else {
                     appData.lists = [{ 
                         id: 1, name: "Mercado Principal", 
-                        items: JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false, tag: '🛒', iva: false})), 
+                        items: JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false, tag: '🛒 Supermercado', iva: false})), 
                         categories: JSON.parse(JSON.stringify(defaultCategories)) 
                     }];
                     appData.currentListId = 1;
                     appData.purchaseHistory = [];
                     appData.customDictionary = [];
                     appData.userAddedDefaults = [];
+                    appData.userAddedCategories = [];
+                    appData.customTags = [];
                 }
             } catch(err) {
                 console.error("Error cargando datos locales, inicializando limpios.", err);
                 appData.lists = [{ 
                     id: 1, name: "Mercado Principal", 
-                    items: JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false, tag: '🛒', iva: false})), 
+                    items: JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false, tag: '🛒 Supermercado', iva: false})), 
                     categories: JSON.parse(JSON.stringify(defaultCategories)) 
                 }];
             }
             
+            state.listFilterMode = 'all';
             buildDictionary();
+            renderTagSelect();
             applyDarkMode(appData.darkMode);
             loadCurrentList();
         }
@@ -783,7 +837,7 @@
         // --- DICCIONARIO INTELIGENTE Y CATÁLOGO ---
         function buildDictionary() {
             let dictMap = new Map();
-            defaultItems.forEach(i => dictMap.set(i.name.toLowerCase(), {...i, tag: '🛒', iva: false}));
+            defaultItems.forEach(i => dictMap.set(i.name.toLowerCase(), {...i, tag: '🛒 Supermercado', iva: false}));
             extendedDictionaryItems.forEach(i => dictMap.set(i.name.toLowerCase(), i));
             appData.userAddedDefaults.forEach(i => dictMap.set(i.name.toLowerCase(), i));
             
@@ -813,9 +867,19 @@
                     document.getElementById("edit-cat").value = m.cat;
                     document.getElementById("edit-qty").value = m.est_qty || m.qty || 1;
                     document.getElementById("edit-price").value = (m.est || m.real).toFixed(2);
-                    document.getElementById("edit-tag").value = m.tag || '🛒';
                     document.getElementById("edit-iva").checked = !!m.iva;
                     syncEditPrice('bs');
+                    
+                    let fallbackTag = m.tag || '🛒 Supermercado';
+                    let tgSel = document.getElementById("edit-tag");
+                    if(fallbackTag.length <= 2) fallbackTag += " Etiqueta"; 
+                    
+                    if (![...tgSel.options].some(o => o.value === fallbackTag)) {
+                        appData.customTags.push(fallbackTag);
+                        renderTagSelect();
+                    }
+                    tgSel.value = fallbackTag;
+
                     listContainer.style.display = 'none';
                 };
                 listContainer.appendChild(div);
@@ -826,16 +890,47 @@
         function addToCustomDictionary(cat, name, est, tag, qty, iva) {
             let existsInDefaults = defaultItems.some(d => d.name.toLowerCase() === name.toLowerCase());
             let existsInUser = appData.userAddedDefaults.some(d => d.name.toLowerCase() === name.toLowerCase());
+            let existsInExtended = extendedDictionaryItems.some(d => d.name.toLowerCase() === name.toLowerCase());
             
-            if (!existsInDefaults) {
+            // Solo guarda si es un producto totalmente nuevo (nunca antes visto en la app global)
+            // Así evitamos sobreescribir las preferencias globales cuando editamos en una lista individual
+            if (!existsInDefaults && !existsInUser && !existsInExtended) {
                 let newItem = { id: Date.now() + Math.random(), cat, name, est, qty, est_qty: qty, real: est, tag, iva, checked: false };
-                
-                // Actualizar si ya existe, si no, agregar
-                if (existsInUser) {
-                    let idx = appData.userAddedDefaults.findIndex(d => d.name.toLowerCase() === name.toLowerCase());
-                    appData.userAddedDefaults[idx] = newItem;
+                appData.userAddedDefaults.push(newItem);
+                buildDictionary();
+            }
+        }
+
+        // --- SISTEMA DE ETIQUETAS DINAMICAS ---
+        function renderTagSelect() {
+            let select = document.getElementById("edit-tag");
+            if (!select) return;
+            let currentVal = select.value;
+            appData.customTags = appData.customTags || [];
+            
+            let html = defaultTags.map(t => `<option value="${t.val}">${t.label}</option>`).join('');
+            html += appData.customTags.map(t => `<option value="${t}">${t}</option>`).join('');
+            html += `<option value="_new_" style="color:var(--primary); font-weight:bold;">+ Nueva Etiqueta...</option>`;
+            
+            select.innerHTML = html;
+            if (currentVal && currentVal !== '_new_') {
+                select.value = currentVal; 
+            }
+        }
+
+        function handleTagChange(select) {
+            if(select.value === '_new_') {
+                let newTag = prompt("Ingresa la nueva etiqueta (Ej: 🥩 Carnicería):");
+                if(newTag && newTag.trim() !== '') {
+                    appData.customTags = appData.customTags || [];
+                    if(!appData.customTags.includes(newTag.trim()) && !defaultTags.some(d => d.val === newTag.trim())) {
+                        appData.customTags.push(newTag.trim());
+                        saveToLocalStorage();
+                    }
+                    renderTagSelect();
+                    select.value = newTag.trim();
                 } else {
-                    appData.userAddedDefaults.push(newItem);
+                    select.selectedIndex = 0;
                 }
             }
         }
@@ -846,29 +941,15 @@
             container.innerHTML = appData.lists.map(l => `<button type="button" class="tab-btn ${l.id === appData.currentListId ? 'active' : ''}" onclick="switchList(${l.id})">${l.name}</button>`).join('');
         }
         function switchList(id) { if(id === appData.currentListId) return; saveToLocalStorage(); appData.currentListId = id; loadCurrentList(); }
-        function createNewList() {
-            let name = prompt("Nombre de la nueva lista:"); if(!name) return;
-            let useCatalog = confirm("¿Iniciar con el catálogo base de supermercado?");
-            let newItems = [];
-            if (useCatalog) {
-                newItems = JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false, tag: '🛒', iva: false}));
-                // Agregar también los productos nuevos creados por el usuario
-                appData.userAddedDefaults.forEach(ui => {
-                    newItems.push({...ui, id: Date.now() + Math.random(), checked: false});
-                });
-            }
-            let newCats = JSON.parse(JSON.stringify(defaultCategories));
-            saveToLocalStorage();
-            let newList = { id: Date.now(), name: name, items: newItems, categories: newCats };
-            appData.lists.push(newList); appData.currentListId = newList.id; loadCurrentList(); showToast("Lista creada");
-        }
-
+        
         function deleteCurrentList() {
             if (appData.lists.length <= 1) return showToast("No puedes borrar tu única lista", true);
             if (confirm(`¿Borrar permanentemente la lista "${appData.lists.find(l=>l.id===appData.currentListId).name}"?`)) {
                 appData.lists = appData.lists.filter(l => l.id !== appData.currentListId);
                 appData.currentListId = appData.lists[0].id;
-                saveToLocalStorage(); loadCurrentList(); showToast("Lista eliminada");
+                localStorage.setItem('compras_pro_appData_v19', JSON.stringify(appData));
+                loadCurrentList(); 
+                showToast("Lista eliminada");
             }
         }
 
@@ -889,6 +970,13 @@
             const cSet = document.getElementById('category-chips-settings'); if(cSet) cSet.innerHTML = htmlSet;
         }
         function setCategoryFilter(id) { state.selectedCatFilter = id; renderAll(); }
+        
+        function setListFilter(mode) {
+            state.listFilterMode = mode;
+            document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+            document.getElementById(`ftab-${mode}`).classList.add('active');
+            filterList();
+        }
 
         // --- ACCIONES GENERALES Y BCV ---
         function factoryResetCatalog() {
@@ -900,17 +988,28 @@
         function executeFactoryReset(mode) {
             saveToHistory();
             state.categories = JSON.parse(JSON.stringify(defaultCategories));
-            let baseItems = JSON.parse(JSON.stringify(defaultItems)).map(item => ({...item, checked: false, tag: '🛒', iva: false}));
             
-            // Integrar los productos que el usuario creó para que no se pierdan
-            appData.userAddedDefaults.forEach(ui => {
-                baseItems.push({...ui, id: Date.now() + Math.random(), checked: false});
+            appData.userAddedCategories.forEach(uc => {
+                if(!state.categories.find(c => c.id === uc.id)) {
+                    state.categories.push({...uc});
+                }
             });
+
+            let baseMap = new Map();
+            JSON.parse(JSON.stringify(defaultItems)).forEach(i => {
+                baseMap.set(i.name.toLowerCase(), {...i, checked: false, tag: '🛒 Supermercado', iva: false});
+            });
+            
+            appData.userAddedDefaults.forEach(ui => {
+                baseMap.set(ui.name.toLowerCase(), {...ui, id: Date.now() + Math.random(), checked: false});
+            });
+
+            let baseItems = Array.from(baseMap.values());
 
             if (mode === 'zero') {
                 state.items = baseItems.map(item => ({...item, est_qty: 0, qty: 0, real: item.est}));
             } else {
-                state.items = baseItems.map(item => ({...item, est_qty: item.qty, real: item.est}));
+                state.items = baseItems.map(item => ({...item, est_qty: item.est_qty || item.qty, real: item.est}));
             }
             state.selectedCatFilter = 'all'; saveToLocalStorage(); closeModals(); renderAll(); showToast("Catálogo restablecido");
         }
@@ -953,6 +1052,7 @@
             document.getElementById('purchase-details-modal').classList.remove('show');
             document.getElementById('reset-modal').classList.remove('show');
             document.getElementById('close-purchase-modal').classList.remove('show');
+            document.getElementById('wizard-modal').classList.remove('show');
             document.getElementById('autocomplete-list').style.display = 'none';
         }
 
@@ -971,18 +1071,31 @@
             if (editCatSelect) editCatSelect.innerHTML = options;
 
             if (visibilityContainer) {
+                visibilityContainer.style.display = "grid";
+                visibilityContainer.style.gridTemplateColumns = "repeat(auto-fill, minmax(140px, 1fr))";
+                visibilityContainer.style.gap = "8px";
+                
+                // Aplicamos estilos para que se vea más pequeño (font-size 11) y no pase a otra línea (nowrap, ellipsis)
                 visibilityContainer.innerHTML = state.categories.map(c => `
-                    <label class="cat-drag-row" data-id="${c.id}" style="display:flex; align-items:center; gap:8px; font-size:14px; border-bottom:1px solid var(--border-color); padding:6px 0;">
-                        <span class="drag-handle">☰</span>
-                        <input type="checkbox" style="transform: scale(1.3); margin:0;" ${c.active ? 'checked' : ''} onchange="toggleCategoryActive(${c.id}, this.checked)">
-                        ${c.name}
+                    <label class="cat-drag-row" data-id="${c.id}" style="display:flex; align-items:center; gap:6px; background:var(--input-bg); padding:6px 8px; border-radius:8px; border:1px solid var(--border-color);">
+                        <span class="drag-handle" style="font-size:16px;">☰</span>
+                        <input type="checkbox" style="transform: scale(1.1); margin:0;" ${c.active ? 'checked' : ''} onchange="toggleCategoryActive(${c.id}, this.checked)">
+                        <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; font-size:11px; line-height: 1;">${c.name}</span>
                     </label>
                 `).join('');
             }
         }
 
         function toggleCategoryActive(id, isActive) { saveToHistory(); let cat = state.categories.find(c => c.id === id); if (cat) cat.active = isActive; saveToLocalStorage(); renderAll();}
-        function addNewCategory() { let input = document.getElementById("new-cat-name"); let name = input.value.trim(); if(!name) return; saveToHistory(); state.categories.push({ id: Date.now(), name: name, active: true }); saveToLocalStorage(); input.value = ''; renderAll(); showToast("Pasillo creado"); }
+        
+        function addNewCategory() { 
+            let input = document.getElementById("new-cat-name"); let name = input.value.trim(); if(!name) return; 
+            saveToHistory(); 
+            let newCat = { id: Date.now(), name: name, active: true };
+            state.categories.push(newCat); 
+            appData.userAddedCategories.push(newCat); 
+            saveToLocalStorage(); input.value = ''; renderAll(); showToast("Pasillo creado"); 
+        }
 
         function initDragAndDrop() {
             if (typeof Sortable === 'undefined') {
@@ -1026,8 +1139,6 @@
             let activeCats = state.categories.filter(c => c.active);
             if (state.selectedCatFilter !== 'all') activeCats = activeCats.filter(c => c.id === state.selectedCatFilter);
 
-            let renderComprados = !document.getElementById("hide-completed-check").checked;
-
             activeCats.forEach(category => {
                 let catItems = state.items.filter(i => i.cat == category.id);
                 if (catItems.length === 0) return;
@@ -1048,7 +1159,6 @@
                         inflationHTML = `<span class="inflation-badge" style="color: ${color};">${sign}${diff.toFixed(1)}% ${icon}</span>`;
                     }
 
-                    // Calculo considerando IVA
                     let subtotal = (item.qty * item.real) * (item.iva ? 1.16 : 1);
 
                     html += `
@@ -1080,7 +1190,34 @@
             filterList();
         }
 
-        // --- CONFIGURACIÓN LISTA ---
+        // --- CONFIGURACIÓN LISTA Y EDICIÓN RÁPIDA ---
+        function toggleQuickEdit() {
+            state.isQuickEditMode = !state.isQuickEditMode;
+            document.getElementById("btn-quick-edit").classList.toggle("btn-primary", state.isQuickEditMode);
+            document.getElementById("btn-quick-edit").classList.toggle("btn-outline", !state.isQuickEditMode);
+            renderSettingsPrices();
+        }
+
+        function quickEditItem(id, field, value) {
+            saveToHistory();
+            let item = state.items.find(i => i.id === id);
+            if(!item) return;
+
+            if (field === 'qty') {
+                item.est_qty = parseFloat(value) || 1;
+                item.qty = item.est_qty;
+            } else if (field === 'price') {
+                item.est = parseFloat(value) || 0;
+                item.real = item.est;
+            } else if (field === 'iva') {
+                item.iva = value;
+            }
+
+            saveToLocalStorage();
+            calculateTotals();
+            showToast("Producto actualizado en esta lista");
+        }
+
         function renderSettingsPrices() {
             const container = document.getElementById('settings-prices-container');
             container.innerHTML = '';
@@ -1097,17 +1234,40 @@
                 <div class="settings-items-container" data-cat-id="${category.id}">`;
 
                 catItems.forEach(item => {
-                    let tagHtml = item.tag ? item.tag : '🛒';
-                    let ivaHtml = item.iva ? ' (IVA)' : '';
-                    html += `
-                    <div class="edit-item-row" data-id="${item.id}" onclick="openItemModal(${item.id})">
-                        <span class="drag-handle">☰</span>
-                        <div class="edit-item-info">
-                            <p>${tagHtml} ${item.name}${ivaHtml}</p>
-                            <span>Ref: ${item.est_qty} | Est: $${item.est.toFixed(2)}</span>
-                        </div>
-                        <div style="color:var(--text-muted); font-size:12px; font-weight:bold;">✏️</div>
-                    </div>`;
+                    let tagHtml = item.tag ? item.tag : '🛒 Supermercado';
+                    let ivaHtml = item.iva ? ' <span style="font-size:10px; color:var(--secondary); font-weight:900;">+IVA</span>' : '';
+                    
+                    if (state.isQuickEditMode) {
+                        html += `
+                        <div class="edit-item-row" style="flex-direction:column; align-items:stretch; gap:6px; background:var(--bg-color);" data-id="${item.id}">
+                            <div style="font-weight:800; font-size:14px; color:var(--text-color); margin-bottom:2px;">${tagHtml} ${item.name}</div>
+                            <div style="display:flex; gap:6px; align-items:center;">
+                                <div style="flex:1;">
+                                    <label style="font-size:10px; color:var(--text-muted); font-weight:800; display:block; margin-bottom:2px;">Cant</label>
+                                    <input type="number" inputmode="decimal" class="form-input" style="padding:8px; margin:0; font-size:14px; text-align:center;" value="${item.est_qty}" onchange="quickEditItem(${item.id}, 'qty', this.value)">
+                                </div>
+                                <div style="flex:1;">
+                                    <label style="font-size:10px; color:var(--text-muted); font-weight:800; display:block; margin-bottom:2px;">Precio ($)</label>
+                                    <input type="number" inputmode="decimal" class="form-input" style="padding:8px; margin:0; font-size:14px; text-align:center;" value="${item.est.toFixed(2)}" onchange="quickEditItem(${item.id}, 'price', this.value)">
+                                </div>
+                                <div style="flex:0.8; display:flex; flex-direction:column; justify-content:flex-end;">
+                                    <label style="font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer; height:36px; background:var(--card-bg); padding:0 8px; border-radius:8px; border:1px solid var(--border-color);">
+                                        <input type="checkbox" style="transform:scale(1.2); margin:0;" ${item.iva?'checked':''} onchange="quickEditItem(${item.id}, 'iva', this.checked)"> IVA
+                                    </label>
+                                </div>
+                            </div>
+                        </div>`;
+                    } else {
+                        html += `
+                        <div class="edit-item-row" data-id="${item.id}" onclick="openItemModal(${item.id})">
+                            <span class="drag-handle">☰</span>
+                            <div class="edit-item-info">
+                                <p>${tagHtml} ${item.name}${ivaHtml}</p>
+                                <span>Ref: ${item.est_qty} | Est: $${item.est.toFixed(2)}</span>
+                            </div>
+                            <div style="color:var(--text-muted); font-size:12px; font-weight:bold;">✏️</div>
+                        </div>`;
+                    }
                 });
                 html += `</div>`; container.innerHTML += html;
             });
@@ -1116,13 +1276,21 @@
         // --- MODAL DE AGREGAR/EDITAR PRODUCTO ---
         function openItemModal(id = null) {
             document.getElementById('autocomplete-list').style.display = 'none';
+            renderTagSelect();
+
             if(id) {
                 let item = state.items.find(i => i.id === id); if(!item) return;
+                
+                if (item.tag && !defaultTags.some(d => d.val === item.tag) && !(appData.customTags||[]).includes(item.tag)) {
+                    appData.customTags.push(item.tag);
+                    renderTagSelect();
+                }
+
                 document.getElementById("modal-item-title").textContent = "Editar Producto";
                 document.getElementById("edit-id").value = item.id;
                 document.getElementById("edit-name").value = item.name;
                 document.getElementById("edit-cat").value = item.cat;
-                document.getElementById("edit-tag").value = item.tag || '🛒';
+                document.getElementById("edit-tag").value = item.tag || '🛒 Supermercado';
                 document.getElementById("edit-qty").value = item.est_qty;
                 document.getElementById("edit-price").value = item.est.toFixed(2);
                 document.getElementById("edit-iva").checked = !!item.iva;
@@ -1134,7 +1302,7 @@
                 document.getElementById("edit-id").value = "";
                 document.getElementById("edit-name").value = "";
                 document.getElementById("edit-cat").value = state.selectedCatFilter !== 'all' ? state.selectedCatFilter : (state.categories[0]?.id || 1);
-                document.getElementById("edit-tag").value = '🛒';
+                document.getElementById("edit-tag").value = '🛒 Supermercado';
                 document.getElementById("edit-qty").value = 1;
                 document.getElementById("edit-price").value = "";
                 document.getElementById("edit-price-bs").value = "";
@@ -1169,26 +1337,29 @@
             let iva = document.getElementById("edit-iva").checked;
             let isBought = document.getElementById("edit-mark-bought").checked;
 
+            let editedItem;
+
             if(idVal) {
-                let item = state.items.find(i => i.id === parseInt(idVal));
-                if(item) {
-                    item.name = name; item.cat = cat; item.tag = tag;
-                    item.est_qty = nQty; item.qty = nQty; item.est = nPrice; item.real = nPrice;
-                    item.iva = iva; item.checked = isBought;
+                editedItem = state.items.find(i => i.id === parseInt(idVal));
+                if(editedItem) {
+                    editedItem.name = name; editedItem.cat = cat; editedItem.tag = tag;
+                    editedItem.est_qty = nQty; editedItem.qty = nQty; editedItem.est = nPrice; editedItem.real = nPrice;
+                    editedItem.iva = iva; editedItem.checked = isBought;
                 }
             } else {
-                state.items.push({ id: Date.now(), cat, tag, name, qty: nQty, est_qty: nQty, est: nPrice, real: nPrice, checked: isBought, iva: iva });
+                editedItem = { id: Date.now(), cat, tag, name, qty: nQty, est_qty: nQty, est: nPrice, real: nPrice, checked: isBought, iva: iva };
+                state.items.push(editedItem);
+                
+                // Solo si el producto es totalmente nuevo lo agregamos al diccionario para el futuro
+                addToCustomDictionary(cat, name, nPrice, tag, nQty, iva);
             }
             
-            // Añadir a la configuración global de predeterminados para que sobreviva al reset
-            addToCustomDictionary(cat, name, nPrice, tag, nQty, iva);
-            
-            saveToLocalStorage(); closeModals(); renderAll(); showToast("Guardado con éxito");
+            saveToLocalStorage(); closeModals(); renderAll(); showToast("Guardado con éxito en esta lista");
         }
 
         function deleteItemFromModal() {
             let id = parseInt(document.getElementById("edit-id").value);
-            let confirmDel = confirm("¿Deseas ELIMINAR este producto por completo de tu lista?\n\n(Pulsa Cancelar si solo quieres TACHARLO / poner su cantidad en 0)");
+            let confirmDel = confirm("¿Deseas ELIMINAR este producto por completo de esta lista?\n\n(Pulsa Cancelar si solo quieres TACHARLO / poner su cantidad en 0)");
             
             saveToHistory();
             if (confirmDel) {
@@ -1205,6 +1376,118 @@
             saveToLocalStorage(); closeModals(); renderAll();
         }
 
+        // --- WIZARD PARA NUEVA LISTA ---
+        function openWizardModal() {
+            wizardSelectedItems = [];
+            document.getElementById("wizard-list-name").value = "";
+            document.getElementById("wizard-search").value = "";
+            document.getElementById("wizard-modal").classList.add("show");
+            renderWizardChips();
+        }
+
+        function renderWizardChips() {
+            const container = document.getElementById("wizard-chips-container");
+            const q = document.getElementById("wizard-search").value.toLowerCase();
+            const btnAdd = document.getElementById("wizard-add-btn");
+            
+            container.innerHTML = "";
+            let matchCount = 0;
+            
+            let uniqueNames = new Set();
+            globalDictionary.forEach(item => {
+                if(uniqueNames.has(item.name.toLowerCase())) return;
+                uniqueNames.add(item.name.toLowerCase());
+                
+                if (item.name.toLowerCase().includes(q)) {
+                    matchCount++;
+                    let isSelected = wizardSelectedItems.includes(item.name);
+                    let chip = document.createElement("div");
+                    chip.className = `wizard-chip ${isSelected ? 'selected' : ''}`;
+                    chip.innerHTML = `${item.name} <span style="font-size:10px; opacity:0.7;">$${(item.est||item.real).toFixed(2)}</span>`;
+                    chip.onclick = () => {
+                        if(isSelected) {
+                            wizardSelectedItems = wizardSelectedItems.filter(n => n !== item.name);
+                        } else {
+                            wizardSelectedItems.push(item.name);
+                        }
+                        renderWizardChips();
+                    };
+                    container.appendChild(chip);
+                }
+            });
+
+            if(q !== "" && matchCount === 0) {
+                btnAdd.style.display = "block";
+                document.getElementById("wizard-new-name").textContent = q;
+            } else {
+                btnAdd.style.display = "none";
+            }
+
+            document.getElementById("wizard-count").textContent = wizardSelectedItems.length;
+        }
+
+        function wizardSelectAll() {
+            const q = document.getElementById("wizard-search").value.toLowerCase();
+            let uniqueNames = new Set();
+            globalDictionary.forEach(item => {
+                if(uniqueNames.has(item.name.toLowerCase())) return;
+                uniqueNames.add(item.name.toLowerCase());
+                if (item.name.toLowerCase().includes(q) && !wizardSelectedItems.includes(item.name)) {
+                    wizardSelectedItems.push(item.name);
+                }
+            });
+            renderWizardChips();
+        }
+
+        function wizardClearAll() { wizardSelectedItems = []; renderWizardChips(); }
+
+        function wizardAddNewInline() {
+            let name = document.getElementById("wizard-search").value.trim();
+            addToCustomDictionary(1, name, 0, '🛒 Supermercado', 1, false);
+            wizardSelectedItems.push(name);
+            document.getElementById("wizard-search").value = "";
+            renderWizardChips();
+            showToast("Agregado al catálogo: " + name);
+        }
+
+        function executeCreateWizardList() {
+            let name = document.getElementById("wizard-list-name").value.trim() || ("Lista " + new Date().toLocaleDateString());
+            
+            let newItems = [];
+            let newCats = JSON.parse(JSON.stringify(defaultCategories));
+            
+            appData.userAddedCategories.forEach(uc => {
+                if(!newCats.find(c => c.id === uc.id)) newCats.push({...uc});
+            });
+
+            wizardSelectedItems.forEach(selName => {
+                let dictItem = globalDictionary.find(d => d.name === selName);
+                if(dictItem) {
+                    newItems.push({
+                        id: Date.now() + Math.random(),
+                        cat: dictItem.cat,
+                        name: dictItem.name,
+                        qty: dictItem.est_qty || dictItem.qty || 1,
+                        est_qty: dictItem.est_qty || dictItem.qty || 1,
+                        est: dictItem.est || dictItem.real || 0,
+                        real: dictItem.est || dictItem.real || 0,
+                        tag: dictItem.tag || '🛒 Supermercado',
+                        iva: !!dictItem.iva,
+                        checked: false
+                    });
+                }
+            });
+
+            saveToLocalStorage();
+            let newList = { id: Date.now(), name: name, items: newItems, categories: newCats };
+            appData.lists.push(newList); appData.currentListId = newList.id; 
+            
+            closeModals();
+            loadCurrentList(); 
+            showToast("Lista creada");
+        }
+
+
         // --- ACTUALIZACIONES DE CARRITO ---
         function updateItemChecked(id, isChecked) { saveToHistory(); let item = state.items.find(i => i.id === id); item.checked = isChecked; saveToLocalStorage(); renderAll(); }
         function updateItemQty(id, val) { saveToHistory(); let item = state.items.find(i => i.id === id); item.qty = parseFloat(val) || 0; saveToLocalStorage(); calculateTotals(); }
@@ -1212,13 +1495,20 @@
 
         function handleEnterKey(event) { if (event.key === "Enter") event.target.blur(); }
         function clearSearch() { document.getElementById("search-input").value = ''; filterList(); }
+        
         function filterList() {
             if (state.currentView !== 'list') return;
-            let query = document.getElementById("search-input").value.toLowerCase(); let hideCompleted = document.getElementById("hide-completed-check").checked;
+            let query = document.getElementById("search-input").value.toLowerCase();
+            let mode = state.listFilterMode || 'all';
+
             state.items.forEach(item => {
                 let row = document.getElementById(`item-row-${item.id}`); if (!row) return;
-                let matchesSearch = item.name.toLowerCase().includes(query); let matchesHide = !hideCompleted || !item.checked;
-                if (matchesSearch && matchesHide) row.classList.remove("hidden-item"); else row.classList.add("hidden-item");
+                
+                let matchesSearch = item.name.toLowerCase().includes(query);
+                let matchesMode = (mode === 'all') || (mode === 'missing' && !item.checked) || (mode === 'bought' && item.checked);
+
+                if (matchesSearch && matchesMode) row.classList.remove("hidden-item"); 
+                else row.classList.add("hidden-item");
             });
         }
 
@@ -1247,16 +1537,16 @@
             Object.keys(catCounters).forEach(catId => { let badge = document.getElementById(`badge-cat-${catId}`); if (badge) badge.textContent = `${catCounters[catId].c}/${catCounters[catId].t}`; });
 
             document.getElementById("checked-total-usd").textContent = "$" + checkedTotalUSD.toFixed(2);
-            document.getElementById("checked-total-bs").textContent = (checkedTotalUSD * appData.rate).toFixed(0) + " Bs";
+            document.getElementById("checked-total-bs").textContent = (checkedTotalUSD * appData.rate).toFixed(2) + " Bs";
             document.getElementById("list-total-usd").textContent = "$" + listTotalUSD.toFixed(2);
-            document.getElementById("list-total-bs").textContent = (listTotalUSD * appData.rate).toFixed(0) + " Bs";
+            document.getElementById("list-total-bs").textContent = (listTotalUSD * appData.rate).toFixed(2) + " Bs";
             
             let activeItemsCount = state.items.filter(i => state.categories.find(c => c.id === i.cat)?.active).length;
             let checkedItemsCount = state.items.filter(i => i.checked && state.categories.find(c => c.id === i.cat)?.active).length;
             document.getElementById("items-count-label").textContent = `${checkedItemsCount}/${activeItemsCount} Prod.`;
         }
 
-        // --- CERRAR COMPRA Y DETALLES DE COMPRAS PASADAS ---
+        // --- CERRAR COMPRA CON PAGOS MÚLTIPLES ---
         function openClosePurchaseModal() {
             let checkedItems = state.items.filter(i => i.checked && state.categories.find(c=>c.id===i.cat)?.active);
             if (checkedItems.length === 0) return showToast("No hay artículos comprados (tildados)", true);
@@ -1264,44 +1554,113 @@
             let totalUSD = checkedItems.reduce((acc, i) => acc + (i.qty * i.real) * (i.iva ? 1.16 : 1), 0);
             
             document.getElementById("close-location").value = "";
-            document.getElementById("close-payment-method").value = "Pago Móvil";
-            document.getElementById("close-total-usd").value = totalUSD.toFixed(2);
-            syncCloseTotals('usd');
+            document.getElementById("close-total-target-usd").textContent = "$" + totalUSD.toFixed(2);
+            document.getElementById("close-total-target-bs").textContent = (totalUSD * appData.rate).toFixed(2) + " Bs";
+            
             document.getElementById("close-action-pending").value = "keep";
 
+            closePayments = [{
+                id: Date.now(),
+                method: "Pago Móvil",
+                usd: totalUSD
+            }];
+
+            renderClosePayments();
             document.getElementById("close-purchase-modal").classList.add("show");
         }
 
-        function syncCloseTotals(target) {
-            let rate = appData.rate;
-            if(target === 'usd') {
-                let usd = parseFloat(document.getElementById("close-total-usd").value) || 0;
-                document.getElementById("close-total-bs").value = (usd * rate).toFixed(2);
+        function renderClosePayments() {
+            const container = document.getElementById("close-payments-container");
+            container.innerHTML = "";
+            let targetTotalUSD = parseFloat(document.getElementById("close-total-target-usd").textContent.replace('$','')) || 0;
+            let currentTotalUSD = 0;
+
+            closePayments.forEach((p, index) => {
+                currentTotalUSD += p.usd;
+                
+                let html = `
+                <div style="display:flex; gap:8px; align-items:center; background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--border-color);">
+                    <div style="flex:2;">
+                        <select class="form-select" style="margin:0; padding:8px; font-size:13px;" onchange="updatePaymentMethod(${p.id}, this.value)">
+                            <option value="Pago Móvil" ${p.method==='Pago Móvil'?'selected':''}>📱 Pago Móvil</option>
+                            <option value="Transferencia" ${p.method==='Transferencia'?'selected':''}>🏦 Transferencia Bs</option>
+                            <option value="Efectivo Divisas" ${p.method==='Efectivo Divisas'?'selected':''}>💵 Efectivo Divisas</option>
+                            <option value="Efectivo Bs" ${p.method==='Efectivo Bs'?'selected':''}>💸 Efectivo Bs</option>
+                            <option value="Zelle" ${p.method==='Zelle'?'selected':''}>🟣 Zelle</option>
+                            <option value="Zinli" ${p.method==='Zinli'?'selected':''}>🟠 Zinli</option>
+                            <option value="Binance" ${p.method==='Binance'?'selected':''}>🟡 Binance (USDT)</option>
+                            <option value="Tarjeta" ${p.method==='Tarjeta'?'selected':''}>💳 Tarjeta</option>
+                        </select>
+                    </div>
+                    <div style="flex:1.5;">
+                        <input type="number" inputmode="decimal" class="form-input" style="margin:0; padding:8px; font-size:14px; text-align:center;" value="${p.usd.toFixed(2)}" step="0.01" onfocus="this.select()" onchange="updatePaymentAmount(${p.id}, this.value)">
+                    </div>
+                    ${closePayments.length > 1 ? `<button class="btn-icon" style="color:var(--danger); padding:6px;" onclick="removePaymentRow(${p.id})">✕</button>` : ''}
+                </div>`;
+                container.innerHTML += html;
+            });
+
+            let diff = targetTotalUSD - currentTotalUSD;
+            const textEl = document.getElementById("close-remaining-text");
+            if(Math.abs(diff) < 0.01) {
+                textEl.textContent = "Pagos cuadrados correctamente ✅";
+                textEl.style.color = "var(--primary)";
+            } else if(diff > 0) {
+                textEl.textContent = `Falta por asignar: $${diff.toFixed(2)}`;
+                textEl.style.color = "var(--danger)";
             } else {
-                let bs = parseFloat(document.getElementById("close-total-bs").value) || 0;
-                document.getElementById("close-total-usd").value = (bs / rate).toFixed(2);
+                textEl.textContent = `Sobra asignado: $${Math.abs(diff).toFixed(2)}`;
+                textEl.style.color = "var(--secondary)";
             }
+        }
+
+        function updatePaymentMethod(id, method) {
+            let p = closePayments.find(x => x.id === id);
+            if(p) p.method = method;
+        }
+
+        function updatePaymentAmount(id, val) {
+            let p = closePayments.find(x => x.id === id);
+            if(p) p.usd = parseFloat(val) || 0;
+            renderClosePayments();
+        }
+
+        function addPaymentRow() {
+            let targetTotalUSD = parseFloat(document.getElementById("close-total-target-usd").textContent.replace('$','')) || 0;
+            let currentTotalUSD = closePayments.reduce((acc, p) => acc + p.usd, 0);
+            let diff = targetTotalUSD - currentTotalUSD;
+            
+            closePayments.push({
+                id: Date.now(),
+                method: "Efectivo Divisas",
+                usd: diff > 0 ? diff : 0
+            });
+            renderClosePayments();
+        }
+
+        function removePaymentRow(id) {
+            closePayments = closePayments.filter(p => p.id !== id);
+            renderClosePayments();
         }
 
         function executeClosePurchase() {
             let checkedItems = state.items.filter(i => i.checked && state.categories.find(c=>c.id===i.cat)?.active);
-            let finalUSD = parseFloat(document.getElementById("close-total-usd").value) || 0;
-            let finalBs = parseFloat(document.getElementById("close-total-bs").value) || 0;
             let location = document.getElementById("close-location").value || "Supermercado General";
-            let paymentMethod = document.getElementById("close-payment-method").value;
             let actionPending = document.getElementById("close-action-pending").value;
+
+            let finalUSD = closePayments.reduce((acc, p) => acc + p.usd, 0);
+            let finalBs = finalUSD * appData.rate;
 
             let now = new Date();
             let dateStr = now.toLocaleDateString('es-VE') + ' ' + now.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
             
             saveToHistory();
 
-            // Guardar Historial
             appData.purchaseHistory.push({
                 id: Date.now(),
                 date: dateStr,
                 location: location,
-                paymentMethod: paymentMethod,
+                payments: JSON.parse(JSON.stringify(closePayments)),
                 listName: appData.lists.find(l=>l.id===appData.currentListId).name,
                 totalUSD: finalUSD,
                 totalBs: finalBs,
@@ -1309,16 +1668,11 @@
                 items: JSON.parse(JSON.stringify(checkedItems))
             });
 
-            // Procesar lista actual según selección
             if (actionPending === 'reset') {
-                // Desmarcar y poner a cantidad por defecto TODO
                 state.items.forEach(item => { item.checked = false; item.qty = item.est_qty; item.real = item.est; });
             } else {
-                // Mantener los pendientes. Solo desmarcar los que ya se compraron
                 state.items.forEach(item => {
-                    if(item.checked) {
-                        item.checked = false; 
-                    }
+                    if(item.checked) item.checked = false; 
                 });
             }
 
@@ -1336,7 +1690,12 @@
                 let html = "";
                 [...appData.purchaseHistory].reverse().forEach(p => {
                     let loc = p.location ? `📍 ${p.location}` : '';
-                    let pay = p.paymentMethod ? `💳 ${p.paymentMethod}` : '';
+                    let payText = "";
+                    if(p.payments && p.payments.length > 0) {
+                        payText = `💳 ` + p.payments.map(x => x.method).join(' + ');
+                    } else if (p.paymentMethod) {
+                        payText = `💳 ${p.paymentMethod}`; 
+                    }
 
                     html += `
                     <div style="background:var(--input-bg); border:1px solid var(--border-color); border-radius:12px; padding:15px;">
@@ -1344,12 +1703,12 @@
                             <span style="font-size:12px; color:var(--text-muted); font-weight: 600;">${p.date}</span>
                             <span style="font-size:10px; background:var(--primary); color:white; padding:3px 8px; border-radius:12px; font-weight: bold;">${p.listName}</span>
                         </div>
-                        <div style="font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom: 8px;">${loc} | ${pay}</div>
+                        <div style="font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom: 8px;">${loc} | ${payText}</div>
                         <div style="display:flex; justify-content:space-between; align-items:flex-end;">
                             <span style="font-size:13px; font-weight:800;">🛒 ${p.itemsCount} Artículos</span>
                             <div style="text-align:right;">
                                 <div style="font-size:18px; font-weight:900; color:var(--text-color);">$${p.totalUSD.toFixed(2)}</div>
-                                <div style="font-size:12px; color:var(--text-muted); font-weight: 600;">${p.totalBs.toFixed(0)} Bs</div>
+                                <div style="font-size:12px; color:var(--text-muted); font-weight: 600;">${p.totalBs.toFixed(2)} Bs</div>
                             </div>
                         </div>
                         <div style="margin-top:12px; display:flex; gap:8px;">
@@ -1364,16 +1723,24 @@
         }
 
         function viewPurchaseDetails(id) {
-            let purchase = appData.purchaseHistory.find(p => p.id === id);
-            if (!purchase) return;
+            let p = appData.purchaseHistory.find(p => p.id === id);
+            if (!p) return;
             
+            let payText = "";
+            if(p.payments && p.payments.length > 0) {
+                payText = p.payments.map(x => `<b>${x.method}:</b> $${x.usd.toFixed(2)}`).join('<br>');
+            } else {
+                payText = `💳 ${p.paymentMethod || 'N/A'}`;
+            }
+
             let html = `<div style="margin-bottom:15px; border-bottom:1px solid var(--border-color); padding-bottom:12px;">
-                            <div style="font-size:18px; font-weight:900;">${purchase.listName}</div>
-                            <div style="font-size:13px; color:var(--text-muted); font-weight:600;">${purchase.date}</div>
-                            <div style="font-size:13px; color:var(--text-muted); font-weight:600; margin-top:5px;">📍 ${purchase.location || 'N/A'} - ${purchase.paymentMethod || 'N/A'}</div>
+                            <div style="font-size:18px; font-weight:900;">${p.listName}</div>
+                            <div style="font-size:13px; color:var(--text-muted); font-weight:600;">${p.date}</div>
+                            <div style="font-size:13px; color:var(--text-muted); font-weight:600; margin-top:5px;">📍 ${p.location || 'N/A'}</div>
+                            <div style="font-size:13px; color:var(--text-color); margin-top:5px; background:var(--input-bg); padding:6px; border-radius:6px;">${payText}</div>
                         </div>`;
             
-            purchase.items.forEach(i => {
+            p.items.forEach(i => {
                 let sub = (i.qty * i.real) * (i.iva ? 1.16 : 1);
                 let iva = i.iva ? '<span style="font-size:9px; color:var(--secondary);">+IVA</span>' : '';
                 html += `<div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px; border-bottom:1px dashed var(--border-color); padding-bottom:6px;">
@@ -1381,10 +1748,10 @@
                             <div style="font-weight:800;">$${sub.toFixed(2)}</div>
                          </div>`;
             });
-            html += `<div style="text-align:right; margin-top:20px; font-size:20px; font-weight:900; color:var(--primary);">Total: $${purchase.totalUSD.toFixed(2)}</div>`;
-            html += `<div style="text-align:right; font-size:14px; font-weight:700; color:var(--text-muted);">Total: ${purchase.totalBs.toFixed(0)} Bs</div>`;
+            html += `<div style="text-align:right; margin-top:20px; font-size:20px; font-weight:900; color:var(--primary);">Total: $${p.totalUSD.toFixed(2)}</div>`;
+            html += `<div style="text-align:right; font-size:14px; font-weight:700; color:var(--text-muted);">Total: ${p.totalBs.toFixed(2)} Bs</div>`;
             
-            document.getElementById("btn-delete-single-purchase").onclick = () => deletePurchase(purchase.id, true);
+            document.getElementById("btn-delete-single-purchase").onclick = () => deletePurchase(p.id, true);
             document.getElementById("purchase-details-container").innerHTML = html;
             document.getElementById("purchase-details-modal").classList.add("show");
         }
@@ -1434,17 +1801,17 @@
         // --- EXPORTAR EXCEL ---
         function exportCatalogCSV() {
             let csv = "Pasillo,Nombre,Cantidad Defecto,Precio Ref USD,Lleva IVA\n";
-            let itemsToExport = state.items; // Exporta los productos de la lista actual
+            let itemsToExport = state.items; 
             
             itemsToExport.forEach(i => {
                 let catName = state.categories.find(c => c.id === i.cat)?.name || 'General';
-                catName = catName.replace(/,/g, ''); // Evitar comas en CSV
+                catName = catName.replace(/,/g, ''); 
                 let name = i.name.replace(/,/g, '');
                 let ivaStr = i.iva ? "Si" : "No";
                 csv += `"${catName}","${name}",${i.est_qty},${i.est},${ivaStr}\n`;
             });
 
-            const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csv], { type: 'text/csv;charset=utf-8;' }); // UTF-8 BOM
+            const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csv], { type: 'text/csv;charset=utf-8;' }); 
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.setAttribute("href", url);
@@ -1460,7 +1827,6 @@
         
         function createNewBackup() {
             showToast("Creando backup... ⏳");
-            // Usamos setTimeout para no congelar la UI
             setTimeout(() => {
                 try {
                     saveToLocalStorage(); 
@@ -1493,7 +1859,6 @@
         function deleteLocalBackup(id) { if(confirm("¿Eliminar este respaldo global?")) { appData.backups = appData.backups.filter(b => b.id !== id); saveToLocalStorage(); renderBackupList(); } }
         
         function restoreFromCode(str, confirmReq) {
-            // Verificar si es una lista importada de otra app
             if(str.startsWith("APP_COMPRAS_PRO_LISTA:")) {
                 let b64 = str.split(":")[1];
                 try {
@@ -1513,7 +1878,15 @@
             try { 
                 let decrypted = JSON.parse(decodeURIComponent(escape(atob(str)))); 
                 if(decrypted.lists) { 
-                    appData = decrypted; saveToLocalStorage(); loadCurrentList(); closeModals(); showToast("Sistema Restaurado"); 
+                    appData.lists = decrypted.lists;
+                    appData.purchaseHistory = decrypted.purchaseHistory || appData.purchaseHistory;
+                    appData.customDictionary = decrypted.customDictionary || appData.customDictionary;
+                    appData.userAddedDefaults = decrypted.userAddedDefaults || appData.userAddedDefaults;
+                    appData.userAddedCategories = decrypted.userAddedCategories || appData.userAddedCategories || [];
+                    appData.customTags = decrypted.customTags || appData.customTags || [];
+                    appData.rate = decrypted.rate || appData.rate;
+                    
+                    saveToLocalStorage(); loadCurrentList(); closeModals(); showToast("Sistema Restaurado"); 
                     return true; 
                 } else { showToast("Código no válido", true); return false; } 
             } catch(err) { showToast("Error al procesar el código", true); return false; }
@@ -1536,36 +1909,48 @@
                 let unitUSD = i.real * (i.iva ? 1.16 : 1);
                 
                 text += `• ${i.name} (x${i.qty})\n`;
-                text += `  └ $${subUSD.toFixed(2)} | ${subBS.toFixed(0)} Bs (Unit: $${unitUSD.toFixed(2)})\n`;
+                text += `  └ $${subUSD.toFixed(2)} | ${subBS.toFixed(2)} Bs (Unit: $${unitUSD.toFixed(2)})\n`;
             });
             
             let totalUSD = checkedItems.reduce((acc, i) => acc + ((i.qty * i.real) * (i.iva ? 1.16 : 1)), 0);
             let totalBS = totalUSD * appData.rate;
-            text += `\n💵 *Tasa BCV:* ${appData.rate.toFixed(2)} Bs.\n🛒 *TOTAL:* *$${totalUSD.toFixed(2)} / Bs. ${totalBS.toFixed(0)}*`;
+            text += `\n💵 *Tasa BCV:* ${appData.rate.toFixed(2)} Bs.\n🛒 *TOTAL:* *$${totalUSD.toFixed(2)} / Bs. ${totalBS.toFixed(2)}*`;
             
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
         }
 
-        // Exportar solo la lista configurada (sin estar comprada) como base64 para que otro la importe
         function shareListWhatsApp() {
             let activeList = appData.lists.find(l => l.id === appData.currentListId);
-            
-            // Construimos un objeto ligero
             let exportData = {
                 name: activeList.name + " (Compartida)",
                 categories: activeList.categories,
-                items: activeList.items.map(i => ({...i, checked: false, real: i.est})) // Quitamos el estado checked
+                items: activeList.items.map(i => ({...i, checked: false, real: i.est})) 
             };
             
             let b64 = btoa(unescape(encodeURIComponent(JSON.stringify(exportData))));
             let code = `APP_COMPRAS_PRO_LISTA:${b64}`;
-            
             let text = `🛒 *Lista de Compras Compartida: ${activeList.name}*\n\nCopia el código que está abajo de este mensaje y pégalo en el botón "Importar Código" dentro de la App Compras Pro para cargar esta lista exacta con las cantidades y productos configurados.\n\n👇 *CÓDIGO DE IMPORTACIÓN:*\n\n${code}`;
             
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
         }
 
-        function refreshOnline() { if (confirm("¿Forzar actualización online desde GitHub?")) { if ('serviceWorker' in navigator) { navigator.serviceWorker.getRegistrations().then(regs => { for (let r of regs) r.unregister(); window.location.reload(true); }); } else { window.location.reload(true); } } }
+        function refreshOnline() { 
+            if (confirm("¿Forzar actualización y borrar caché para aplicar cambios sin errores?")) { 
+                if ('caches' in window) {
+                    caches.keys().then(names => {
+                        for (let name of names) caches.delete(name);
+                    });
+                }
+                if ('serviceWorker' in navigator) { 
+                    navigator.serviceWorker.getRegistrations().then(regs => { 
+                        for (let r of regs) r.unregister(); 
+                        window.location.reload(true); 
+                    }); 
+                } else { 
+                    window.location.reload(true); 
+                } 
+            } 
+        }
 
         window.onload = initApp;
     </script>
