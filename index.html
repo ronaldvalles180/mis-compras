@@ -887,18 +887,31 @@
             listContainer.style.display = 'block';
         }
 
-        function addToCustomDictionary(cat, name, est, tag, qty, iva) {
-            let existsInDefaults = defaultItems.some(d => d.name.toLowerCase() === name.toLowerCase());
-            let existsInUser = appData.userAddedDefaults.some(d => d.name.toLowerCase() === name.toLowerCase());
-            let existsInExtended = extendedDictionaryItems.some(d => d.name.toLowerCase() === name.toLowerCase());
+        function updateDictionaryDefaults(item) {
+            let nameLower = item.name.toLowerCase();
+            let idx = appData.userAddedDefaults.findIndex(d => d.name.toLowerCase() === nameLower);
             
-            // Solo guarda si es un producto totalmente nuevo (nunca antes visto en la app global)
-            // Así evitamos sobreescribir las preferencias globales cuando editamos en una lista individual
-            if (!existsInDefaults && !existsInUser && !existsInExtended) {
-                let newItem = { id: Date.now() + Math.random(), cat, name, est, qty, est_qty: qty, real: est, tag, iva, checked: false };
+            let defaultId = idx > -1 ? appData.userAddedDefaults[idx].id : Date.now();
+            
+            let newItem = { 
+                id: defaultId, 
+                cat: item.cat, 
+                name: item.name, 
+                est: item.est, 
+                qty: item.est_qty, 
+                est_qty: item.est_qty, 
+                real: item.real, 
+                tag: item.tag || '🛒 Supermercado', 
+                iva: !!item.iva, 
+                checked: false 
+            };
+            
+            if (idx > -1) {
+                appData.userAddedDefaults[idx] = newItem;
+            } else {
                 appData.userAddedDefaults.push(newItem);
-                buildDictionary();
             }
+            buildDictionary();
         }
 
         // --- SISTEMA DE ETIQUETAS DINAMICAS ---
@@ -1075,7 +1088,7 @@
                 visibilityContainer.style.gridTemplateColumns = "repeat(auto-fill, minmax(140px, 1fr))";
                 visibilityContainer.style.gap = "8px";
                 
-                // Aplicamos estilos para que se vea más pequeño (font-size 11) y no pase a otra línea (nowrap, ellipsis)
+                // Alineación lineal, tamaño 11px, sin saltos de linea
                 visibilityContainer.innerHTML = state.categories.map(c => `
                     <label class="cat-drag-row" data-id="${c.id}" style="display:flex; align-items:center; gap:6px; background:var(--input-bg); padding:6px 8px; border-radius:8px; border:1px solid var(--border-color);">
                         <span class="drag-handle" style="font-size:16px;">☰</span>
@@ -1110,11 +1123,13 @@
             }
             document.querySelectorAll('.settings-items-container').forEach(container => {
                 Sortable.create(container, { handle: '.drag-handle', animation: 150, onEnd: function (evt) {
-                    let catId = parseInt(evt.from.dataset.catId); let newOrderIds = Array.from(evt.from.children).map(el => parseInt(el.dataset.id));
-                    let otherItems = state.items.filter(i => i.cat !== catId); let catItems = state.items.filter(i => i.cat === catId);
-                    catItems.sort((a, b) => newOrderIds.indexOf(a.id) - newOrderIds.indexOf(b.id));
-                    state.items = [...otherItems, ...catItems]; saveToLocalStorage(); renderAll(); }
-                });
+                    let catId = Number(evt.from.dataset.catId); 
+                    let newOrderIds = Array.from(evt.from.children).map(el => String(el.dataset.id));
+                    let otherItems = state.items.filter(i => i.cat !== catId); 
+                    let catItems = state.items.filter(i => i.cat === catId);
+                    catItems.sort((a, b) => newOrderIds.indexOf(String(a.id)) - newOrderIds.indexOf(String(b.id)));
+                    state.items = [...otherItems, ...catItems]; saveToLocalStorage(); renderAll(); 
+                }});
             });
         }
 
@@ -1164,8 +1179,8 @@
                     html += `
                     <div class="item-card ${rowClass}" id="item-row-${item.id}">
                         <div class="item-card-header">
-                            <label class="check-container"><input type="checkbox" ${item.checked ? 'checked' : ''} onchange="updateItemChecked(${item.id}, this.checked)"><span class="checkmark"></span></label>
-                            <div class="item-name-group" onclick="openItemModal(${item.id})">
+                            <label class="check-container"><input type="checkbox" ${item.checked ? 'checked' : ''} onchange="updateItemChecked('${item.id}', this.checked)"><span class="checkmark"></span></label>
+                            <div class="item-name-group" onclick="openItemModal('${item.id}')">
                                 <div class="item-name">${item.name}</div>
                                 <div class="item-subtext">${tagHtml} ${ivaHtml} <span>Est: $${item.est.toFixed(2)}</span> ${inflationHTML}</div>
                             </div>
@@ -1175,11 +1190,11 @@
                             <div class="item-inputs-inline">
                                 <div class="mini-input-box">
                                     <span>Cant</span>
-                                    <input type="number" inputmode="decimal" value="${item.qty}" step="any" onfocus="this.select()" onchange="updateItemQty(${item.id}, this.value)" onkeydown="handleEnterKey(event)">
+                                    <input type="number" inputmode="decimal" value="${item.qty}" step="any" onfocus="this.select()" onchange="updateItemQty('${item.id}', this.value)" onkeydown="handleEnterKey(event)">
                                 </div>
                                 <div class="mini-input-box ${priceAlertClass}" id="price-box-${item.id}">
                                     <span>$</span>
-                                    <input type="number" inputmode="decimal" class="item-price" value="${item.real.toFixed(2)}" step="0.01" onfocus="this.select()" onchange="updateItemPrice(${item.id}, this.value)" onkeydown="handleEnterKey(event)">
+                                    <input type="number" inputmode="decimal" class="item-price" value="${item.real.toFixed(2)}" step="0.01" onfocus="this.select()" onchange="updateItemPrice('${item.id}', this.value)" onkeydown="handleEnterKey(event)">
                                 </div>
                             </div>
                         </div>
@@ -1200,7 +1215,7 @@
 
         function quickEditItem(id, field, value) {
             saveToHistory();
-            let item = state.items.find(i => i.id === id);
+            let item = state.items.find(i => String(i.id) === String(id));
             if(!item) return;
 
             if (field === 'qty') {
@@ -1213,9 +1228,12 @@
                 item.iva = value;
             }
 
+            // Actualiza el diccionario base para el futuro
+            updateDictionaryDefaults(item);
+
             saveToLocalStorage();
             calculateTotals();
-            showToast("Producto actualizado en esta lista");
+            showToast("Actualizado en esta lista");
         }
 
         function renderSettingsPrices() {
@@ -1244,22 +1262,22 @@
                             <div style="display:flex; gap:6px; align-items:center;">
                                 <div style="flex:1;">
                                     <label style="font-size:10px; color:var(--text-muted); font-weight:800; display:block; margin-bottom:2px;">Cant</label>
-                                    <input type="number" inputmode="decimal" class="form-input" style="padding:8px; margin:0; font-size:14px; text-align:center;" value="${item.est_qty}" onchange="quickEditItem(${item.id}, 'qty', this.value)">
+                                    <input type="number" inputmode="decimal" class="form-input" style="padding:8px; margin:0; font-size:14px; text-align:center;" value="${item.est_qty}" onchange="quickEditItem('${item.id}', 'qty', this.value)">
                                 </div>
                                 <div style="flex:1;">
                                     <label style="font-size:10px; color:var(--text-muted); font-weight:800; display:block; margin-bottom:2px;">Precio ($)</label>
-                                    <input type="number" inputmode="decimal" class="form-input" style="padding:8px; margin:0; font-size:14px; text-align:center;" value="${item.est.toFixed(2)}" onchange="quickEditItem(${item.id}, 'price', this.value)">
+                                    <input type="number" inputmode="decimal" class="form-input" style="padding:8px; margin:0; font-size:14px; text-align:center;" value="${item.est.toFixed(2)}" onchange="quickEditItem('${item.id}', 'price', this.value)">
                                 </div>
                                 <div style="flex:0.8; display:flex; flex-direction:column; justify-content:flex-end;">
                                     <label style="font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer; height:36px; background:var(--card-bg); padding:0 8px; border-radius:8px; border:1px solid var(--border-color);">
-                                        <input type="checkbox" style="transform:scale(1.2); margin:0;" ${item.iva?'checked':''} onchange="quickEditItem(${item.id}, 'iva', this.checked)"> IVA
+                                        <input type="checkbox" style="transform:scale(1.2); margin:0;" ${item.iva?'checked':''} onchange="quickEditItem('${item.id}', 'iva', this.checked)"> IVA
                                     </label>
                                 </div>
                             </div>
                         </div>`;
                     } else {
                         html += `
-                        <div class="edit-item-row" data-id="${item.id}" onclick="openItemModal(${item.id})">
+                        <div class="edit-item-row" data-id="${item.id}" onclick="openItemModal('${item.id}')">
                             <span class="drag-handle">☰</span>
                             <div class="edit-item-info">
                                 <p>${tagHtml} ${item.name}${ivaHtml}</p>
@@ -1279,7 +1297,7 @@
             renderTagSelect();
 
             if(id) {
-                let item = state.items.find(i => i.id === id); if(!item) return;
+                let item = state.items.find(i => String(i.id) === String(id)); if(!item) return;
                 
                 if (item.tag && !defaultTags.some(d => d.val === item.tag) && !(appData.customTags||[]).includes(item.tag)) {
                     appData.customTags.push(item.tag);
@@ -1330,7 +1348,7 @@
             if(!name) return showToast("El nombre es obligatorio", true);
 
             saveToHistory();
-            let cat = parseInt(document.getElementById("edit-cat").value);
+            let cat = Number(document.getElementById("edit-cat").value);
             let tag = document.getElementById("edit-tag").value;
             let nQty = parseFloat(document.getElementById("edit-qty").value) || 1;
             let nPrice = parseFloat(document.getElementById("edit-price").value) || 0;
@@ -1340,33 +1358,33 @@
             let editedItem;
 
             if(idVal) {
-                editedItem = state.items.find(i => i.id === parseInt(idVal));
+                editedItem = state.items.find(i => String(i.id) === String(idVal));
                 if(editedItem) {
                     editedItem.name = name; editedItem.cat = cat; editedItem.tag = tag;
                     editedItem.est_qty = nQty; editedItem.qty = nQty; editedItem.est = nPrice; editedItem.real = nPrice;
                     editedItem.iva = iva; editedItem.checked = isBought;
                 }
             } else {
-                editedItem = { id: Date.now(), cat, tag, name, qty: nQty, est_qty: nQty, est: nPrice, real: nPrice, checked: isBought, iva: iva };
+                editedItem = { id: Date.now() + Math.random(), cat, tag, name, qty: nQty, est_qty: nQty, est: nPrice, real: nPrice, checked: isBought, iva: iva };
                 state.items.push(editedItem);
-                
-                // Solo si el producto es totalmente nuevo lo agregamos al diccionario para el futuro
-                addToCustomDictionary(cat, name, nPrice, tag, nQty, iva);
             }
+            
+            // Actualizar catálogo global para el futuro, respetando listas existentes
+            if (editedItem) updateDictionaryDefaults(editedItem);
             
             saveToLocalStorage(); closeModals(); renderAll(); showToast("Guardado con éxito en esta lista");
         }
 
         function deleteItemFromModal() {
-            let id = parseInt(document.getElementById("edit-id").value);
+            let idVal = document.getElementById("edit-id").value;
             let confirmDel = confirm("¿Deseas ELIMINAR este producto por completo de esta lista?\n\n(Pulsa Cancelar si solo quieres TACHARLO / poner su cantidad en 0)");
             
             saveToHistory();
             if (confirmDel) {
-                state.items = state.items.filter(i => i.id !== id);
+                state.items = state.items.filter(i => String(i.id) !== String(idVal));
                 showToast("Producto eliminado de la lista");
             } else {
-                let item = state.items.find(i => i.id === id);
+                let item = state.items.find(i => String(i.id) === String(idVal));
                 if(item) {
                     item.qty = 0;
                     item.checked = false;
@@ -1443,7 +1461,9 @@
 
         function wizardAddNewInline() {
             let name = document.getElementById("wizard-search").value.trim();
-            addToCustomDictionary(1, name, 0, '🛒 Supermercado', 1, false);
+            updateDictionaryDefaults({
+                cat: 1, name: name, est: 0, real: 0, tag: '🛒 Supermercado', est_qty: 1, qty: 1, iva: false
+            });
             wizardSelectedItems.push(name);
             document.getElementById("wizard-search").value = "";
             renderWizardChips();
@@ -1489,9 +1509,9 @@
 
 
         // --- ACTUALIZACIONES DE CARRITO ---
-        function updateItemChecked(id, isChecked) { saveToHistory(); let item = state.items.find(i => i.id === id); item.checked = isChecked; saveToLocalStorage(); renderAll(); }
-        function updateItemQty(id, val) { saveToHistory(); let item = state.items.find(i => i.id === id); item.qty = parseFloat(val) || 0; saveToLocalStorage(); calculateTotals(); }
-        function updateItemPrice(id, val) { saveToHistory(); let item = state.items.find(i => i.id === id); item.real = parseFloat(val) || 0; saveToLocalStorage(); renderAll(); }
+        function updateItemChecked(id, isChecked) { saveToHistory(); let item = state.items.find(i => String(i.id) === String(id)); item.checked = isChecked; saveToLocalStorage(); renderAll(); }
+        function updateItemQty(id, val) { saveToHistory(); let item = state.items.find(i => String(i.id) === String(id)); item.qty = parseFloat(val) || 0; saveToLocalStorage(); calculateTotals(); }
+        function updateItemPrice(id, val) { saveToHistory(); let item = state.items.find(i => String(i.id) === String(id)); item.real = parseFloat(val) || 0; saveToLocalStorage(); renderAll(); }
 
         function handleEnterKey(event) { if (event.key === "Enter") event.target.blur(); }
         function clearSearch() { document.getElementById("search-input").value = ''; filterList(); }
@@ -1936,11 +1956,14 @@
 
         function refreshOnline() { 
             if (confirm("¿Forzar actualización y borrar caché para aplicar cambios sin errores?")) { 
+                // Elimina las caches de archivos
                 if ('caches' in window) {
                     caches.keys().then(names => {
                         for (let name of names) caches.delete(name);
                     });
                 }
+                
+                // Desregistra los Service Workers
                 if ('serviceWorker' in navigator) { 
                     navigator.serviceWorker.getRegistrations().then(regs => { 
                         for (let r of regs) r.unregister(); 
