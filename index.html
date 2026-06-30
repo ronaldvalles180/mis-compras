@@ -6,6 +6,11 @@
     <title>Compras Pro</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2c3e50">
+    
+    <!-- LIBRERÍAS EXTERNAS PARA DRAG & DROP Y ESCÁNER DE BARRAS -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
     <style>
         /* === VARIABLES DE TEMA CLARO Y OSCURO === */
         :root {
@@ -74,9 +79,9 @@
         .sticky-header { position: sticky; top: 55px; z-index: 90; background: var(--bg-color); padding: 10px 0 5px 0; margin-top: -5px; }
         
         .search-card { background: var(--card-bg); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid var(--border-color); }
-        .search-row { display: flex; gap: 8px; }
+        .search-row { display: flex; gap: 8px; align-items: center; }
         .search-input { flex: 1; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-color); padding: 10px 15px; border-radius: 8px; font-size: 16px; outline: none; }
-        .btn-clear { background: var(--chip-bg); border: none; color: var(--chip-text); width: 42px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;}
+        .btn-icon-search { background: var(--chip-bg); border: none; color: var(--text-color); width: 42px; height: 42px; border-radius: 8px; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer;}
         .filter-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-muted); font-weight: 500; }
 
         /* Chips de Categorías */
@@ -110,21 +115,22 @@
         .input-group label { font-size: 10px; color: var(--text-muted); font-weight: 600; width: 35px; }
         .input-group input { border: none; background: transparent; color: var(--text-color); width: 100%; font-size: 16px; font-weight: bold; text-align: center; outline: none; padding: 4px 0; }
         
-        /* Alerta de Precio Cero */
         .price-alert-box { border: 2px solid var(--danger) !important; background-color: var(--alert-bg) !important; }
 
-        .item-totals { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; flex-shrink: 0; min-width: 50px; }
+        .item-totals { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; flex-shrink: 0; min-width: 55px; }
         .item-subtotal { font-size: 14px; font-weight: 800; color: var(--text-color); }
+        .inflation-badge { font-size: 10px; font-weight: bold; padding: 2px 0; display: block; text-align: right; }
 
         /* === TARJETAS DE CONFIGURACIÓN === */
         .config-card { background: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border: 1px solid var(--border-color); }
         .config-card h3 { margin: 0 0 10px 0; font-size: 15px; color: var(--text-color); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center;}
         
         .edit-item-row { display: flex; align-items: center; padding: 10px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        .arrows-col { display: flex; flex-direction: column; gap: 2px; }
-        .btn-arrow { background: var(--input-bg); border: none; color: var(--text-muted); font-size: 10px; padding: 4px; border-radius: 4px; }
-        .edit-item-info { flex: 1; }
-        .edit-item-info p { margin: 0; font-size: 14px; font-weight: 600; color: var(--text-color); }
+        .drag-handle { color: var(--text-muted); cursor: grab; font-size: 18px; padding: 0 5px; touch-action: none;}
+        .drag-handle:active { cursor: grabbing; color: var(--primary); }
+        
+        .edit-item-info { flex: 1; overflow: hidden;}
+        .edit-item-info p { margin: 0; font-size: 14px; font-weight: 600; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         .edit-item-info span { font-size: 11px; color: var(--text-muted); }
         
         /* Botones Generales */
@@ -134,18 +140,14 @@
         .btn-danger { background: var(--danger); color: white; }
         .btn-outline { background: transparent; border: 1px solid var(--input-border); color: var(--text-color); }
         .btn-outline-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
-        .btn-icon { padding: 8px; font-size: 16px; border-radius: 8px; background: var(--input-bg); border: none; color: var(--text-color); }
         .btn-delete-cat { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 3px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; }
 
-        /* Campos de Entrada Generales */
         .form-input, .form-select { width: 100%; padding: 10px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); border-radius: 8px; font-size: 16px; margin-bottom: 10px; outline: none; font-weight:bold;}
 
-        /* === BARRA INFERIOR DE TOTALES Y NAVEGACIÓN === */
+        /* === BARRA INFERIOR NATIVA === */
         .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--nav-bg); border-top: 1px solid var(--border-color); z-index: 1000; padding-bottom: env(safe-area-inset-bottom); box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
-        
         .totals-row { display: flex; padding: 12px 15px; background: var(--input-bg); border-bottom: 1px solid var(--border-color); align-items: center; gap: 10px; }
         
-        /* Rediseño de la Caja de Tasa BCV */
         .rate-widget { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; padding: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .rate-widget span { font-size: 11px; font-weight: bold; color: var(--text-muted); padding: 0 6px; }
         .rate-widget input { width: 65px; border: none; background: transparent; color: var(--text-color); font-weight: bold; font-size: 16px; text-align: center; outline: none; }
@@ -162,18 +164,17 @@
         .nav-item.active { color: var(--nav-active); }
         .nav-icon { font-size: 22px; margin-bottom: 2px; }
 
-        /* === MENÚ FLOTANTE (BOTTOM SHEET) === */
-        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: none; opacity: 0; transition: 0.3s; }
-        .sheet-overlay.show { display: block; opacity: 1; }
+        /* === MODALES Y OVERLAYS === */
+        .sheet-overlay, .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; display: none; opacity: 0; transition: 0.3s; }
+        .sheet-overlay.show, .modal-overlay.show { display: block; opacity: 1; }
+        .modal-overlay.show { display: flex; align-items: center; justify-content: center; padding: 20px;}
+        
         .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: var(--card-bg); border-radius: 20px 20px 0 0; z-index: 2001; padding: 20px 15px calc(20px + env(safe-area-inset-bottom)); transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .bottom-sheet.show { bottom: 0; }
         .sheet-handle { width: 40px; height: 5px; background: var(--input-border); border-radius: 5px; margin: 0 auto 15px auto; }
         .sheet-menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         
-        /* === VENTANA FLOTANTE PARA EDITAR (MODAL) === */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 20px; opacity: 0; transition: 0.2s; }
-        .modal-overlay.show { display: flex; opacity: 1; }
-        .modal-card { background: var(--card-bg); width: 100%; max-width: 400px; border-radius: 16px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: scale(0.9); transition: 0.2s; }
+        .modal-card { background: var(--card-bg); width: 100%; max-width: 400px; border-radius: 16px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: scale(0.9); transition: 0.2s; max-height: 90vh; overflow-y: auto;}
         .modal-overlay.show .modal-card { transform: scale(1); }
         .modal-header { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: var(--text-color); }
         .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
@@ -184,13 +185,7 @@
         .toast.show { opacity: 1; transform: translateY(0); }
         .toast.error { background: var(--danger); color: white; }
 
-        @media print {
-            body { padding: 0; background: white; color: black; }
-            .tabs-header, .sticky-header, .bottom-bar, .config-box, .sheet-overlay, .bottom-sheet, .modal-overlay, .toast-container { display: none !important; }
-            .item-card { border: none; box-shadow: none; border-bottom: 1px solid #ccc; border-radius: 0; margin: 0; padding: 5px 0; }
-            .item-inputs { display: none; }
-            .check-container { display: none; }
-        }
+        #reader { width: 100%; border-radius: 12px; overflow: hidden; background: black;}
     </style>
 </head>
 <body>
@@ -206,12 +201,14 @@
         
         <!-- VISTA 1: CHECKLIST PRINCIPAL -->
         <div id="view-list" class="view-panel active">
-            <!-- Bloque Pegajoso (Buscador + Píldoras) -->
+            <!-- Bloque Pegajoso (Buscador + Mic + Cámara + Píldoras) -->
             <div class="sticky-header">
                 <div class="search-card">
                     <div class="search-row">
                         <input type="text" id="search-input" class="search-input" placeholder="🔍 Buscar producto..." onfocus="this.select()" oninput="filterList()">
-                        <button class="btn-clear" onclick="clearSearch()">✕</button>
+                        <button class="btn-icon-search" onclick="startVoiceSearch()" title="Dictado por Voz">🎤</button>
+                        <button class="btn-icon-search" onclick="startScanner()" title="Escanear Código">📷</button>
+                        <button class="btn-icon-search" onclick="clearSearch()" style="color:var(--text-muted);">✕</button>
                     </div>
                     <div class="filter-row">
                         <label style="display:flex; align-items:center; gap:5px;">
@@ -219,7 +216,6 @@
                         </label>
                         <span id="items-count-label">0 / 0</span>
                     </div>
-                    <!-- Píldoras Filtro de Categorías -->
                     <div class="category-chips" id="category-chips-list"></div>
                 </div>
             </div>
@@ -239,7 +235,6 @@
                 </div>
             </div>
 
-            <!-- Bloque Pegajoso Píldoras en Configuración -->
             <div class="sticky-header">
                 <div class="search-card" style="padding: 10px;">
                     <h3 style="margin: 0 0 5px 0; font-size: 13px; color: var(--text-muted);">Filtrar Catálogo:</h3>
@@ -248,6 +243,7 @@
             </div>
 
             <div class="config-card" style="margin-top: 5px;">
+                <p style="font-size: 11px; color: var(--text-muted); text-align:center; margin-top:0;">💡 Mantén pulsado <b>☰</b> para ordenar los pasillos y productos.</p>
                 <div id="settings-prices-container"></div>
             </div>
 
@@ -257,8 +253,9 @@
                 <select id="new-item-cat" class="form-select"></select>
                 <div style="display: flex; gap: 10px;">
                     <input type="number" id="new-item-qty" class="form-input" placeholder="Cant. Ref" step="any" onfocus="this.select()">
-                    <input type="number" id="new-item-price" class="form-input" placeholder="Precio ($)" step="0.01" onfocus="this.select()">
+                    <input type="number" id="new-item-price" class="form-input" placeholder="Precio Est. ($)" step="0.01" onfocus="this.select()">
                 </div>
+                <input type="text" id="new-item-barcode" class="form-input" placeholder="Código de Barras (Opcional)" onfocus="this.select()">
                 <button class="btn btn-primary btn-full" onclick="addNewItemToCatalog()">Añadir al Catálogo</button>
             </div>
         </div>
@@ -313,10 +310,7 @@
             <button class="btn btn-outline-danger" onclick="deleteCurrentList(); toggleMenu();">🗑️ Borrar Lista</button>
             <button class="btn btn-primary" onclick="createNewBackup(); toggleMenu();">💾 Backup Hoy</button>
             <button class="btn btn-secondary" onclick="openBackupModal(); toggleMenu();">📦 Restaurar Backup</button>
-            
-            <!-- NUEVO: Botón para forzar actualización de la caché web (PWA) -->
             <button class="btn btn-outline" style="border-color: #8e44ad; color: #8e44ad;" onclick="refreshOnline(); toggleMenu();">🔄 Forzar Actualización Web</button>
-            
             <button class="btn btn-outline-danger" onclick="factoryResetCatalog(); toggleMenu();">⚠️ Restablecer Fábrica</button>
         </div>
     </div>
@@ -336,15 +330,27 @@
                     <input type="number" id="edit-qty" class="form-input" step="any" onfocus="this.select()">
                 </div>
                 <div style="flex:1;">
-                    <label style="font-size:12px; font-weight:bold; color:var(--text-muted);">Precio ($)</label>
+                    <label style="font-size:12px; font-weight:bold; color:var(--text-muted);">Precio Est. ($)</label>
                     <input type="number" id="edit-price" class="form-input" step="0.01" onfocus="this.select()">
                 </div>
             </div>
+            <label style="font-size:12px; font-weight:bold; color:var(--text-muted);">Código de Barras</label>
+            <input type="text" id="edit-barcode" class="form-input" style="text-align:left;" placeholder="Sin código" onfocus="this.select()">
+            
             <div class="modal-actions">
                 <button class="btn btn-outline" style="flex:1;" onclick="closeModals()">Cancelar</button>
                 <button class="btn btn-primary" style="flex:1;" onclick="saveItemEdits()">Guardar</button>
             </div>
             <button class="btn btn-outline-danger btn-full" style="margin-top:10px;" onclick="deleteItemFromModal()">🗑️ Eliminar Producto</button>
+        </div>
+    </div>
+
+    <!-- MODAL ESCÁNER DE BARRAS -->
+    <div class="modal-overlay" id="scanner-modal">
+        <div class="modal-card">
+            <div class="modal-header">📷 Escáner de Barras</div>
+            <div id="reader"></div>
+            <button class="btn btn-outline-danger btn-full" style="margin-top:15px;" onclick="closeScanner()">Cancelar</button>
         </div>
     </div>
 
@@ -511,11 +517,12 @@
             { id: 132, cat: 6, name: "Protección femenina", qty: 2, est: 2.00 }
         ];
 
-        // --- SISTEMA BASE Y ESTADOS ---
         let appData = { lists: [], currentListId: 1, backups: [], rate: 40.00, darkMode: false };
         let state = { items: [], categories: [], currentView: 'list', selectedCatFilter: 'all' };
         let undoStack = [];
+        let html5QrcodeScanner = null;
 
+        // --- SISTEMA BASE Y UTILIDADES ---
         function showToast(message, isError = false) {
             const container = document.getElementById("toast-container");
             const toast = document.createElement('div');
@@ -534,27 +541,22 @@
         function undoAction() {
             if (undoStack.length === 0) return showToast("No hay acciones por deshacer", true);
             let parsed = JSON.parse(undoStack.pop());
-            state.items = parsed.items;
-            state.categories = parsed.categories;
-            saveToLocalStorage();
-            renderAll();
-            showToast("Acción deshecha");
+            state.items = parsed.items; state.categories = parsed.categories;
+            saveToLocalStorage(); renderAll(); showToast("Acción deshecha");
         }
 
         function initApp() {
-            let savedAppData = localStorage.getItem('compras_pro_appData_v12');
-            
+            let savedAppData = localStorage.getItem('compras_pro_appData_v14');
             if (savedAppData) {
                 appData = JSON.parse(savedAppData);
             } else {
                 appData.lists = [{ 
                     id: 1, name: "Mercado Principal", 
-                    items: JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false})), 
+                    items: JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false, barcode: ''})), 
                     categories: JSON.parse(JSON.stringify(defaultCategories)) 
                 }];
                 appData.currentListId = 1;
             }
-            
             applyDarkMode(appData.darkMode);
             loadCurrentList();
         }
@@ -567,180 +569,161 @@
 
         function toggleDarkMode() {
             appData.darkMode = !appData.darkMode;
-            applyDarkMode(appData.darkMode);
-            saveToLocalStorage();
+            applyDarkMode(appData.darkMode); saveToLocalStorage();
         }
 
         function loadCurrentList() {
             let list = appData.lists.find(l => l.id === appData.currentListId) || appData.lists[0];
-            state.items = list.items;
-            state.categories = list.categories;
-            state.selectedCatFilter = 'all';
+            state.items = list.items; state.categories = list.categories; state.selectedCatFilter = 'all';
             document.getElementById('exchange-rate').value = appData.rate.toFixed(2);
             renderAll();
         }
 
         function saveToLocalStorage() {
             let listIdx = appData.lists.findIndex(l => l.id === appData.currentListId);
-            if(listIdx > -1) {
-                appData.lists[listIdx].items = state.items;
-                appData.lists[listIdx].categories = state.categories;
-            }
+            if(listIdx > -1) { appData.lists[listIdx].items = state.items; appData.lists[listIdx].categories = state.categories; }
             appData.rate = parseFloat(document.getElementById('exchange-rate').value) || 1;
-            localStorage.setItem('compras_pro_appData_v12', JSON.stringify(appData));
+            localStorage.setItem('compras_pro_appData_v14', JSON.stringify(appData));
         }
 
-        // --- GESTIÓN DE TABS (LISTAS) ---
+        // --- GESTIÓN DE TABS ---
         function renderTabs() {
             const container = document.getElementById("tabs-container");
-            container.innerHTML = appData.lists.map(l => `
-                <button type="button" class="tab-btn ${l.id === appData.currentListId ? 'active' : ''}" onclick="switchList(${l.id})">
-                    ${l.name}
-                </button>
-            `).join('');
+            container.innerHTML = appData.lists.map(l => `<button type="button" class="tab-btn ${l.id === appData.currentListId ? 'active' : ''}" onclick="switchList(${l.id})">${l.name}</button>`).join('');
         }
-
-        function switchList(id) {
-            if(id === appData.currentListId) return;
-            saveToLocalStorage();
-            appData.currentListId = id;
-            loadCurrentList();
-        }
-
+        function switchList(id) { if(id === appData.currentListId) return; saveToLocalStorage(); appData.currentListId = id; loadCurrentList(); }
         function createNewList() {
-            let name = prompt("Nombre de la nueva lista (ej. Viaje, Repuestos):");
-            if(!name) return;
-            let useCatalog = confirm("¿Iniciar con el catálogo base de supermercado?\n(Cancela para crear lista vacía)");
-            let newItems = useCatalog ? JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false})) : [];
+            let name = prompt("Nombre de la nueva lista:"); if(!name) return;
+            let useCatalog = confirm("¿Iniciar con el catálogo base de supermercado?");
+            let newItems = useCatalog ? JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false, barcode: ''})) : [];
             let newCats = JSON.parse(JSON.stringify(defaultCategories));
             saveToLocalStorage();
             let newList = { id: Date.now(), name: name, items: newItems, categories: newCats };
-            appData.lists.push(newList);
-            appData.currentListId = newList.id;
-            loadCurrentList();
-            showToast("Lista creada exitosamente");
+            appData.lists.push(newList); appData.currentListId = newList.id; loadCurrentList(); showToast("Lista creada");
         }
-
         function deleteCurrentList() {
             if(appData.lists.length <= 1) return showToast("No puedes borrar tu única lista", true);
-            if(confirm("¿Seguro que deseas borrar toda esta lista de compras?")) {
+            if(confirm("¿Seguro que deseas borrar toda esta lista?")) {
                 appData.lists = appData.lists.filter(l => l.id !== appData.currentListId);
                 appData.currentListId = appData.lists[0].id;
-                loadCurrentList();
-                if(state.currentView === 'settings') switchView('list');
-                showToast("Lista borrada");
+                loadCurrentList(); if(state.currentView === 'settings') switchView('list'); showToast("Lista borrada");
             }
         }
 
-        // --- SISTEMA DE PÍLDORAS (FILTRO POR CATEGORÍA) ---
+        // --- SISTEMA DE PÍLDORAS ---
         function renderCategoryChips() {
             let htmlList = `<button class="chip ${state.selectedCatFilter === 'all' ? 'active' : ''}" onclick="setCategoryFilter('all')">🛒 Todos</button>`;
             state.categories.filter(c => c.active).forEach(c => {
                 let shortName = c.name.replace(/^\d+\.\s*/, '');
                 htmlList += `<button class="chip ${state.selectedCatFilter === c.id ? 'active' : ''}" onclick="setCategoryFilter(${c.id})">${shortName}</button>`;
             });
-            const cList = document.getElementById('category-chips-list');
-            if(cList) cList.innerHTML = htmlList;
+            const cList = document.getElementById('category-chips-list'); if(cList) cList.innerHTML = htmlList;
 
             let htmlSet = `<button class="chip ${state.selectedCatFilter === 'all' ? 'active' : ''}" onclick="setCategoryFilter('all')">🛒 Todos</button>`;
             state.categories.forEach(c => {
                 let shortName = c.name.replace(/^\d+\.\s*/, '');
                 htmlSet += `<button class="chip ${state.selectedCatFilter === c.id ? 'active' : ''}" onclick="setCategoryFilter(${c.id})">${shortName}</button>`;
             });
-            const cSet = document.getElementById('category-chips-settings');
-            if(cSet) cSet.innerHTML = htmlSet;
+            const cSet = document.getElementById('category-chips-settings'); if(cSet) cSet.innerHTML = htmlSet;
         }
+        function setCategoryFilter(id) { state.selectedCatFilter = id; renderAll(); }
 
-        function setCategoryFilter(id) {
-            state.selectedCatFilter = id;
-            renderAll();
-        }
-
-        // --- ACCIONES GENERALES ---
+        // --- ACCIONES GENERALES Y BCV ---
         function resetToDefaults() {
             state.categories = JSON.parse(JSON.stringify(defaultCategories));
-            state.items = JSON.parse(JSON.stringify(defaultItems)).map(item => ({
-                ...item, est_qty: item.qty, real: item.est, checked: false
-            }));
-            state.selectedCatFilter = 'all';
-            saveToLocalStorage();
+            state.items = JSON.parse(JSON.stringify(defaultItems)).map(item => ({...item, est_qty: item.qty, real: item.est, checked: false, barcode: ''}));
+            state.selectedCatFilter = 'all'; saveToLocalStorage();
         }
-
         function factoryResetCatalog() {
             if (confirm("¿Restaurar valores de fábrica para ESTA LISTA? Perderás todo lo personalizado.")) {
                 saveToHistory(); resetToDefaults(); renderAll(); showToast("Catálogo restaurado");
             }
         }
-
         function resetChecklistValues() {
             if (confirm("¿Limpiar todo el carrito para empezar una nueva compra?")) {
-                saveToHistory();
-                state.items.forEach(item => { item.checked = false; item.qty = item.est_qty; item.real = item.est; });
+                saveToHistory(); state.items.forEach(item => { item.checked = false; item.qty = item.est_qty; item.real = item.est; });
                 saveToLocalStorage(); renderAll(); showToast("Carrito como nuevo");
             }
         }
-
-        function handleRateChange() {
-            appData.rate = parseFloat(document.getElementById('exchange-rate').value) || 1;
-            saveToLocalStorage(); calculateTotals();
-        }
-
+        function handleRateChange() { appData.rate = parseFloat(document.getElementById('exchange-rate').value) || 1; saveToLocalStorage(); calculateTotals(); }
+        
         function fetchBCVRate() {
-            const btn = document.getElementById("btn-fetch-bcv");
-            btn.innerHTML = "⏳"; btn.disabled = true;
+            const btn = document.getElementById("btn-fetch-bcv"); btn.innerHTML = "⏳"; btn.disabled = true;
             fetch('https://bcv-api.rafnixg.dev/rates/')
             .then(res => { if (!res.ok) throw new Error(); return res.json(); })
             .then(data => {
                 let bcvUSD = data?.rates?.USD || data?.USD || data?.usd;
-                if (bcvUSD) {
-                    document.getElementById('exchange-rate').value = parseFloat(bcvUSD).toFixed(2);
-                    handleRateChange(); showToast(`Tasa BCV actual: ${parseFloat(bcvUSD).toFixed(2)} Bs.`);
-                } else throw new Error();
+                if (bcvUSD) { document.getElementById('exchange-rate').value = parseFloat(bcvUSD).toFixed(2); handleRateChange(); showToast(`Tasa BCV: ${parseFloat(bcvUSD).toFixed(2)} Bs.`); } else throw new Error();
             })
             .catch(err => {
                 fetch('https://pydolarvenezuela-api.vercel.io/api/v1/dollar?page=bcv')
                 .then(res => res.json()).then(data => {
                     let price = data?.monitors?.bcv?.price;
                     if (price) { document.getElementById('exchange-rate').value = parseFloat(price).toFixed(2); handleRateChange(); showToast(`Tasa (Espejo): ${parseFloat(price).toFixed(2)}`); } 
-                    else showToast("Fallo al conectar con BCV", true);
-                }).catch(() => showToast("Sin conexión a internet para BCV", true));
+                    else showToast("Fallo BCV", true);
+                }).catch(() => showToast("Sin conexión BCV", true));
             }).finally(() => { btn.innerHTML = "↻"; btn.disabled = false; });
         }
 
-        // --- NAVEGACIÓN Y MENÚS ---
+        // --- CÁMARA Y MICRÓFONO (NATIVOS) ---
+        function startVoiceSearch() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if(!SpeechRecognition) return showToast("El micrófono no es compatible con este navegador", true);
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'es-VE';
+            recognition.onstart = () => showToast("🎤 Escuchando... Di un producto");
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('search-input').value = transcript;
+                filterList(); showToast(`Buscando: "${transcript}"`);
+            };
+            recognition.start();
+        }
+
+        function startScanner() {
+            document.getElementById('scanner-modal').classList.add('show');
+            if(html5QrcodeScanner) { html5QrcodeScanner.clear(); }
+            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
+            html5QrcodeScanner.render(onScanSuccess, (err) => {});
+        }
+        
+        function onScanSuccess(decodedText) {
+            closeScanner(); showToast("Código leído: " + decodedText);
+            let found = state.items.find(i => i.barcode === decodedText);
+            if(found) {
+                document.getElementById('search-input').value = found.name;
+                filterList(); showToast("Producto encontrado!");
+            } else {
+                document.getElementById('new-item-barcode').value = decodedText;
+                switchView('settings');
+                document.getElementById("new-item-name").focus();
+                showToast("Código no registrado. Llénalo y guárdalo.", true);
+            }
+        }
+        
+        function closeScanner() {
+            if(html5QrcodeScanner) html5QrcodeScanner.clear();
+            document.getElementById('scanner-modal').classList.remove('show');
+        }
+
+        // --- NAVEGACIÓN Y MODALES ---
         function switchView(view) {
             state.currentView = view;
-            document.getElementById('view-list').classList.remove('active');
-            document.getElementById('view-settings').classList.remove('active');
+            document.getElementById('view-list').classList.remove('active'); document.getElementById('view-settings').classList.remove('active');
             document.getElementById(`view-${view}`).classList.add('active');
-            
-            document.getElementById('nav-list').classList.remove('active');
-            document.getElementById('nav-settings').classList.remove('active');
+            document.getElementById('nav-list').classList.remove('active'); document.getElementById('nav-settings').classList.remove('active');
             document.getElementById(`nav-${view}`).classList.add('active');
-            
             renderAll();
         }
+        function toggleMenu() { document.getElementById('sheet-overlay').classList.toggle('show'); document.getElementById('bottom-sheet').classList.toggle('show'); }
+        function closeModals() { document.getElementById('edit-modal').classList.remove('show'); document.getElementById('backup-modal').classList.remove('show'); closeScanner(); }
 
-        function toggleMenu() {
-            const overlay = document.getElementById('sheet-overlay');
-            const sheet = document.getElementById('bottom-sheet');
-            overlay.classList.toggle('show');
-            sheet.classList.toggle('show');
-        }
-
-        function closeModals() {
-            document.getElementById('edit-modal').classList.remove('show');
-            document.getElementById('backup-modal').classList.remove('show');
-        }
-
-        // --- MOTOR DE RENDERIZADO VISUAL ---
+        // --- MOTOR DE RENDERIZADO E INTERFAZ ---
         function renderAll() {
-            renderTabs();
-            renderDynamicSelects();
-            renderCategoryChips(); 
-            if (state.currentView === 'list') renderChecklist();
-            else renderSettingsPrices();
+            renderTabs(); renderDynamicSelects(); renderCategoryChips(); 
+            if (state.currentView === 'list') renderChecklist(); else renderSettingsPrices();
             calculateTotals();
+            initDragAndDrop(); // Reinicializa los listeners tactiles
         }
 
         function renderDynamicSelects() {
@@ -749,12 +732,12 @@
             const editCatSelect = document.getElementById("edit-cat");
             
             let options = state.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-            if (newCatSelect) newCatSelect.innerHTML = options;
-            if (editCatSelect) editCatSelect.innerHTML = options;
+            if (newCatSelect) newCatSelect.innerHTML = options; if (editCatSelect) editCatSelect.innerHTML = options;
 
             if (visibilityContainer) {
                 visibilityContainer.innerHTML = state.categories.map(c => `
-                    <label style="display:flex; align-items:center; gap:8px; font-size:14px; border-bottom:1px solid var(--border-color); padding-bottom:4px;">
+                    <label class="cat-drag-row" data-id="${c.id}" style="display:flex; align-items:center; gap:8px; font-size:14px; border-bottom:1px solid var(--border-color); padding:6px 0;">
+                        <span class="drag-handle">☰</span>
                         <input type="checkbox" style="transform: scale(1.3); margin:0;" ${c.active ? 'checked' : ''} onchange="toggleCategoryActive(${c.id}, this.checked)">
                         ${c.name}
                     </label>
@@ -762,48 +745,49 @@
             }
         }
 
-        function toggleCategoryActive(id, isActive) {
-            saveToHistory();
-            let cat = state.categories.find(c => c.id === id);
-            if (cat) cat.active = isActive;
-            saveToLocalStorage();
+        function toggleCategoryActive(id, isActive) { saveToHistory(); let cat = state.categories.find(c => c.id === id); if (cat) cat.active = isActive; saveToLocalStorage(); }
+        function addNewCategory() { let input = document.getElementById("new-cat-name"); let name = input.value.trim(); if(!name) return; saveToHistory(); state.categories.push({ id: Date.now(), name: name, active: true }); saveToLocalStorage(); input.value = ''; renderAll(); showToast("Pasillo creado"); }
+
+        // --- LÓGICA DE DRAG AND DROP NATIVO (SortableJS) ---
+        function initDragAndDrop() {
+            if (typeof Sortable === 'undefined') return;
+            
+            // D&D para Categorías
+            const catList = document.getElementById('settings-categories-visibility');
+            if(catList) {
+                Sortable.create(catList, {
+                    handle: '.drag-handle', animation: 150,
+                    onEnd: function (evt) {
+                        let movedItem = state.categories.splice(evt.oldIndex, 1)[0];
+                        state.categories.splice(evt.newIndex, 0, movedItem);
+                        saveToLocalStorage(); renderAll();
+                    }
+                });
+            }
+
+            // D&D para Items
+            document.querySelectorAll('.settings-items-container').forEach(container => {
+                Sortable.create(container, {
+                    handle: '.drag-handle', animation: 150,
+                    onEnd: function (evt) {
+                        let catId = parseInt(evt.from.dataset.catId);
+                        let newOrderIds = Array.from(evt.from.children).map(el => parseInt(el.dataset.id));
+                        let otherItems = state.items.filter(i => i.cat !== catId);
+                        let catItems = state.items.filter(i => i.cat === catId);
+                        catItems.sort((a, b) => newOrderIds.indexOf(a.id) - newOrderIds.indexOf(b.id));
+                        state.items = [...otherItems, ...catItems];
+                        saveToLocalStorage(); renderAll();
+                    }
+                });
+            });
         }
 
-        function addNewCategory() {
-            let input = document.getElementById("new-cat-name");
-            let name = input.value.trim();
-            if(!name) return;
-            saveToHistory();
-            state.categories.push({ id: Date.now(), name: name, active: true });
-            saveToLocalStorage(); input.value = ''; renderAll(); showToast("Pasillo creado");
-        }
-
-        function moveCategoryUp(id) {
-            let idx = state.categories.findIndex(c => c.id === id);
-            if (idx > 0) { saveToHistory(); let temp = state.categories[idx]; state.categories[idx] = state.categories[idx - 1]; state.categories[idx - 1] = temp; saveToLocalStorage(); renderAll(); }
-        }
-        function moveCategoryDown(id) {
-            let idx = state.categories.findIndex(c => c.id === id);
-            if (idx > -1 && idx < state.categories.length - 1) { saveToHistory(); let temp = state.categories[idx]; state.categories[idx] = state.categories[idx + 1]; state.categories[idx + 1] = temp; saveToLocalStorage(); renderAll(); }
-        }
-        function moveItemUp(id, e) {
-            e.stopPropagation(); let item = state.items.find(i => i.id === id); let catItems = state.items.filter(i => i.cat === item.cat); let localIdx = catItems.findIndex(i => i.id === id);
-            if(localIdx > 0) { saveToHistory(); let prevItem = catItems[localIdx - 1]; let g1 = state.items.findIndex(i => i.id === item.id); let g2 = state.items.findIndex(i => i.id === prevItem.id); let temp = state.items[g1]; state.items[g1] = state.items[g2]; state.items[g2] = temp; saveToLocalStorage(); renderAll(); }
-        }
-        function moveItemDown(id, e) {
-            e.stopPropagation(); let item = state.items.find(i => i.id === id); let catItems = state.items.filter(i => i.cat === item.cat); let localIdx = catItems.findIndex(i => i.id === id);
-            if(localIdx > -1 && localIdx < catItems.length - 1) { saveToHistory(); let nextItem = catItems[localIdx + 1]; let g1 = state.items.findIndex(i => i.id === item.id); let g2 = state.items.findIndex(i => i.id === nextItem.id); let temp = state.items[g1]; state.items[g1] = state.items[g2]; state.items[g2] = temp; saveToLocalStorage(); renderAll(); }
-        }
-
-        // --- CHECKLIST PRINCIPAL (TARJETAS + FILTRO PÍLDORAS) ---
+        // --- CHECKLIST CON HISTORIAL DE PRECIOS E INFLACIÓN ---
         function renderChecklist() {
             const container = document.getElementById('categories-container');
             container.innerHTML = '';
-
             let activeCats = state.categories.filter(c => c.active);
-            if (state.selectedCatFilter !== 'all') {
-                activeCats = activeCats.filter(c => c.id === state.selectedCatFilter);
-            }
+            if (state.selectedCatFilter !== 'all') activeCats = activeCats.filter(c => c.id === state.selectedCatFilter);
 
             activeCats.forEach(category => {
                 let catItems = state.items.filter(i => i.cat == category.id);
@@ -815,12 +799,19 @@
                     let rowClass = item.checked ? 'checked' : '';
                     let priceAlertClass = (item.checked && item.real === 0) ? 'price-alert-box' : '';
                     
+                    // Cálculo de Inflación Automático
+                    let inflationHTML = '';
+                    if(item.real > 0 && item.est > 0 && item.real !== item.est) {
+                        let diff = ((item.real - item.est) / item.est) * 100;
+                        let color = diff > 0 ? 'var(--danger)' : 'var(--primary)';
+                        let icon = diff > 0 ? '📈' : '📉';
+                        let sign = diff > 0 ? '+' : '';
+                        inflationHTML = `<span class="inflation-badge" style="color: ${color};">${sign}${diff.toFixed(1)}% ${icon}</span>`;
+                    }
+
                     html += `
                     <div class="item-card ${rowClass}" id="item-row-${item.id}">
-                        <label class="check-container">
-                            <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="updateItemChecked(${item.id}, this.checked)">
-                            <span class="checkmark"></span>
-                        </label>
+                        <label class="check-container"><input type="checkbox" ${item.checked ? 'checked' : ''} onchange="updateItemChecked(${item.id}, this.checked)"><span class="checkmark"></span></label>
                         <div class="item-content">
                             <div class="item-name">${item.name}</div>
                             <div class="item-inputs">
@@ -836,6 +827,7 @@
                         </div>
                         <div class="item-totals">
                             <div class="item-subtotal" id="subtotal-${item.id}">$0.00</div>
+                            ${inflationHTML}
                         </div>
                     </div>`;
                 });
@@ -844,168 +836,108 @@
             filterList();
         }
 
-        // --- CONFIGURACIÓN LISTA (FILTRO PÍLDORAS) ---
+        // --- CONFIGURACIÓN CON DRAG & DROP ---
         function renderSettingsPrices() {
             const container = document.getElementById('settings-prices-container');
             container.innerHTML = '';
-
             let catsToRender = state.categories;
-            if (state.selectedCatFilter !== 'all') {
-                catsToRender = catsToRender.filter(c => c.id === state.selectedCatFilter);
-            }
+            if (state.selectedCatFilter !== 'all') catsToRender = catsToRender.filter(c => c.id === state.selectedCatFilter);
 
             catsToRender.forEach(category => {
                 let catItems = state.items.filter(i => i.cat == category.id);
-                let catOptions = state.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-                
                 let html = `
                 <div style="display:flex; justify-content:space-between; align-items:center; margin: 15px 0 10px 0; border-bottom: 2px solid var(--border-color); padding-bottom:5px;">
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <div style="display:flex; flex-direction:column; gap:2px;">
-                            <button class="btn-arrow" onclick="moveCategoryUp(${category.id})">▲</button>
-                            <button class="btn-arrow" onclick="moveCategoryDown(${category.id})">▼</button>
-                        </div>
-                        <h4 style="margin:0; color:var(--primary); font-size:15px;">${category.name}</h4>
-                    </div>
+                    <h4 style="margin:0; color:var(--primary); font-size:15px;">${category.name}</h4>
                     <button class="btn-delete-cat" onclick="deleteCategory(${category.id})">🗑 Borrar</button>
-                </div>`;
+                </div>
+                <div class="settings-items-container" data-cat-id="${category.id}">`;
 
                 catItems.forEach(item => {
                     html += `
-                    <div class="edit-item-row" onclick="openEditModal(${item.id})">
-                        <div class="arrows-col">
-                            <button class="btn-arrow" onclick="moveItemUp(${item.id}, event)">▲</button>
-                            <button class="btn-arrow" onclick="moveItemDown(${item.id}, event)">▼</button>
-                        </div>
+                    <div class="edit-item-row" data-id="${item.id}" onclick="openEditModal(${item.id})">
+                        <span class="drag-handle">☰</span>
                         <div class="edit-item-info">
                             <p>${item.name}</p>
-                            <span>Ref: ${item.est_qty} | Est: $${item.est.toFixed(2)}</span>
+                            <span>Ref: ${item.est_qty} | Est: $${item.est.toFixed(2)} ${item.barcode ? ' | 🏷️' : ''}</span>
                         </div>
                         <div style="color:var(--text-muted); font-size:12px;">✏️ Editar</div>
                     </div>`;
                 });
+                html += `</div>`;
                 container.innerHTML += html;
             });
         }
 
-        // --- VENTANA MODAL PARA EDITAR ---
+        function deleteCategory(id) {
+            let cat = state.categories.find(c => c.id === id);
+            if (confirm(`¿Eliminar pasillo "${cat.name}" y todo lo que contiene?`)) {
+                saveToHistory(); state.categories = state.categories.filter(c => c.id !== id); state.items = state.items.filter(i => i.cat !== id); saveToLocalStorage(); renderAll(); showToast("Pasillo eliminado");
+            }
+        }
+
+        // --- MODAL DE EDICIÓN ---
         function openEditModal(id) {
-            let item = state.items.find(i => i.id === id);
-            if(!item) return;
-            document.getElementById("edit-id").value = item.id;
-            document.getElementById("edit-name").value = item.name;
-            document.getElementById("edit-cat").value = item.cat;
-            document.getElementById("edit-qty").value = item.est_qty;
-            document.getElementById("edit-price").value = item.est.toFixed(2);
+            let item = state.items.find(i => i.id === id); if(!item) return;
+            document.getElementById("edit-id").value = item.id; document.getElementById("edit-name").value = item.name;
+            document.getElementById("edit-cat").value = item.cat; document.getElementById("edit-qty").value = item.est_qty;
+            document.getElementById("edit-price").value = item.est.toFixed(2); document.getElementById("edit-barcode").value = item.barcode || '';
             document.getElementById("edit-modal").classList.add("show");
         }
 
         function saveItemEdits() {
-            let id = parseInt(document.getElementById("edit-id").value);
-            let item = state.items.find(i => i.id === id);
-            if(!item) return;
-            
+            let id = parseInt(document.getElementById("edit-id").value); let item = state.items.find(i => i.id === id); if(!item) return;
             saveToHistory();
-            item.name = document.getElementById("edit-name").value.trim() || item.name;
-            item.cat = parseInt(document.getElementById("edit-cat").value);
-            let nQty = parseFloat(document.getElementById("edit-qty").value) || 0;
-            let nPrice = parseFloat(document.getElementById("edit-price").value) || 0;
-            
-            item.est_qty = nQty; item.qty = nQty;
-            item.est = nPrice; item.real = nPrice;
-            
+            item.name = document.getElementById("edit-name").value.trim() || item.name; item.cat = parseInt(document.getElementById("edit-cat").value);
+            let nQty = parseFloat(document.getElementById("edit-qty").value) || 0; let nPrice = parseFloat(document.getElementById("edit-price").value) || 0;
+            item.barcode = document.getElementById("edit-barcode").value.trim();
+            item.est_qty = nQty; item.qty = nQty; item.est = nPrice; item.real = nPrice;
             saveToLocalStorage(); closeModals(); renderAll(); showToast("Editado con éxito");
         }
 
         function deleteItemFromModal() {
             let id = parseInt(document.getElementById("edit-id").value);
-            if (confirm(`¿Eliminar este producto de forma definitiva?`)) {
-                saveToHistory();
-                state.items = state.items.filter(i => i.id !== id);
-                saveToLocalStorage(); closeModals(); renderAll(); showToast("Producto eliminado");
-            }
+            if (confirm(`¿Eliminar este producto de forma definitiva?`)) { saveToHistory(); state.items = state.items.filter(i => i.id !== id); saveToLocalStorage(); closeModals(); renderAll(); showToast("Producto eliminado"); }
         }
 
         function addNewItemToCatalog() {
-            const name = document.getElementById("new-item-name").value.trim();
-            const cat = parseInt(document.getElementById("new-item-cat").value);
-            const qty = parseFloat(document.getElementById("new-item-qty").value) || 1;
-            const est = parseFloat(document.getElementById("new-item-price").value) || 0;
+            const name = document.getElementById("new-item-name").value.trim(); const cat = parseInt(document.getElementById("new-item-cat").value);
+            const qty = parseFloat(document.getElementById("new-item-qty").value) || 1; const est = parseFloat(document.getElementById("new-item-price").value) || 0;
+            const barcode = document.getElementById("new-item-barcode").value.trim();
             if (!name) return showToast("Debes escribir un nombre", true);
-            saveToHistory();
-            state.items.push({ id: Date.now(), cat, name, qty, est_qty: qty, est, real: est, checked: false });
-            saveToLocalStorage(); document.getElementById("new-item-name").value = ''; renderAll(); showToast("Producto creado");
+            saveToHistory(); state.items.push({ id: Date.now(), cat, name, qty, est_qty: qty, est, real: est, checked: false, barcode });
+            saveToLocalStorage(); document.getElementById("new-item-name").value = ''; document.getElementById("new-item-barcode").value = ''; renderAll(); showToast("Producto creado");
         }
 
-        function deleteItem(id) {
-            let item = state.items.find(i => i.id === id);
-            if (!item) return;
-            if (confirm(`¿Eliminar "${item.name}"?`)) {
-                saveToHistory(); state.items = state.items.filter(i => i.id !== id); saveToLocalStorage(); renderAll(); showToast("Producto eliminado");
-            }
-        }
-
-        function updateItemChecked(id, isChecked) {
-            saveToHistory();
-            let item = state.items.find(i => i.id === id);
-            item.checked = isChecked;
-            saveToLocalStorage();
-            renderAll(); 
-        }
-
-        function updateItemQty(id, val) {
-            saveToHistory(); let item = state.items.find(i => i.id === id); item.qty = parseFloat(val) || 0; saveToLocalStorage(); calculateTotals();
-        }
-
-        function updateItemPrice(id, val) {
-            saveToHistory(); let item = state.items.find(i => i.id === id); item.real = parseFloat(val) || 0; saveToLocalStorage(); renderAll(); 
-        }
+        // --- ACTUALIZACIONES DE ESTADO (CARRITO) ---
+        function updateItemChecked(id, isChecked) { saveToHistory(); let item = state.items.find(i => i.id === id); item.checked = isChecked; saveToLocalStorage(); renderAll(); }
+        function updateItemQty(id, val) { saveToHistory(); let item = state.items.find(i => i.id === id); item.qty = parseFloat(val) || 0; saveToLocalStorage(); calculateTotals(); }
+        function updateItemPrice(id, val) { saveToHistory(); let item = state.items.find(i => i.id === id); item.real = parseFloat(val) || 0; saveToLocalStorage(); renderAll(); }
 
         function handleEnterKey(event) { if (event.key === "Enter") event.target.blur(); }
         function clearSearch() { document.getElementById("search-input").value = ''; filterList(); }
-
         function filterList() {
             if (state.currentView !== 'list') return;
             let query = document.getElementById("search-input").value.toLowerCase();
             let hideCompleted = document.getElementById("hide-completed-check").checked;
-
             state.items.forEach(item => {
-                let row = document.getElementById(`item-row-${item.id}`);
-                if (!row) return;
-                let matchesSearch = item.name.toLowerCase().includes(query);
-                let matchesHide = !hideCompleted || !item.checked;
-                if (matchesSearch && matchesHide) row.classList.remove("hidden-item");
-                else row.classList.add("hidden-item");
+                let row = document.getElementById(`item-row-${item.id}`); if (!row) return;
+                let matchesSearch = item.name.toLowerCase().includes(query); let matchesHide = !hideCompleted || !item.checked;
+                if (matchesSearch && matchesHide) row.classList.remove("hidden-item"); else row.classList.add("hidden-item");
             });
         }
 
         function calculateTotals() {
-            let checkedTotalUSD = 0; let listTotalUSD = 0;
-            let catCounters = {};
+            let checkedTotalUSD = 0; let listTotalUSD = 0; let catCounters = {};
             state.categories.forEach(c => catCounters[c.id] = {c:0, t:0});
 
             state.items.forEach(item => {
-                let subtotal = item.qty * item.real;
-                let isActiveCat = state.categories.find(c => c.id === item.cat)?.active;
-
-                if (isActiveCat) {
-                    listTotalUSD += subtotal;
-                    if (item.checked) checkedTotalUSD += subtotal;
-                }
-
-                let cell = document.getElementById(`subtotal-${item.id}`);
-                if (cell) cell.textContent = "$" + subtotal.toFixed(2);
-
-                if (catCounters[item.cat]) {
-                    catCounters[item.cat].t++;
-                    if (item.checked) catCounters[item.cat].c++;
-                }
+                let subtotal = item.qty * item.real; let isActiveCat = state.categories.find(c => c.id === item.cat)?.active;
+                if (isActiveCat) { listTotalUSD += subtotal; if (item.checked) checkedTotalUSD += subtotal; }
+                let cell = document.getElementById(`subtotal-${item.id}`); if (cell) cell.textContent = "$" + subtotal.toFixed(2);
+                if (catCounters[item.cat]) { catCounters[item.cat].t++; if (item.checked) catCounters[item.cat].c++; }
             });
 
-            Object.keys(catCounters).forEach(catId => {
-                let badge = document.getElementById(`badge-cat-${catId}`);
-                if (badge) badge.textContent = `${catCounters[catId].c}/${catCounters[catId].t}`;
-            });
+            Object.keys(catCounters).forEach(catId => { let badge = document.getElementById(`badge-cat-${catId}`); if (badge) badge.textContent = `${catCounters[catId].c}/${catCounters[catId].t}`; });
 
             document.getElementById("checked-total-usd").textContent = "$" + checkedTotalUSD.toFixed(2);
             document.getElementById("checked-total-bs").textContent = (checkedTotalUSD * appData.rate).toFixed(0) + " Bs";
@@ -1018,20 +950,12 @@
         }
 
         // --- BACKUPS AVANZADOS ---
-        function openBackupModal() {
-            renderBackupList();
-            document.getElementById('backup-modal').classList.add('show');
-        }
-
+        function openBackupModal() { renderBackupList(); document.getElementById('backup-modal').classList.add('show'); }
         function createNewBackup() {
-            saveToLocalStorage();
-            let code = btoa(unescape(encodeURIComponent(JSON.stringify(appData))));
-            let now = new Date();
-            let dateStr = now.toLocaleString('es-VE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-            appData.backups.push({ id: Date.now(), date: dateStr, code: code });
-            saveToLocalStorage(); openBackupModal(); showToast("Backup Global creado");
+            saveToLocalStorage(); let code = btoa(unescape(encodeURIComponent(JSON.stringify(appData)))); let now = new Date();
+            let dateStr = now.toLocaleDateString('es-VE') + ' ' + now.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
+            appData.backups.push({ id: Date.now(), date: dateStr, code: code }); saveToLocalStorage(); openBackupModal(); showToast("Backup Global creado");
         }
-
         function renderBackupList() {
             const container = document.getElementById("backups-list-container");
             if (appData.backups.length === 0) { container.innerHTML = `<p style="text-align:center; font-size:12px; color:var(--text-muted);">No hay respaldos guardados.</p>`; return; }
@@ -1040,65 +964,32 @@
                 let b = appData.backups[i];
                 html += `<div style="display:flex; justify-content:space-between; align-items:center; background:var(--input-bg); padding:10px; border-radius:8px;">
                     <span style="font-size:12px; font-weight:bold; color:var(--text-color);">${b.date}</span>
-                    <div style="display:flex; gap:5px;">
-                        <button class="btn-icon" onclick="copyCodeToClipboard('${b.code}')">📋</button>
-                        <button class="btn-icon" style="color:var(--secondary);" onclick="restoreFromCode('${b.code}', true)">🔄</button>
-                        <button class="btn-icon" style="color:var(--danger);" onclick="deleteLocalBackup(${b.id})">✕</button>
-                    </div>
-                </div>`;
+                    <div style="display:flex; gap:5px;"><button class="btn-icon" onclick="copyCodeToClipboard('${b.code}')">📋</button><button class="btn-icon" style="color:var(--secondary);" onclick="restoreFromCode('${b.code}', true)">🔄</button><button class="btn-icon" style="color:var(--danger);" onclick="deleteLocalBackup(${b.id})">✕</button></div></div>`;
             }
             container.innerHTML = html;
         }
-
-        function copyCodeToClipboard(code) {
-            navigator.clipboard.writeText(code).then(() => showToast("Código copiado")).catch(() => {
-                let el = document.createElement('textarea'); el.value = code; document.body.appendChild(el); el.select(); document.execCommand('copy'); el.remove(); showToast("Código copiado");
-            });
-        }
-
-        function deleteLocalBackup(id) {
-            if(confirm("¿Eliminar este respaldo global?")) { appData.backups = appData.backups.filter(b => b.id !== id); saveToLocalStorage(); renderBackupList(); }
-        }
-
+        function copyCodeToClipboard(code) { navigator.clipboard.writeText(code).then(() => showToast("Código copiado")).catch(() => { let el = document.createElement('textarea'); el.value = code; document.body.appendChild(el); el.select(); document.execCommand('copy'); el.remove(); showToast("Código copiado"); }); }
+        function deleteLocalBackup(id) { if(confirm("¿Eliminar este respaldo global?")) { appData.backups = appData.backups.filter(b => b.id !== id); saveToLocalStorage(); renderBackupList(); } }
         function restoreFromCode(str, confirmReq) {
             if (confirmReq && !confirm("¿Restaurar App Completa? Reemplazará todas las listas y pasillos actuales de la aplicación.")) return false;
-            try {
-                let decrypted = JSON.parse(decodeURIComponent(escape(atob(str))));
-                if(decrypted.lists) { appData = decrypted; saveToLocalStorage(); loadCurrentList(); closeModals(); showToast("Sistema Restaurado Exitosamente"); return true; }
-                else { showToast("El Código de seguridad no es válido", true); return false; }
-            } catch(err) { showToast("Error al procesar el código", true); return false; }
+            try { let decrypted = JSON.parse(decodeURIComponent(escape(atob(str)))); if(decrypted.lists) { appData = decrypted; saveToLocalStorage(); loadCurrentList(); closeModals(); showToast("Sistema Restaurado Exitosamente"); return true; } else { showToast("El Código de seguridad no es válido", true); return false; } } catch(err) { showToast("Error al procesar el código", true); return false; }
         }
+        function importManualBackup() { let str = document.getElementById("manual-import-string").value.trim(); if (!str) return showToast("Por favor, pega un código de seguridad", true); restoreFromCode(str, true); document.getElementById("manual-import-string").value = ''; }
 
-        function importManualBackup() {
-            let str = document.getElementById("manual-import-string").value.trim();
-            if (!str) return showToast("Por favor, pega un código de seguridad", true);
-            restoreFromCode(str, true);
-            document.getElementById("manual-import-string").value = '';
-        }
-
+        // --- ENVÍO A WHATSAPP ---
         function shareWhatsApp() {
             let checkedItems = state.items.filter(i => i.checked && state.categories.find(c=>c.id===i.cat)?.active);
             if (checkedItems.length === 0) return showToast("No hay compras marcadas para enviar", true);
-            let listName = appData.lists.find(l=>l.id===appData.currentListId).name;
-            let text = `📋 *COMPRA: ${listName}*\n\n`;
+            let listName = appData.lists.find(l=>l.id===appData.currentListId).name; let now = new Date();
+            let dateStr = now.toLocaleDateString('es-VE'); let timeStr = now.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
+            let text = `📋 *COMPRA: ${listName}*\n📅 *Fecha:* ${dateStr} a las ${timeStr}\n\n`;
             checkedItems.forEach(i => { text += `• ${i.name} (x${i.qty}) -> *$${(i.qty * i.real).toFixed(2)}*\n`; });
             let totalUSD = checkedItems.reduce((acc, i) => acc + (i.qty * i.real), 0);
             text += `\n💵 *Tasa Ref:* ${appData.rate.toFixed(2)} Bs.\n🛒 *TOTAL:* *$${totalUSD.toFixed(2)} / Bs. ${(totalUSD * appData.rate).toFixed(0)}*`;
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
         }
 
-        function refreshOnline() {
-            if (confirm("¿Forzar actualización online desde GitHub?")) {
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.getRegistrations().then(regs => {
-                        for (let r of regs) r.unregister();
-                        window.location.reload(true);
-                    });
-                } else {
-                    window.location.reload(true);
-                }
-            }
-        }
+        function refreshOnline() { if (confirm("¿Forzar actualización online desde GitHub?")) { if ('serviceWorker' in navigator) { navigator.serviceWorker.getRegistrations().then(regs => { for (let r of regs) r.unregister(); window.location.reload(true); }); } else { window.location.reload(true); } } }
 
         window.onload = initApp;
     </script>
