@@ -58,10 +58,12 @@
 
         .config-box { background: white; padding: 12px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 15px; }
         .config-box h3 { margin-top: 0; margin-bottom: 8px; font-size: 14px; color: #2c3e50; border-bottom: 1px solid #edf2f7; padding-bottom: 4px; }
+        textarea { width: 100%; height: 70px; font-family: monospace; font-size: 12px; box-sizing: border-box; padding: 6px; border: 1px solid #cbd5e1; border-radius: 6px; resize: none; }
 
-        .btn-delete-row { background: none; border: none; color: #e74c3c; font-size: 14px; cursor: pointer; padding: 0; display: inline-block; width: 100%; text-align: center; }
+        /* Botón de Eliminación Rápida <span> */
+        .btn-delete-row { background: none; border: none; color: #e74c3c; font-size: 14px; cursor: pointer; padding: 0; display: inline-block; width: 100%; text-align: center; font-weight: bold; }
 
-        /* Barra Inferior Ampliada con soporte para botón BCV integrado */
+        /* Barra Inferior Organizada en una Matriz de Botones Grandes */
         .summary-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2c3e50; color: white; padding: 12px 8px; box-shadow: 0 -2px 8px rgba(0,0,0,0.2); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; box-sizing: border-box; gap: 8px; }
         .summary-row-data { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 5px; }
         .summary-box { text-align: center; font-size: 11px; flex: 1; }
@@ -72,9 +74,10 @@
         .rate-box { background: #34495e; padding: 4px 6px; border-radius: 4px; text-align: center; border: 1px solid #455a64; }
         .rate-box label { font-weight: bold; font-size: 9px; color: #f1c40f; display: block; }
         .rate-input-wrapper { display: flex; align-items: center; gap: 3px; margin-top: 2px; }
-        .rate-box input { width: 55px; padding: 2px; font-size: 16px; font-weight: bold; text-align: center; border-radius: 3px; border: none; background: white; color: #333; }
-        .btn-fetch-bcv { background: #27ae60; border: none; color: white; padding: 4px 5px; border-radius: 3px; font-size: 10px; font-weight: bold; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .rate-box input { width: 60px; padding: 2px; font-size: 16px; font-weight: bold; text-align: center; border-radius: 3px; border: none; background: white; color: #333; }
+        .btn-fetch-bcv { background: #27ae60; border: none; color: white; padding: 5px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
 
+        /* Matriz de Acciones: 2 filas de 3 botones de tamaño ideal */
         .actions-wrapper { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: 100%; }
         .btn-action { color: white; border: none; padding: 12px 2px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .btn-orange { background-color: #e67e22; }
@@ -92,7 +95,7 @@
             h2 { background: #34495e !important; color: white; -webkit-print-color-adjust: exact; }
             input[type="number"], .rate-box input { border: none; background: transparent; }
             table { table-layout: auto; }
-            td:last-child, th:last-child { display: none; }
+            td:last-child, th:last-child { display: none; } /* Oculta columna borrar en impresión */
         }
     </style>
 </head>
@@ -101,7 +104,7 @@
     <div class="top-tools" id="global-tools">
         <div class="search-wrapper">
             <input type="text" id="search-input" class="search-box" placeholder="🔍 Buscar producto en tiempo real..." oninput="filterList()">
-            <button class="btn-clear-search" onclick="clearSearch()">✕</button>
+            <button type="button" class="btn-clear-search" onclick="clearSearch()">✕</button>
         </div>
         <div class="filter-row">
             <label><input type="checkbox" id="hide-completed-check" onchange="filterList()"> Ocultar comprados</label>
@@ -123,7 +126,7 @@
         <div class="config-box">
             <h3>➕ Agregar Nuevo Producto al Catálogo</h3>
             <div style="display: flex; flex-direction: column; gap: 6px;">
-                <input type="text" id="new-item-name" class="edit-input" placeholder="Nombre del artículo" style="text-align: left; padding-left: 8px;">
+                <input type="text" id="new-item-name" class="edit-input" placeholder="Nombre del artículo (ej. Nutella)" style="text-align: left; padding-left: 8px;">
                 <select id="new-item-cat" class="select-input">
                     <option value="1">1. DESPENSA Y VÍVERES</option>
                     <option value="2">2. CHARCUTERÍA Y PROTEÍNAS</option>
@@ -136,23 +139,23 @@
                     <input type="number" id="new-item-qty" class="edit-input" placeholder="Cant. Ref" step="any">
                     <input type="number" id="new-item-price" class="edit-input" placeholder="Precio Est. ($)" step="0.01">
                 </div>
-                <button class="btn-action btn-green" style="padding: 10px;" onclick="addNewItemToCatalog()">Añadir al Catálogo</button>
+                <button type="button" class="btn-action btn-green" style="padding: 10px;" onclick="addNewItemToCatalog()">Añadir al Catálogo</button>
             </div>
         </div>
 
-        <!-- SECCIÓN DE COPIA DE SEGURIDAD HISTÓRICA POR FECHAS -->
+        <!-- Seccion Historial de Copias por Fecha -->
         <div class="config-box">
             <h3>📦 Historial de Copias de Seguridad</h3>
             <div style="display: flex; gap: 4px; margin-bottom: 10px;">
-                <button class="btn-action btn-teal" onclick="createNewBackup()">💾 Crear Nueva Copia (Hoy)</button>
-                <button class="btn-action btn-red" onclick="factoryResetCatalog()">Fábrica</button>
+                <button type="button" class="btn-action btn-teal" onclick="createNewBackup()">💾 Crear Nueva Copia (Hoy)</button>
+                <button type="button" class="btn-action btn-red" onclick="factoryResetCatalog()">🔄 Restaurar Fábrica</button>
             </div>
             
             <div id="backups-history-list" style="margin-bottom: 12px; max-height: 160px; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px; background: #f8f9fa;"></div>
 
             <p style="font-size: 11px; color: #555; margin-bottom: 4px;">📂 Para importar datos desde otro equipo, pega el código aquí:</p>
             <input type="text" id="manual-import-string" class="edit-input" placeholder="Pega el código cifrado aquí..." style="margin-bottom: 6px; text-align: left; padding-left: 8px; font-size: 14px;">
-            <button class="btn-action btn-blue" style="width: 100%; padding: 10px;" onclick="importManualBackup()">📥 Importar Código Externo</button>
+            <button type="button" class="btn-action btn-blue" style="width: 100%; padding: 10px;" onclick="importManualBackup()">📥 Importar Código Externo</button>
         </div>
 
         <div class="config-box">
@@ -168,7 +171,7 @@
                 <label>💵 Tasa (1 $)</label>
                 <div class="rate-input-wrapper">
                     <input type="number" id="exchange-rate" value="40.00" step="0.01" oninput="handleRateChange()">
-                    <button id="btn-fetch-bcv" class="btn-fetch-bcv" onclick="fetchBCVRate()">BCV</button>
+                    <button type="button" id="btn-fetch-bcv" class="btn-fetch-bcv" onclick="fetchBCVRate()">BCV</button>
                 </div>
             </div>
             <div class="summary-box">
@@ -182,12 +185,13 @@
         </div>
         
         <div class="actions-wrapper">
-            <button id="btn-toggle-view" class="btn-action btn-blue" onclick="toggleView()">Configurar</button>
-            <button class="btn-action btn-orange" onclick="undoAction()">↩️ Deshacer</button>
-            <button class="btn-action btn-red" onclick="resetChecklistValues()">🔄 Reset</button>
-            <button class="btn-action btn-teal" style="background-color: #8e44ad;" onclick="refreshOnline()">🔄 Web</button>
-            <button class="btn-action btn-whatsapp" onclick="shareWhatsApp()">🟢 WhatsApp</button>
-            <button id="btn-pdf-trigger" class="btn-action btn-green" onclick="window.print()">PDF</button>
+            <button type="button" id="btn-toggle-view" class="btn-action btn-blue" onclick="toggleView()">Configurar</button>
+            <button type="button" class="btn-action btn-orange" onclick="undoAction()">↩️ Deshacer</button>
+            <!-- BOTÓN RESET INTELIGENTE DEPENDIENDO DE LA VISTA -->
+            <button type="button" class="btn-action btn-red" onclick="handleBottomReset()">🔄 Reset</button>
+            <button type="button" class="btn-action btn-teal" style="background-color: #8e44ad;" onclick="refreshOnline()">🔄 Web</button>
+            <button type="button" class="btn-action btn-whatsapp" onclick="shareWhatsApp()">🟢 WhatsApp</button>
+            <button type="button" id="btn-pdf-trigger" class="btn-action btn-green" onclick="window.print()">PDF</button>
         </div>
     </div>
 
@@ -246,43 +250,43 @@
             { id: 40, cat: 2, name: "Leche (Líquida descremada)", qty: 2, est: 4.00 },
             { id: 41, cat: 2, name: "Pollo / Milanesa", qty: 4.00, est: 8.30 },
             { id: 42, cat: 2, name: "Pollo / Chupetas", qty: 2.00, est: 5.20 },
-            { id: 44, cat: 2, name: "Pollo / Alas", qty: 2.00, est: 5.20 },
-            { id: 45, cat: 2, name: "Mollejitas de Pollo", qty: 0.250, est: 4.20 },
-            { id: 46, cat: 2, name: "Carne de (Molida)", qty: 2.00, est: 12.00 },
-            { id: 47, cat: 2, name: "Carne de (Bistec)", qty: 4.00, est: 12.00 },
-            { id: 48, cat: 2, name: "Carne de (Guisar)", qty: 0.500, est: 12.00 },
-            { id: 49, cat: 2, name: "Carne de (Mechar)", qty: 0.500, est: 12.00 },
-            { id: 50, cat: 2, name: "Chuleta Ahumada", qty: 1.00, est: 9.30 },
-            { id: 51, cat: 2, name: "Chuletas Normal", qty: 1.00, est: 7.90 },
-            { id: 52, cat: 2, name: "Carne de cerdo / Pulpa", qty: 3.00, est: 9.00 },
-            { id: 53, cat: 2, name: "Huesito Ahumado", qty: 0.250, est: 6.00 },
-            { id: 54, cat: 2, name: "Filet de pescado", qty: 2.00, est: 10.00 },
-            { id: 55, cat: 2, name: "Hígado de res", qty: 0.500, est: 5.00 },
-            { id: 56, cat: 2, name: "Lagarto", qty: 1.00, est: 12.00 },
-            { id: 57, cat: 2, name: "Mondongo", qty: 0.500, est: 3.00 },
-            { id: 58, cat: 2, name: "Costilla", qty: 0.400, est: 9.00 },
+            { id: 43, cat: 2, name: "Pollo / Alas", qty: 2.00, est: 5.20 },
+            { id: 44, cat: 2, name: "Mollejitas de Pollo", qty: 0.250, est: 4.20 },
+            { id: 45, cat: 2, name: "Carne de (Molida)", qty: 2.00, est: 12.00 },
+            { id: 46, cat: 2, name: "Carne de (Bistec)", qty: 4.00, est: 12.00 },
+            { id: 47, cat: 2, name: "Carne de (Guisar)", qty: 0.500, est: 12.00 },
+            { id: 48, cat: 2, name: "Carne de (Mechar)", qty: 0.500, est: 12.00 },
+            { id: 49, cat: 2, name: "Chuleta Ahumada", qty: 1.00, est: 9.30 },
+            { id: 50, cat: 2, name: "Chuletas Normal", qty: 1.00, est: 7.90 },
+            { id: 51, cat: 2, name: "Carne de cerdo / Pulpa", qty: 3.00, est: 9.00 },
+            { id: 52, cat: 2, name: "Huesito Ahumado", qty: 0.250, est: 6.00 },
+            { id: 53, cat: 2, name: "Filet de pescado", qty: 2.00, est: 10.00 },
+            { id: 54, cat: 2, name: "Hígado de res", qty: 0.500, est: 5.00 },
+            { id: 55, cat: 2, name: "Lagarto", qty: 1.00, est: 12.00 },
+            { id: 56, cat: 2, name: "Mondongo", qty: 0.500, est: 3.00 },
+            { id: 57, cat: 2, name: "Costilla", qty: 0.400, est: 9.00 },
             // FRUTAS Y VERDURAS
-            { id: 59, cat: 3, name: "Cebolla Normal", qty: 1.87, est: 1.00 },
-            { id: 60, cat: 3, name: "Cebolla Morada", qty: 0.520, est: 3.00 },
-            { id: 61, cat: 3, name: "Ajo (Cabezas o pelado)", qty: 0.280, est: 13.27 },
-            { id: 62, cat: 3, name: "Tomates", qty: 2.70, est: 3.33 },
-            { id: 63, cat: 3, name: "Cilantro, Perejil y Albahaca", qty: 0.550, est: 1.59 },
-            { id: 64, cat: 3, name: "Pimentón", qty: 1.13, est: 5.00 },
-            { id: 65, cat: 3, name: "Cebollín / Puerro", qty: 0.645, est: 1.50 },
-            { id: 66, cat: 3, name: "Papas", qty: 3.00, est: 2.10 },
-            { id: 67, cat: 3, name: "Zanahorias", qty: 1.50, est: 1.85 },
-            { id: 68, cat: 3, name: "Remolacha", qty: 1.00, est: 2.00 },
-            { id: 69, cat: 3, name: "Plátanos (Verdes o maduros)", qty: 3.70, est: 1.10 },
-            { id: 70, cat: 3, name: "Pepino", qty: 0.630, est: 1.10 },
-            { id: 71, cat: 3, name: "Lechuga Americana", qty: 0.625, est: 1.20 },
-            { id: 72, cat: 3, name: "Repollo", qty: 0.500, est: 0.80 },
-            { id: 73, cat: 3, name: "Cambur", qty: 3.00, est: 1.25 },
-            { id: 74, cat: 3, name: "Manzanas", qty: 6, est: 1.30 },
-            { id: 75, cat: 3, name: "Limones", qty: 1.80, est: 3.00 },
-            { id: 76, cat: 3, name: "Naranjas", qty: 2.00, est: 2.00 },
-            { id: 77, cat: 3, name: "Parchitas", qty: 1.50, est: 3.00 },
-            { id: 78, cat: 3, name: "Tamarindo 250 g", qty: 2, est: 1.35 },
-            { id: 79, cat: 3, name: "Piña", qty: 2.00, est: 1.40 },
+            { id: 58, cat: 3, name: "Cebolla Normal", qty: 1.87, est: 1.00 },
+            { id: 59, cat: 3, name: "Cebolla Morada", qty: 0.520, est: 3.00 },
+            { id: 60, cat: 3, name: "Ajo (Cabezas o pelado)", qty: 0.280, est: 13.27 },
+            { id: 61, cat: 3, name: "Tomates", qty: 2.70, est: 3.33 },
+            { id: 62, cat: 3, name: "Cilantro, Perejil y Albahaca", qty: 0.550, est: 1.59 },
+            { id: 63, cat: 3, name: "Pimentón", qty: 1.13, est: 5.00 },
+            { id: 64, cat: 3, name: "Cebollín / Puerro", qty: 0.645, est: 1.50 },
+            { id: 65, cat: 3, name: "Papas", qty: 3.00, est: 2.10 },
+            { id: 66, cat: 3, name: "Zanahorias", qty: 1.50, est: 1.85 },
+            { id: 67, cat: 3, name: "Remolacha", qty: 1.00, est: 2.00 },
+            { id: 68, cat: 3, name: "Plátanos (Verdes o maduros)", qty: 3.70, est: 1.10 },
+            { id: 69, cat: 3, name: "Pepino", qty: 0.630, est: 1.10 },
+            { id: 70, cat: 3, name: "Lechuga Americana", qty: 0.625, est: 1.20 },
+            { id: 71, cat: 3, name: "Repollo", qty: 0.500, est: 0.80 },
+            { id: 72, cat: 3, name: "Cambur", qty: 3.00, est: 1.25 },
+            { id: 73, cat: 3, name: "Manzanas", qty: 6, est: 1.30 },
+            { id: 74, cat: 3, name: "Limones", qty: 1.80, est: 3.00 },
+            { id: 75, cat: 3, name: "Naranjas", qty: 2.00, est: 2.00 },
+            { id: 76, cat: 3, name: "Parchitas", qty: 1.50, est: 3.00 },
+            { id: 77, cat: 3, name: "Tamarindo 250 g", qty: 2, est: 1.35 },
+            { id: 78, cat: 3, name: "Piña", qty: 2.00, est: 1.40 },
             { id: 80, cat: 3, name: "Melón", qty: 1.00, est: 1.00 },
             { id: 81, cat: 3, name: "Patilla", qty: 1.56, est: 0.70 },
             { id: 82, cat: 3, name: "Lechosa", qty: 1.00, est: 1.00 },
@@ -358,17 +362,46 @@
         }
 
         function initApp() {
-            let savedState = localStorage.getItem('compras_app_state_v6');
-            let savedRate = localStorage.getItem('compras_app_rate');
-            let savedBackups = localStorage.getItem('compras_app_backups');
+            let savedState = localStorage.getItem('compras_pro_app_state_final');
+            let savedRate = localStorage.getItem('compras_pro_app_rate');
+            let savedBackups = localStorage.getItem('compras_pro_app_backups');
             
-            if (savedRate) state.rate = parseFloat(savedRate);
-            document.getElementById('exchange-rate').value = state.rate;
+            if (savedRate) state.rate = parseFloat(savedRate) || 40.00;
+            document.getElementById('exchange-rate').value = state.rate.toFixed(2);
 
-            if (savedBackups) state.backups = JSON.parse(savedBackups);
+            if (savedBackups) {
+                try {
+                    state.backups = JSON.parse(savedBackups) || [];
+                } catch(e) {
+                    state.backups = [];
+                }
+            }
 
             if (savedState) {
-                state.items = JSON.parse(savedState);
+                try {
+                    let parsed = JSON.parse(savedState);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        state.items = parsed.map(item => {
+                            let orig = defaultItems.find(d => d.id === item.id);
+                            let baseQty = typeof item.qty === 'number' ? item.qty : (orig ? orig.qty : 1);
+                            let baseEst = typeof item.est === 'number' ? item.est : (orig ? orig.est : 0);
+                            return {
+                                id: item.id,
+                                cat: item.cat || (orig ? orig.cat : 1),
+                                name: item.name || (orig ? orig.name : "Artículo"),
+                                qty: baseQty,
+                                est_qty: typeof item.est_qty === 'number' ? item.est_qty : baseQty,
+                                est: baseEst,
+                                real: typeof item.real === 'number' ? item.real : baseEst,
+                                checked: !!item.checked
+                            };
+                        });
+                    } else {
+                        resetToDefaults();
+                    }
+                } catch(e) {
+                    resetToDefaults();
+                }
             } else {
                 resetToDefaults();
             }
@@ -376,7 +409,8 @@
         }
 
         function resetToDefaults() {
-            state.items = defaultItems.map(item => ({
+            // Genera una copia 100% limpia e independiente del array por defecto
+            state.items = JSON.parse(JSON.stringify(defaultItems)).map(item => ({
                 ...item,
                 est_qty: item.qty,
                 real: item.est,
@@ -385,18 +419,19 @@
             saveToLocalStorage();
         }
 
+        /* FUNCIÓN PRINCIPAL DE FÁBRICA: Restaura eliminados y borra los manuales */
         function factoryResetCatalog() {
-            if (confirm("¿Estás seguro de volver a los valores de fábrica? Se perderán todas tus modificaciones guardadas en el catálogo de referencia.")) {
+            if (confirm("¿Estás seguro de volver a los valores de fábrica? Esto restaurará los productos originales eliminados y borrará los nuevos.")) {
                 saveToHistory();
                 resetToDefaults();
                 renderAll();
-                generateBackupString();
-                alert("Catálogo de fábrica restaurado.");
+                alert("Catálogo de fábrica restaurado con éxito.");
             }
         }
 
+        /* FUNCIÓN SECUNDARIA DE LIMPIEZA: Solo limpia montos para el día a día */
         function resetChecklistValues() {
-            if (confirm("¿Desmarcar todo y restablecer cantidades/precios reales a los de referencia?")) {
+            if (confirm("¿Desmarcar todo y restablecer cantidades/precios reales a los valores de referencia (Est)?")) {
                 saveToHistory();
                 state.items.forEach(item => {
                     item.checked = false;
@@ -408,9 +443,19 @@
             }
         }
 
+        /* CONTROL INTELIGENTE DEL BOTÓN INFERIOR SEGÚN LA VISTA */
+        function handleBottomReset() {
+            if (state.currentView === 'settings') {
+                factoryResetCatalog();
+            } else {
+                resetChecklistValues();
+            }
+        }
+
         function saveToLocalStorage() {
-            localStorage.setItem('compras_app_state_v6', JSON.stringify(state.items));
-            localStorage.setItem('compras_app_rate', state.rate);
+            localStorage.setItem('compras_pro_app_state_final', JSON.stringify(state.items));
+            localStorage.setItem('compras_pro_app_rate', state.rate);
+            localStorage.setItem('compras_pro_app_backups', JSON.stringify(state.backups));
         }
 
         function handleRateChange() {
@@ -419,31 +464,45 @@
             calculateTotals();
         }
 
-        // --- FUNCIÓN GANADORA: CONSUMO AUTOMÁTICO DE TASA BCV DESDE API ---
         function fetchBCVRate() {
             const btn = document.getElementById("btn-fetch-bcv");
             const originalText = btn.textContent;
             btn.textContent = "⏳...";
             btn.disabled = true;
 
-            fetch('https://bcv-api.rafnixg.dev/rates')
+            fetch('https://bcv-api.rafnixg.dev/rates/')
             .then(res => {
-                if (!res.ok) throw new Error("Error de red");
+                if (!res.ok) throw new Error("Error en API principal");
                 return res.json();
             })
             .then(data => {
-                let bcvUSD = data.USD || data.usd || (data.rates && data.rates.USD);
+                let bcvUSD = data?.rates?.USD || data?.USD || data?.usd;
                 if (bcvUSD) {
                     let parsedRate = parseFloat(bcvUSD);
                     document.getElementById('exchange-rate').value = parsedRate.toFixed(2);
                     handleRateChange();
-                    alert("¡Tasa BCV cargada automáticamente a " + parsedRate.toFixed(2) + " Bs.!");
+                    alert("¡Tasa BCV obtenida con éxito: " + parsedRate.toFixed(2) + " Bs.!");
                 } else {
-                    alert("No se encontró el campo USD en la API. Modifícalo manualmente.");
+                    throw new Error("Formato inválido");
                 }
             })
             .catch(err => {
-                alert("No pudimos conectar con la API de tasas automáticas. Digita el valor de la tasa manual en la casilla.");
+                fetch('https://pydolarvenezuela-api.vercel.io/api/v1/dollar?page=bcv')
+                .then(res => res.json())
+                .then(data => {
+                    let price = data?.monitors?.bcv?.price;
+                    if (price) {
+                        let parsedRate = parseFloat(price);
+                        document.getElementById('exchange-rate').value = parsedRate.toFixed(2);
+                        handleRateChange();
+                        alert("¡Tasa BCV cargada (Servidor Espejo): " + parsedRate.toFixed(2) + " Bs.!");
+                    } else {
+                        alert("No se pudo obtener el valor automatizado. Escribe la tasa manualmente.");
+                    }
+                })
+                .catch(() => {
+                    alert("Sin conexión temporal a los servidores de tasa oficial. Escribe el valor manual.");
+                });
             })
             .finally(() => {
                 btn.textContent = originalText;
@@ -464,7 +523,6 @@
                 btn.className = "btn-action btn-orange";
                 tools.style.display = "none";
                 pdfBtn.style.display = "none";
-                generateBackupString();
             } else {
                 state.currentView = 'list';
                 document.getElementById('view-settings').classList.remove('active');
@@ -477,25 +535,10 @@
             renderAll();
         }
 
-        function filterList() {
-            if (state.currentView !== 'list') return;
-            let query = document.getElementById("search-input").value.toLowerCase();
-            let hideCompleted = document.getElementById("hide-completed-check").checked;
-
-            state.items.forEach(item => {
-                let row = document.getElementById(`item-row-${item.id}`);
-                if (!row) return;
-                let matchesSearch = item.name.toLowerCase().includes(query);
-                let matchesHide = !hideCompleted || !item.checked;
-
-                if (matchesSearch && matchesHide) row.classList.remove("hidden-item");
-                else row.classList.add("hidden-item");
-            });
-        }
-
         function renderAll() {
-            if (state.currentView === 'list') renderChecklist();
-            else {
+            if (state.currentView === 'list') {
+                renderChecklist();
+            } else {
                 renderSettingsPrices();
                 renderBackupList();
             }
@@ -546,7 +589,7 @@
                         <td class="center"><input type="number" class="item-price" value="${item.real.toFixed(2)}" step="0.01" onchange="updateItemPrice(${item.id}, this.value)" onkeydown="handleEnterKey(event)"></td>
                         <td class="est-price-cell">$${item.est.toFixed(2)}</td>
                         <td class="right item-subtotal" id="subtotal-${item.id}">$0.00</td>
-                        <td class="center"><button class="btn-delete-row" onclick="deleteItem(${item.id})">✕</button></td>
+                        <td class="center"><button type="button" class="btn-delete-row" onclick="deleteItem(${item.id})">✕</button></td>
                     </tr>`;
                 });
 
@@ -566,7 +609,7 @@
                 <div class="table-container">
                     <table>
                         <colgroup>
-                            <col style="width: 34%;">
+                            <col style="width: 32%;">
                             <col style="width: 17%;">
                             <col style="width: 11%;">
                             <col style="width: 20%;">
@@ -597,7 +640,7 @@
                         <td class="est-price-cell">${origQty}</td>
                         <td class="center"><input type="number" class="edit-input" value="${item.est.toFixed(2)}" step="0.01" onchange="updateItemEstPrice(${item.id}, this.value)" onkeydown="handleEnterKey(event)"></td>
                         <td class="est-price-cell">${origPrice}</td>
-                        <td class="center"><button class="btn-delete-row" onclick="deleteItem(${item.id})">✕</button></td>
+                        <td class="center"><button type="button" class="btn-delete-row" onclick="deleteItem(${item.id})">✕</button></td>
                     </tr>`;
                 });
 
@@ -620,7 +663,7 @@
             if (!name) return alert("Por favor ingresa un nombre para el artículo.");
 
             saveToHistory();
-            state.items.push({
+            let newItem = {
                 id: Date.now(),
                 cat: cat,
                 name: name,
@@ -629,12 +672,29 @@
                 est: est,
                 real: est,
                 checked: false
-            });
+            };
+
+            state.items.push(newItem);
             saveToLocalStorage();
             
-            nameField.value = ''; qtyField.value = ''; priceField.value = '';
-            alert(`"${name}" agregado.`);
+            nameField.value = '';
+            qtyField.value = '';
+            priceField.value = '';
+            
+            alert(`"${name}" agregado correctamente.`);
             renderAll();
+        }
+
+        function deleteItem(id) {
+            let item = state.items.find(i => i.id === id);
+            if (!item) return;
+
+            if (confirm(`¿Quieres eliminar "${item.name}" de tu lista de forma permanente?`)) {
+                saveToHistory();
+                state.items = state.items.filter(i => i.id !== id);
+                saveToLocalStorage();
+                renderAll();
+            }
         }
 
         function updateItemChecked(id, isChecked) {
@@ -648,6 +708,7 @@
             }
             saveToLocalStorage();
             calculateTotals();
+            filterList(); // Auto-oculta en vivo
         }
 
         function updateItemQty(id, val) {
@@ -670,7 +731,8 @@
             saveToHistory();
             let item = state.items.find(i => i.id === id);
             let parsed = parseFloat(val) || 0;
-            item.est_qty = parsed; item.qty = parsed;
+            item.est_qty = parsed;
+            item.qty = parsed;
             saveToLocalStorage();
         }
 
@@ -678,7 +740,8 @@
             saveToHistory();
             let item = state.items.find(i => i.id === id);
             let parsed = parseFloat(val) || 0;
-            item.est = parsed; item.real = parsed;
+            item.est = parsed;
+            item.real = parsed;
             saveToLocalStorage();
         }
 
@@ -691,8 +754,27 @@
             filterList();
         }
 
+        function filterList() {
+            if (state.currentView !== 'list') return;
+            let query = document.getElementById("search-input").value.toLowerCase();
+            let hideCompleted = document.getElementById("hide-completed-check").checked;
+
+            state.items.forEach(item => {
+                let row = document.getElementById(`item-row-${item.id}`);
+                if (!row) return;
+
+                let matchesSearch = item.name.toLowerCase().includes(query);
+                let matchesHide = !hideCompleted || !item.checked;
+
+                if (matchesSearch && matchesHide) row.classList.remove("hidden-item");
+                else row.classList.add("hidden-item");
+            });
+        }
+
         function calculateTotals() {
-            let checkedTotalUSD = 0; let listTotalUSD = 0;
+            let checkedTotalUSD = 0;
+            let listTotalUSD = 0;
+
             let catCounters = {1: {c:0, t:0}, 2: {c:0, t:0}, 3: {c:0, t:0}, 4: {c:0, t:0}, 5: {c:0, t:0}, 6: {c:0, t:0}};
 
             state.items.forEach(item => {
@@ -717,49 +799,84 @@
             let checkedTotalLocal = checkedTotalUSD * state.rate;
             let listTotalLocal = listTotalUSD * state.rate;
 
-            document.getElementById("checked-total").textContent = "$" + checkedTotalUSD.toFixed(2) + " / " + checkedTotalLocal.toFixed(0) + " Bs.";
-            document.getElementById("list-total").textContent = "$" + listTotalUSD.toFixed(2) + " / " + listTotalLocal.toFixed(0) + " Bs.";
+            document.getElementById("checked-total").textContent = 
+                "$" + checkedTotalUSD.toFixed(2) + " / " + checkedTotalLocal.toFixed(0) + " Bs.";
+            
+            document.getElementById("list-total").textContent = 
+                "$" + listTotalUSD.toFixed(2) + " / " + listTotalLocal.toFixed(0) + " Bs.";
+
             document.getElementById("items-count-label").textContent = `${state.items.filter(i=>i.checked).length} / ${state.items.length} Comprados`;
         }
 
+        // --- GESTIÓN DE COPIAS DE SEGURIDAD HISTÓRICO ---
         function createNewBackup() {
             let backupData = { rate: state.rate, items: state.items };
             let code = btoa(unescape(encodeURIComponent(JSON.stringify(backupData))));
+            
             let now = new Date();
-            let dateStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0') + ' ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+            let dateStr = now.toLocaleString('es-VE', { 
+                day: '2-digit', month: '2-digit', year: 'numeric', 
+                hour: '2-digit', minute: '2-digit' 
+            });
+
             state.backups.push({ id: Date.now(), date: dateStr, code: code });
-            localStorage.setItem('compras_app_backups', JSON.stringify(state.backups));
+            saveToLocalStorage();
             renderBackupList();
-            generateBackupString();
-            alert("Copia guardada: " + dateStr);
+            alert("Copia guardada en el dispositivo con la fecha: " + dateStr);
         }
 
         function renderBackupList() {
             const container = document.getElementById("backups-history-list");
+            if (!container) return;
+
             if (state.backups.length === 0) {
                 container.innerHTML = `<p style="text-align:center; font-size:11px; color:#7f8c8d; margin:10px 0;">No hay copias guardadas.</p>`;
                 return;
             }
-            let html = `<table style="min-width:100%; table-layout:auto; margin-bottom:0;"><thead><tr style="background:#e2e8f0;"><th style="padding:4px; font-size:10px; text-align:center;">Fecha de Registro</th><th style="padding:4px; font-size:10px; text-align:center;">Acciones</th></tr></thead><tbody>`;
+
+            let html = `<table style="min-width:100%; table-layout:auto; margin-bottom:0;">
+                <thead>
+                    <tr style="background:#e2e8f0;">
+                        <th style="padding:4px; font-size:10px; text-align:center;">Fecha de Registro</th>
+                        <th style="padding:4px; font-size:10px; text-align:center;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
             for (let i = state.backups.length - 1; i >= 0; i--) {
                 let b = state.backups[i];
-                html += `<tr style="border-bottom:1px solid #cbd5e1;"><td style="padding:6px; font-size:11px; font-weight:bold; text-align:center; color:#2c3e50;">${b.date}</td><td style="padding:4px; text-align:center; display:flex; gap:4px; justify-content:center;"><button class="btn-action btn-teal" style="padding:5px 6px; font-size:10px; flex:none; border-radius:4px;" onclick="copyCodeToClipboard('${b.code}')">📋 Copiar</button><button class="btn-action btn-blue" style="padding:5px 6px; font-size:10px; flex:none; border-radius:4px;" onclick="restoreFromCode('${b.code}', true)">🔄 Usar</button><button class="btn-action btn-red" style="padding:5px 4px; font-size:10px; flex:none; background:#e74c3c; border-radius:4px;" onclick="deleteLocalBackup(${b.id})">✕</button></td></tr>`;
+                html += `<tr style="border-bottom:1px solid #cbd5e1;">
+                    <td style="padding:6px; font-size:11px; font-weight:bold; text-align:center; color:#2c3e50;">${b.date}</td>
+                    <td style="padding:4px; text-align:center; display:flex; gap:4px; justify-content:center;">
+                        <button type="button" class="btn-action btn-teal" style="padding:5px 6px; font-size:10px; flex:none; border-radius:4px;" onclick="copyCodeToClipboard('${b.code}')">📋 Copiar</button>
+                        <button type="button" class="btn-action btn-blue" style="padding:5px 6px; font-size:10px; flex:none; border-radius:4px;" onclick="restoreFromCode('${b.code}', true)">🔄 Usar</button>
+                        <button type="button" class="btn-action btn-red" style="padding:5px 4px; font-size:10px; flex:none; background:#e74c3c; border-radius:4px;" onclick="deleteLocalBackup(${b.id})">✕</button>
+                    </td>
+                </tr>`;
             }
             html += `</tbody></table>`;
             container.innerHTML = html;
         }
 
         function copyCodeToClipboard(code) {
-            navigator.clipboard.writeText(code).then(() => { alert("¡Código copiado!"); }).catch(() => {
-                let el = document.createElement('textarea'); el.value = code; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); alert("¡Código copiado!");
+            navigator.clipboard.writeText(code).then(() => {
+                alert("¡Código copiado al portapapeles!");
+            }).catch(() => {
+                let el = document.createElement('textarea');
+                el.value = code;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                alert("¡Código copiado!");
             });
         }
 
         function deleteLocalBackup(id) {
-            if(confirm("¿Quieres eliminar esta copia?")) {
+            if(confirm("¿Quieres eliminar esta copia de seguridad?")) {
                 state.backups = state.backups.filter(b => b.id !== id);
-                localStorage.setItem('compras_app_backups', JSON.stringify(state.backups));
-                renderBackupList(); generateBackupString();
+                saveToLocalStorage();
+                renderBackupList();
             }
         }
 
@@ -768,39 +885,62 @@
             try {
                 let decrypted = JSON.parse(decodeURIComponent(escape(atob(str))));
                 if(decrypted.items && Array.isArray(decrypted.items)) {
-                    saveToHistory(); state.rate = decrypted.rate || 40.00; state.items = decrypted.items;
-                    document.getElementById('exchange-rate').value = state.rate; saveToLocalStorage(); renderAll(); return true;
-                } else { alert("Catálogo no compatible."); return false; }
-            } catch(err) { alert("Error al procesar el código."); return false; }
+                    saveToHistory();
+                    state.rate = decrypted.rate || 40.00;
+                    state.items = decrypted.items;
+                    document.getElementById('exchange-rate').value = state.rate.toFixed(2);
+                    saveToLocalStorage();
+                    renderAll();
+                    return true;
+                } else {
+                    alert("Catálogo no compatible.");
+                    return false;
+                }
+            } catch(err) {
+                alert("Error al procesar el código.");
+                return false;
+            }
         }
 
         function importManualBackup() {
             let str = document.getElementById("manual-import-string").value.trim();
-            if (!str) return alert("Ingresa un código válido.");
-            if(restoreFromCode(str, false)) { document.getElementById("manual-import-string").value = ''; alert("¡Importado con éxito!"); toggleView(); }
-        }
-
-        function generateBackupString() {
-            let backupData = { rate: state.rate, items: state.items };
-            document.getElementById("backup-string").value = btoa(unescape(encodeURIComponent(JSON.stringify(backupData))));
+            if (!str) return alert("Por favor ingresa un código válido.");
+            if(restoreFromCode(str, false)) {
+                document.getElementById("manual-import-string").value = '';
+                alert("¡Importado con éxito!");
+                toggleView();
+            }
         }
 
         function shareWhatsApp() {
             let checkedItems = state.items.filter(i => i.checked);
-            if (checkedItems.length === 0) return alert("No hay artículos tildados.");
+            if (checkedItems.length === 0) return alert("No hay artículos tildados para compartir.");
+
             let text = `📋 *RESUMEN DE COMPRA REAL*\n\n`;
-            checkedItems.forEach(i => { text += `• ${i.name} (x${i.qty}) -> *$${(i.qty * i.real).toFixed(2)}*\n`; });
+            checkedItems.forEach(i => {
+                text += `• ${i.name} (x${i.qty}) -> *$${(i.qty * i.real).toFixed(2)}*\n`;
+            });
+
             let rateInput = parseFloat(document.getElementById('exchange-rate').value) || 1;
             let totalUSD = checkedItems.reduce((acc, i) => acc + (i.qty * i.real), 0);
-            text += `\n💵 *Tasa Ref:* ${rateInput.toFixed(2)} Bs.\n🛒 *TOTAL:* *$${totalUSD.toFixed(2)} / Bs. ${(totalUSD * rateInput).toFixed(0)}*`;
-            window.openactivation = window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+            let totalBs = totalUSD * rateInput;
+
+            text += `\n💵 *Tasa Ref:* ${rateInput.toFixed(2)} Bs.\n`;
+            text += `🛒 *TOTAL:* *$${totalUSD.toFixed(2)} / Bs. ${totalBs.toFixed(0)}*`;
+
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
         }
 
         function refreshOnline() {
             if (confirm("¿Forzar actualización online desde GitHub?")) {
                 if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.getRegistrations().then(regs => { for (let r of regs) r.unregister(); window.location.reload(true); });
-                } else { window.location.reload(true); }
+                    navigator.serviceWorker.getRegistrations().then(regs => {
+                        for (let r of regs) r.unregister();
+                        window.location.reload(true);
+                    });
+                } else {
+                    window.location.reload(true);
+                }
             }
         }
 
