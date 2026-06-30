@@ -26,6 +26,8 @@
             --input-border: #ced4da;
             --toast-bg: #333333;
             --toast-text: #ffffff;
+            --chip-bg: #e2e8f0;
+            --chip-text: #4a5568;
         }
 
         [data-theme="dark"] {
@@ -46,6 +48,8 @@
             --input-border: #444444;
             --toast-bg: #e4e6eb;
             --toast-text: #121212;
+            --chip-bg: #333333;
+            --chip-text: #e4e6eb;
         }
 
         /* === ESTILOS BASE === */
@@ -60,20 +64,29 @@
         .tab-btn.active { background: var(--primary); color: white; }
         .btn-add-list { background: transparent; color: var(--primary); font-size: 24px; font-weight: bold; border: none; cursor: pointer; padding: 0 5px; }
 
-        /* === CONTENEDORES Y BUSCADOR === */
+        /* === CONTENEDORES === */
         .container { padding: 0 15px; }
         .view-panel { display: none; animation: fadeIn 0.3s; }
         .view-panel.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .search-card { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border: 1px solid var(--border-color); }
+        /* === BUSCADOR Y PÍLDORAS FLOTANTES (STICKY) === */
+        .sticky-header { position: sticky; top: 55px; z-index: 90; background: var(--bg-color); padding: 10px 0 5px 0; margin-top: -5px; }
+        
+        .search-card { background: var(--card-bg); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid var(--border-color); }
         .search-row { display: flex; gap: 8px; }
         .search-input { flex: 1; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-color); padding: 10px 15px; border-radius: 8px; font-size: 16px; outline: none; }
-        .btn-clear { background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-muted); width: 42px; border-radius: 8px; font-size: 16px; font-weight: bold; }
+        .btn-clear { background: var(--chip-bg); border: none; color: var(--chip-text); width: 42px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;}
         .filter-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-muted); font-weight: 500; }
 
+        /* Chips de Categorías */
+        .category-chips { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 2px; scrollbar-width: none; }
+        .category-chips::-webkit-scrollbar { display: none; }
+        .chip { background: var(--chip-bg); color: var(--chip-text); border: 1px solid transparent; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; transition: 0.2s; }
+        .chip.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 2px 5px rgba(39, 174, 96, 0.4); }
+
         /* === TARJETAS DE PRODUCTOS (CHECKLIST) === */
-        h2 { font-size: 16px; color: var(--primary); margin: 25px 0 10px 5px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 5px; }
+        h2 { font-size: 16px; color: var(--primary); margin: 15px 0 10px 5px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 5px; }
         h2 .badge { background: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
 
         .item-card { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.04); display: flex; align-items: center; gap: 12px; border: 1px solid var(--border-color); transition: background 0.2s; }
@@ -102,14 +115,10 @@
 
         .item-totals { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; flex-shrink: 0; min-width: 50px; }
         .item-subtotal { font-size: 14px; font-weight: 800; color: var(--text-color); }
-        .item-est-total { font-size: 10px; color: var(--text-muted); }
 
         /* === TARJETAS DE CONFIGURACIÓN === */
         .config-card { background: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); border: 1px solid var(--border-color); }
         .config-card h3 { margin: 0 0 10px 0; font-size: 15px; color: var(--text-color); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center;}
-        
-        .list-setting-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
-        .list-setting-item:last-child { border-bottom: none; }
         
         .edit-item-row { display: flex; align-items: center; padding: 10px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .arrows-col { display: flex; flex-direction: column; gap: 2px; }
@@ -126,18 +135,21 @@
         .btn-outline { background: transparent; border: 1px solid var(--input-border); color: var(--text-color); }
         .btn-outline-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
         .btn-icon { padding: 8px; font-size: 16px; border-radius: 8px; background: var(--input-bg); border: none; color: var(--text-color); }
+        .btn-delete-cat { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 3px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; }
 
         /* Campos de Entrada Generales */
-        .form-input, .form-select { width: 100%; padding: 10px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); border-radius: 8px; font-size: 16px; margin-bottom: 10px; outline: none; }
+        .form-input, .form-select { width: 100%; padding: 10px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); border-radius: 8px; font-size: 16px; margin-bottom: 10px; outline: none; font-weight:bold;}
 
         /* === BARRA INFERIOR DE TOTALES Y NAVEGACIÓN === */
         .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--nav-bg); border-top: 1px solid var(--border-color); z-index: 1000; padding-bottom: env(safe-area-inset-bottom); box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
         
-        .totals-row { display: flex; padding: 10px 15px; background: var(--input-bg); border-bottom: 1px solid var(--border-color); align-items: center; gap: 10px; }
-        .rate-widget { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; display: flex; align-items: center; padding: 2px; }
-        .rate-widget span { font-size: 10px; font-weight: bold; color: var(--text-muted); padding: 0 4px; }
-        .rate-widget input { width: 50px; border: none; background: transparent; color: var(--text-color); font-weight: bold; font-size: 14px; text-align: center; outline: none; }
-        .rate-widget button { background: var(--primary); border: none; color: white; font-size: 10px; font-weight: bold; border-radius: 4px; padding: 4px 6px; }
+        .totals-row { display: flex; padding: 12px 15px; background: var(--input-bg); border-bottom: 1px solid var(--border-color); align-items: center; gap: 10px; }
+        
+        /* Rediseño de la Caja de Tasa BCV */
+        .rate-widget { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; padding: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .rate-widget span { font-size: 11px; font-weight: bold; color: var(--text-muted); padding: 0 6px; }
+        .rate-widget input { width: 65px; border: none; background: transparent; color: var(--text-color); font-weight: bold; font-size: 16px; text-align: center; outline: none; }
+        .rate-widget button { background: var(--primary); border: none; color: white; font-size: 12px; font-weight: bold; border-radius: 6px; padding: 6px 10px; margin-left: 2px; cursor: pointer; }
         
         .totals-info { flex: 1; display: flex; justify-content: space-around; text-align: center; }
         .total-box { display: flex; flex-direction: column; }
@@ -167,14 +179,14 @@
         .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
 
         /* === TOAST NOTIFICATIONS === */
-        .toast-container { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); z-index: 4000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .toast { background: var(--toast-bg); color: var(--toast-text); padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transform: translateY(20px); transition: 0.3s; }
+        .toast-container { position: fixed; bottom: 130px; left: 50%; transform: translateX(-50%); z-index: 4000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: 90%; max-width: 350px;}
+        .toast { background: var(--toast-bg); color: var(--toast-text); padding: 12px 20px; border-radius: 30px; font-size: 13px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transform: translateY(20px); transition: 0.3s; text-align: center;}
         .toast.show { opacity: 1; transform: translateY(0); }
         .toast.error { background: var(--danger); color: white; }
 
         @media print {
             body { padding: 0; background: white; color: black; }
-            .tabs-header, .search-card, .bottom-bar, .config-box, .sheet-overlay, .bottom-sheet, .modal-overlay, .toast-container { display: none !important; }
+            .tabs-header, .sticky-header, .bottom-bar, .config-box, .sheet-overlay, .bottom-sheet, .modal-overlay, .toast-container { display: none !important; }
             .item-card { border: none; box-shadow: none; border-bottom: 1px solid #ccc; border-radius: 0; margin: 0; padding: 5px 0; }
             .item-inputs { display: none; }
             .check-container { display: none; }
@@ -191,46 +203,61 @@
 
     <!-- CONTENIDO PRINCIPAL -->
     <div class="container">
-        <!-- VISTA 1: CHECKLIST -->
+        
+        <!-- VISTA 1: CHECKLIST PRINCIPAL -->
         <div id="view-list" class="view-panel active">
-            <div class="search-card" id="search-container">
-                <div class="search-row">
-                    <input type="text" id="search-input" class="search-input" placeholder="🔍 Buscar producto..." oninput="filterList()">
-                    <button class="btn-clear" onclick="clearSearch()">✕</button>
-                </div>
-                <div class="filter-row">
-                    <label style="display:flex; align-items:center; gap:5px;">
-                        <input type="checkbox" id="hide-completed-check" checked onchange="filterList()" style="margin:0;"> Ocultar comprados
-                    </label>
-                    <span id="items-count-label">0 / 0</span>
+            <!-- Bloque Pegajoso (Buscador + Píldoras) -->
+            <div class="sticky-header">
+                <div class="search-card">
+                    <div class="search-row">
+                        <input type="text" id="search-input" class="search-input" placeholder="🔍 Buscar producto..." onfocus="this.select()" oninput="filterList()">
+                        <button class="btn-clear" onclick="clearSearch()">✕</button>
+                    </div>
+                    <div class="filter-row">
+                        <label style="display:flex; align-items:center; gap:5px;">
+                            <input type="checkbox" id="hide-completed-check" checked onchange="filterList()" style="margin:0;"> Ocultar comprados
+                        </label>
+                        <span id="items-count-label">0 / 0</span>
+                    </div>
+                    <!-- Píldoras Filtro de Categorías -->
+                    <div class="category-chips" id="category-chips-list"></div>
                 </div>
             </div>
+            
             <div id="categories-container"></div>
         </div>
 
-        <!-- VISTA 2: CONFIGURACIÓN -->
+        <!-- VISTA 2: CONFIGURACIÓN Y CATÁLOGO -->
         <div id="view-settings" class="view-panel">
+            
             <div class="config-card">
                 <h3>👁️ Pasillos a Comprar Hoy</h3>
                 <div id="settings-categories-visibility" style="display: flex; flex-direction: column; gap: 8px;"></div>
                 <div style="display: flex; gap: 6px; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color);">
-                    <input type="text" id="new-cat-name" class="form-input" placeholder="Nuevo pasillo" style="margin:0; padding:6px 10px;">
+                    <input type="text" id="new-cat-name" class="form-input" placeholder="Nuevo pasillo" onfocus="this.select()" style="margin:0; padding:6px 10px;">
                     <button class="btn btn-secondary" onclick="addNewCategory()">Crear</button>
                 </div>
             </div>
 
-            <div class="config-card">
-                <h3>✏️ Catálogo (Toca para editar)</h3>
+            <!-- Bloque Pegajoso Píldoras en Configuración -->
+            <div class="sticky-header">
+                <div class="search-card" style="padding: 10px;">
+                    <h3 style="margin: 0 0 5px 0; font-size: 13px; color: var(--text-muted);">Filtrar Catálogo:</h3>
+                    <div class="category-chips" id="category-chips-settings"></div>
+                </div>
+            </div>
+
+            <div class="config-card" style="margin-top: 5px;">
                 <div id="settings-prices-container"></div>
             </div>
 
             <div class="config-card">
-                <h3>➕ Agregar Producto</h3>
-                <input type="text" id="new-item-name" class="form-input" placeholder="Nombre del artículo">
+                <h3>➕ Agregar Nuevo Producto</h3>
+                <input type="text" id="new-item-name" class="form-input" placeholder="Nombre del artículo" onfocus="this.select()">
                 <select id="new-item-cat" class="form-select"></select>
                 <div style="display: flex; gap: 10px;">
-                    <input type="number" id="new-item-qty" class="form-input" placeholder="Cant. Ref" step="any">
-                    <input type="number" id="new-item-price" class="form-input" placeholder="Precio ($)" step="0.01">
+                    <input type="number" id="new-item-qty" class="form-input" placeholder="Cant. Ref" step="any" onfocus="this.select()">
+                    <input type="number" id="new-item-price" class="form-input" placeholder="Precio ($)" step="0.01" onfocus="this.select()">
                 </div>
                 <button class="btn btn-primary btn-full" onclick="addNewItemToCatalog()">Añadir al Catálogo</button>
             </div>
@@ -242,7 +269,7 @@
         <div class="totals-row">
             <div class="rate-widget">
                 <span>BCV</span>
-                <input type="number" id="exchange-rate" value="40.00" step="0.01" onchange="handleRateChange()">
+                <input type="number" id="exchange-rate" value="40.00" step="0.01" onfocus="this.select()" onchange="handleRateChange()">
                 <button onclick="fetchBCVRate()" id="btn-fetch-bcv">↻</button>
             </div>
             <div class="totals-info">
@@ -274,7 +301,7 @@
         </div>
     </div>
 
-    <!-- MENÚ FLOTANTE (BOTTOM SHEET) -->
+    <!-- MENÚ FLOTANTE AVANZADO -->
     <div class="sheet-overlay" id="sheet-overlay" onclick="toggleMenu()"></div>
     <div class="bottom-sheet" id="bottom-sheet">
         <div class="sheet-handle"></div>
@@ -285,8 +312,12 @@
             <button class="btn btn-outline" onclick="resetChecklistValues(); toggleMenu();">🧹 Limpiar Carrito</button>
             <button class="btn btn-outline-danger" onclick="deleteCurrentList(); toggleMenu();">🗑️ Borrar Lista</button>
             <button class="btn btn-primary" onclick="createNewBackup(); toggleMenu();">💾 Backup Hoy</button>
-            <button class="btn btn-secondary" onclick="openBackupModal(); toggleMenu();">📦 Historial Backups</button>
-            <button class="btn btn-outline-danger" style="grid-column: span 2;" onclick="factoryResetCatalog(); toggleMenu();">⚠️ Restaurar Catálogo de Fábrica</button>
+            <button class="btn btn-secondary" onclick="openBackupModal(); toggleMenu();">📦 Restaurar Backup</button>
+            
+            <!-- NUEVO: Botón para forzar actualización de la caché web (PWA) -->
+            <button class="btn btn-outline" style="border-color: #8e44ad; color: #8e44ad;" onclick="refreshOnline(); toggleMenu();">🔄 Forzar Actualización Web</button>
+            
+            <button class="btn btn-outline-danger" onclick="factoryResetCatalog(); toggleMenu();">⚠️ Restablecer Fábrica</button>
         </div>
     </div>
 
@@ -296,17 +327,17 @@
             <div class="modal-header">Editar Producto</div>
             <input type="hidden" id="edit-id">
             <label style="font-size:12px; font-weight:bold; color:var(--text-muted);">Nombre</label>
-            <input type="text" id="edit-name" class="form-input" style="text-align:left;">
+            <input type="text" id="edit-name" class="form-input" style="text-align:left;" onfocus="this.select()">
             <label style="font-size:12px; font-weight:bold; color:var(--text-muted);">Pasillo</label>
             <select id="edit-cat" class="form-select" style="text-align-last:left;"></select>
             <div style="display:flex; gap:10px;">
                 <div style="flex:1;">
                     <label style="font-size:12px; font-weight:bold; color:var(--text-muted);">Cant. Ref</label>
-                    <input type="number" id="edit-qty" class="form-input" step="any">
+                    <input type="number" id="edit-qty" class="form-input" step="any" onfocus="this.select()">
                 </div>
                 <div style="flex:1;">
                     <label style="font-size:12px; font-weight:bold; color:var(--text-muted);">Precio ($)</label>
-                    <input type="number" id="edit-price" class="form-input" step="0.01">
+                    <input type="number" id="edit-price" class="form-input" step="0.01" onfocus="this.select()">
                 </div>
             </div>
             <div class="modal-actions">
@@ -324,7 +355,7 @@
             <div id="backups-list-container" style="display:flex; flex-direction:column; gap:10px; margin-bottom:15px;"></div>
             <div style="border-top:1px solid var(--border-color); padding-top:15px; margin-top:15px;">
                 <label style="font-size:12px; font-weight:bold; color:var(--text-muted);">Importar Código</label>
-                <input type="text" id="manual-import-string" class="form-input" placeholder="Pegar código..." style="text-align:left;">
+                <input type="text" id="manual-import-string" class="form-input" placeholder="Pegar código..." style="text-align:left;" onfocus="this.select()">
                 <button class="btn btn-primary btn-full" onclick="importManualBackup()">Importar</button>
             </div>
             <button class="btn btn-outline btn-full" style="margin-top:10px;" onclick="closeModals()">Cerrar</button>
@@ -335,7 +366,7 @@
     <div class="toast-container" id="toast-container"></div>
 
     <script>
-        // --- CONSTANTES Y LISTADO ORIGINAL (132 Artículos Intactos) ---
+        // --- CONSTANTES Y LISTADO ORIGINAL (132 Artículos) ---
         const defaultCategories = [
             { id: 1, name: "1. DESPENSA Y VÍVERES", active: true },
             { id: 2, name: "2. CHARCUTERÍA Y PROTEÍNAS", active: true },
@@ -480,9 +511,9 @@
             { id: 132, cat: 6, name: "Protección femenina", qty: 2, est: 2.00 }
         ];
 
-        // --- SISTEMA BASE ---
+        // --- SISTEMA BASE Y ESTADOS ---
         let appData = { lists: [], currentListId: 1, backups: [], rate: 40.00, darkMode: false };
-        let state = { items: [], categories: [], currentView: 'list' };
+        let state = { items: [], categories: [], currentView: 'list', selectedCatFilter: 'all' };
         let undoStack = [];
 
         function showToast(message, isError = false) {
@@ -511,12 +542,11 @@
         }
 
         function initApp() {
-            let savedAppData = localStorage.getItem('compras_pro_appData_v10');
+            let savedAppData = localStorage.getItem('compras_pro_appData_v12');
             
             if (savedAppData) {
                 appData = JSON.parse(savedAppData);
             } else {
-                // Instancia inicial
                 appData.lists = [{ 
                     id: 1, name: "Mercado Principal", 
                     items: JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false})), 
@@ -545,6 +575,7 @@
             let list = appData.lists.find(l => l.id === appData.currentListId) || appData.lists[0];
             state.items = list.items;
             state.categories = list.categories;
+            state.selectedCatFilter = 'all';
             document.getElementById('exchange-rate').value = appData.rate.toFixed(2);
             renderAll();
         }
@@ -556,10 +587,10 @@
                 appData.lists[listIdx].categories = state.categories;
             }
             appData.rate = parseFloat(document.getElementById('exchange-rate').value) || 1;
-            localStorage.setItem('compras_pro_appData_v10', JSON.stringify(appData));
+            localStorage.setItem('compras_pro_appData_v12', JSON.stringify(appData));
         }
 
-        // --- PESTAÑAS (LISTAS) ---
+        // --- GESTIÓN DE TABS (LISTAS) ---
         function renderTabs() {
             const container = document.getElementById("tabs-container");
             container.innerHTML = appData.lists.map(l => `
@@ -579,7 +610,7 @@
         function createNewList() {
             let name = prompt("Nombre de la nueva lista (ej. Viaje, Repuestos):");
             if(!name) return;
-            let useCatalog = confirm("¿Iniciar con el catálogo del supermercado?\n(Cancela para lista vacía)");
+            let useCatalog = confirm("¿Iniciar con el catálogo base de supermercado?\n(Cancela para crear lista vacía)");
             let newItems = useCatalog ? JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false})) : [];
             let newCats = JSON.parse(JSON.stringify(defaultCategories));
             saveToLocalStorage();
@@ -587,40 +618,65 @@
             appData.lists.push(newList);
             appData.currentListId = newList.id;
             loadCurrentList();
-            showToast("Lista creada");
+            showToast("Lista creada exitosamente");
         }
 
         function deleteCurrentList() {
-            if(appData.lists.length <= 1) return showToast("No puedes eliminar tu única lista", true);
-            if(confirm("¿Eliminar esta lista completa?")) {
+            if(appData.lists.length <= 1) return showToast("No puedes borrar tu única lista", true);
+            if(confirm("¿Seguro que deseas borrar toda esta lista de compras?")) {
                 appData.lists = appData.lists.filter(l => l.id !== appData.currentListId);
                 appData.currentListId = appData.lists[0].id;
                 loadCurrentList();
                 if(state.currentView === 'settings') switchView('list');
-                showToast("Lista eliminada");
+                showToast("Lista borrada");
             }
         }
 
-        // --- MANEJO DE ACCIONES ---
+        // --- SISTEMA DE PÍLDORAS (FILTRO POR CATEGORÍA) ---
+        function renderCategoryChips() {
+            let htmlList = `<button class="chip ${state.selectedCatFilter === 'all' ? 'active' : ''}" onclick="setCategoryFilter('all')">🛒 Todos</button>`;
+            state.categories.filter(c => c.active).forEach(c => {
+                let shortName = c.name.replace(/^\d+\.\s*/, '');
+                htmlList += `<button class="chip ${state.selectedCatFilter === c.id ? 'active' : ''}" onclick="setCategoryFilter(${c.id})">${shortName}</button>`;
+            });
+            const cList = document.getElementById('category-chips-list');
+            if(cList) cList.innerHTML = htmlList;
+
+            let htmlSet = `<button class="chip ${state.selectedCatFilter === 'all' ? 'active' : ''}" onclick="setCategoryFilter('all')">🛒 Todos</button>`;
+            state.categories.forEach(c => {
+                let shortName = c.name.replace(/^\d+\.\s*/, '');
+                htmlSet += `<button class="chip ${state.selectedCatFilter === c.id ? 'active' : ''}" onclick="setCategoryFilter(${c.id})">${shortName}</button>`;
+            });
+            const cSet = document.getElementById('category-chips-settings');
+            if(cSet) cSet.innerHTML = htmlSet;
+        }
+
+        function setCategoryFilter(id) {
+            state.selectedCatFilter = id;
+            renderAll();
+        }
+
+        // --- ACCIONES GENERALES ---
         function resetToDefaults() {
             state.categories = JSON.parse(JSON.stringify(defaultCategories));
             state.items = JSON.parse(JSON.stringify(defaultItems)).map(item => ({
                 ...item, est_qty: item.qty, real: item.est, checked: false
             }));
+            state.selectedCatFilter = 'all';
             saveToLocalStorage();
         }
 
         function factoryResetCatalog() {
-            if (confirm("¿Restaurar valores de fábrica para ESTA LISTA? Borrará todo lo personalizado.")) {
-                saveToHistory(); resetToDefaults(); renderAll(); showToast("Fábrica restaurada");
+            if (confirm("¿Restaurar valores de fábrica para ESTA LISTA? Perderás todo lo personalizado.")) {
+                saveToHistory(); resetToDefaults(); renderAll(); showToast("Catálogo restaurado");
             }
         }
 
         function resetChecklistValues() {
-            if (confirm("¿Limpiar carrito para una nueva compra?")) {
+            if (confirm("¿Limpiar todo el carrito para empezar una nueva compra?")) {
                 saveToHistory();
                 state.items.forEach(item => { item.checked = false; item.qty = item.est_qty; item.real = item.est; });
-                saveToLocalStorage(); renderAll(); showToast("Carrito limpio");
+                saveToLocalStorage(); renderAll(); showToast("Carrito como nuevo");
             }
         }
 
@@ -638,7 +694,7 @@
                 let bcvUSD = data?.rates?.USD || data?.USD || data?.usd;
                 if (bcvUSD) {
                     document.getElementById('exchange-rate').value = parseFloat(bcvUSD).toFixed(2);
-                    handleRateChange(); showToast(`Tasa BCV: ${parseFloat(bcvUSD).toFixed(2)} Bs.`);
+                    handleRateChange(); showToast(`Tasa BCV actual: ${parseFloat(bcvUSD).toFixed(2)} Bs.`);
                 } else throw new Error();
             })
             .catch(err => {
@@ -646,12 +702,12 @@
                 .then(res => res.json()).then(data => {
                     let price = data?.monitors?.bcv?.price;
                     if (price) { document.getElementById('exchange-rate').value = parseFloat(price).toFixed(2); handleRateChange(); showToast(`Tasa (Espejo): ${parseFloat(price).toFixed(2)}`); } 
-                    else showToast("Fallo BCV automático", true);
-                }).catch(() => showToast("Sin conexión BCV", true));
+                    else showToast("Fallo al conectar con BCV", true);
+                }).catch(() => showToast("Sin conexión a internet para BCV", true));
             }).finally(() => { btn.innerHTML = "↻"; btn.disabled = false; });
         }
 
-        // --- NAVEGACIÓN UI ---
+        // --- NAVEGACIÓN Y MENÚS ---
         function switchView(view) {
             state.currentView = view;
             document.getElementById('view-list').classList.remove('active');
@@ -662,7 +718,6 @@
             document.getElementById('nav-settings').classList.remove('active');
             document.getElementById(`nav-${view}`).classList.add('active');
             
-            document.getElementById('search-container').style.display = view === 'list' ? 'flex' : 'none';
             renderAll();
         }
 
@@ -678,10 +733,11 @@
             document.getElementById('backup-modal').classList.remove('show');
         }
 
-        // --- RENDERIZADO VISUAL ---
+        // --- MOTOR DE RENDERIZADO VISUAL ---
         function renderAll() {
             renderTabs();
             renderDynamicSelects();
+            renderCategoryChips(); 
             if (state.currentView === 'list') renderChecklist();
             else renderSettingsPrices();
             calculateTotals();
@@ -719,10 +775,9 @@
             if(!name) return;
             saveToHistory();
             state.categories.push({ id: Date.now(), name: name, active: true });
-            saveToLocalStorage(); input.value = ''; renderAll(); showToast("Categoría creada");
+            saveToLocalStorage(); input.value = ''; renderAll(); showToast("Pasillo creado");
         }
 
-        // --- ORDENAMIENTO (FLECHAS) ---
         function moveCategoryUp(id) {
             let idx = state.categories.findIndex(c => c.id === id);
             if (idx > 0) { saveToHistory(); let temp = state.categories[idx]; state.categories[idx] = state.categories[idx - 1]; state.categories[idx - 1] = temp; saveToLocalStorage(); renderAll(); }
@@ -732,26 +787,25 @@
             if (idx > -1 && idx < state.categories.length - 1) { saveToHistory(); let temp = state.categories[idx]; state.categories[idx] = state.categories[idx + 1]; state.categories[idx + 1] = temp; saveToLocalStorage(); renderAll(); }
         }
         function moveItemUp(id, e) {
-            e.stopPropagation();
-            let item = state.items.find(i => i.id === id);
-            let catItems = state.items.filter(i => i.cat === item.cat);
-            let localIdx = catItems.findIndex(i => i.id === id);
+            e.stopPropagation(); let item = state.items.find(i => i.id === id); let catItems = state.items.filter(i => i.cat === item.cat); let localIdx = catItems.findIndex(i => i.id === id);
             if(localIdx > 0) { saveToHistory(); let prevItem = catItems[localIdx - 1]; let g1 = state.items.findIndex(i => i.id === item.id); let g2 = state.items.findIndex(i => i.id === prevItem.id); let temp = state.items[g1]; state.items[g1] = state.items[g2]; state.items[g2] = temp; saveToLocalStorage(); renderAll(); }
         }
         function moveItemDown(id, e) {
-            e.stopPropagation();
-            let item = state.items.find(i => i.id === id);
-            let catItems = state.items.filter(i => i.cat === item.cat);
-            let localIdx = catItems.findIndex(i => i.id === id);
+            e.stopPropagation(); let item = state.items.find(i => i.id === id); let catItems = state.items.filter(i => i.cat === item.cat); let localIdx = catItems.findIndex(i => i.id === id);
             if(localIdx > -1 && localIdx < catItems.length - 1) { saveToHistory(); let nextItem = catItems[localIdx + 1]; let g1 = state.items.findIndex(i => i.id === item.id); let g2 = state.items.findIndex(i => i.id === nextItem.id); let temp = state.items[g1]; state.items[g1] = state.items[g2]; state.items[g2] = temp; saveToLocalStorage(); renderAll(); }
         }
 
-        // --- CHECKLIST PRINCIPAL (TARJETAS) ---
+        // --- CHECKLIST PRINCIPAL (TARJETAS + FILTRO PÍLDORAS) ---
         function renderChecklist() {
             const container = document.getElementById('categories-container');
             container.innerHTML = '';
 
-            state.categories.filter(c => c.active).forEach(category => {
+            let activeCats = state.categories.filter(c => c.active);
+            if (state.selectedCatFilter !== 'all') {
+                activeCats = activeCats.filter(c => c.id === state.selectedCatFilter);
+            }
+
+            activeCats.forEach(category => {
                 let catItems = state.items.filter(i => i.cat == category.id);
                 if (catItems.length === 0) return;
 
@@ -772,11 +826,11 @@
                             <div class="item-inputs">
                                 <div class="input-group">
                                     <label>Cant</label>
-                                    <input type="number" value="${item.qty}" step="any" onchange="updateItemQty(${item.id}, this.value)" onkeydown="handleEnterKey(event)">
+                                    <input type="number" value="${item.qty}" step="any" onfocus="this.select()" onchange="updateItemQty(${item.id}, this.value)" onkeydown="handleEnterKey(event)">
                                 </div>
                                 <div class="input-group ${priceAlertClass}" id="price-box-${item.id}">
                                     <label>$</label>
-                                    <input type="number" class="item-price" value="${item.real.toFixed(2)}" step="0.01" onchange="updateItemPrice(${item.id}, this.value)" onkeydown="handleEnterKey(event)">
+                                    <input type="number" class="item-price" value="${item.real.toFixed(2)}" step="0.01" onfocus="this.select()" onchange="updateItemPrice(${item.id}, this.value)" onkeydown="handleEnterKey(event)">
                                 </div>
                             </div>
                         </div>
@@ -790,20 +844,26 @@
             filterList();
         }
 
-        // --- CONFIGURACIÓN LISTA (TARJETAS LIMPIAS) ---
+        // --- CONFIGURACIÓN LISTA (FILTRO PÍLDORAS) ---
         function renderSettingsPrices() {
             const container = document.getElementById('settings-prices-container');
             container.innerHTML = '';
 
-            state.categories.forEach(category => {
+            let catsToRender = state.categories;
+            if (state.selectedCatFilter !== 'all') {
+                catsToRender = catsToRender.filter(c => c.id === state.selectedCatFilter);
+            }
+
+            catsToRender.forEach(category => {
                 let catItems = state.items.filter(i => i.cat == category.id);
+                let catOptions = state.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
                 
                 let html = `
                 <div style="display:flex; justify-content:space-between; align-items:center; margin: 15px 0 10px 0; border-bottom: 2px solid var(--border-color); padding-bottom:5px;">
                     <div style="display:flex; align-items:center; gap:8px;">
                         <div style="display:flex; flex-direction:column; gap:2px;">
-                            <button class="btn-move" onclick="moveCategoryUp(${category.id})">▲</button>
-                            <button class="btn-move" onclick="moveCategoryDown(${category.id})">▼</button>
+                            <button class="btn-arrow" onclick="moveCategoryUp(${category.id})">▲</button>
+                            <button class="btn-arrow" onclick="moveCategoryDown(${category.id})">▼</button>
                         </div>
                         <h4 style="margin:0; color:var(--primary); font-size:15px;">${category.name}</h4>
                     </div>
@@ -848,39 +908,21 @@
             saveToHistory();
             item.name = document.getElementById("edit-name").value.trim() || item.name;
             item.cat = parseInt(document.getElementById("edit-cat").value);
-            
             let nQty = parseFloat(document.getElementById("edit-qty").value) || 0;
             let nPrice = parseFloat(document.getElementById("edit-price").value) || 0;
             
             item.est_qty = nQty; item.qty = nQty;
             item.est = nPrice; item.real = nPrice;
             
-            saveToLocalStorage();
-            closeModals();
-            renderAll();
-            showToast("Producto actualizado");
+            saveToLocalStorage(); closeModals(); renderAll(); showToast("Editado con éxito");
         }
 
         function deleteItemFromModal() {
             let id = parseInt(document.getElementById("edit-id").value);
-            if (confirm(`¿Eliminar este producto?`)) {
+            if (confirm(`¿Eliminar este producto de forma definitiva?`)) {
                 saveToHistory();
                 state.items = state.items.filter(i => i.id !== id);
-                saveToLocalStorage();
-                closeModals();
-                renderAll();
-                showToast("Producto eliminado");
-            }
-        }
-
-        // --- FUNCIONES LÓGICAS INTERNAS ---
-        function deleteCategory(id) {
-            let cat = state.categories.find(c => c.id === id);
-            if (confirm(`¿Eliminar pasillo "${cat.name}" y todo lo que contiene?`)) {
-                saveToHistory();
-                state.categories = state.categories.filter(c => c.id !== id);
-                state.items = state.items.filter(i => i.cat !== id);
-                saveToLocalStorage(); renderAll(); showToast("Pasillo eliminado");
+                saveToLocalStorage(); closeModals(); renderAll(); showToast("Producto eliminado");
             }
         }
 
@@ -889,12 +931,18 @@
             const cat = parseInt(document.getElementById("new-item-cat").value);
             const qty = parseFloat(document.getElementById("new-item-qty").value) || 1;
             const est = parseFloat(document.getElementById("new-item-price").value) || 0;
-            if (!name) return showToast("Falta nombre", true);
+            if (!name) return showToast("Debes escribir un nombre", true);
             saveToHistory();
             state.items.push({ id: Date.now(), cat, name, qty, est_qty: qty, est, real: est, checked: false });
-            saveToLocalStorage();
-            document.getElementById("new-item-name").value = '';
-            renderAll(); showToast("Añadido al catálogo");
+            saveToLocalStorage(); document.getElementById("new-item-name").value = ''; renderAll(); showToast("Producto creado");
+        }
+
+        function deleteItem(id) {
+            let item = state.items.find(i => i.id === id);
+            if (!item) return;
+            if (confirm(`¿Eliminar "${item.name}"?`)) {
+                saveToHistory(); state.items = state.items.filter(i => i.id !== id); saveToLocalStorage(); renderAll(); showToast("Producto eliminado");
+            }
         }
 
         function updateItemChecked(id, isChecked) {
@@ -902,22 +950,15 @@
             let item = state.items.find(i => i.id === id);
             item.checked = isChecked;
             saveToLocalStorage();
-            renderAll(); // Forza validación visual de la alerta de precio 0
+            renderAll(); 
         }
 
         function updateItemQty(id, val) {
-            saveToHistory();
-            let item = state.items.find(i => i.id === id);
-            item.qty = parseFloat(val) || 0;
-            saveToLocalStorage(); calculateTotals();
+            saveToHistory(); let item = state.items.find(i => i.id === id); item.qty = parseFloat(val) || 0; saveToLocalStorage(); calculateTotals();
         }
 
         function updateItemPrice(id, val) {
-            saveToHistory();
-            let item = state.items.find(i => i.id === id);
-            item.real = parseFloat(val) || 0;
-            saveToLocalStorage();
-            renderAll(); // Refresca color de alerta
+            saveToHistory(); let item = state.items.find(i => i.id === id); item.real = parseFloat(val) || 0; saveToLocalStorage(); renderAll(); 
         }
 
         function handleEnterKey(event) { if (event.key === "Enter") event.target.blur(); }
@@ -968,13 +1009,12 @@
 
             document.getElementById("checked-total-usd").textContent = "$" + checkedTotalUSD.toFixed(2);
             document.getElementById("checked-total-bs").textContent = (checkedTotalUSD * appData.rate).toFixed(0) + " Bs";
-            
             document.getElementById("list-total-usd").textContent = "$" + listTotalUSD.toFixed(2);
             document.getElementById("list-total-bs").textContent = (listTotalUSD * appData.rate).toFixed(0) + " Bs";
             
             let activeItemsCount = state.items.filter(i => state.categories.find(c => c.id === i.cat)?.active).length;
             let checkedItemsCount = state.items.filter(i => i.checked && state.categories.find(c => c.id === i.cat)?.active).length;
-            document.getElementById("items-count-label").textContent = `${checkedItemsCount}/${activeItemsCount}`;
+            document.getElementById("items-count-label").textContent = `${checkedItemsCount}/${activeItemsCount} Prod.`;
         }
 
         // --- BACKUPS AVANZADOS ---
@@ -994,12 +1034,12 @@
 
         function renderBackupList() {
             const container = document.getElementById("backups-list-container");
-            if (appData.backups.length === 0) { container.innerHTML = `<p style="text-align:center; font-size:12px; color:var(--text-muted);">No hay respaldos.</p>`; return; }
+            if (appData.backups.length === 0) { container.innerHTML = `<p style="text-align:center; font-size:12px; color:var(--text-muted);">No hay respaldos guardados.</p>`; return; }
             let html = "";
             for (let i = appData.backups.length - 1; i >= 0; i--) {
                 let b = appData.backups[i];
                 html += `<div style="display:flex; justify-content:space-between; align-items:center; background:var(--input-bg); padding:10px; border-radius:8px;">
-                    <span style="font-size:12px; font-weight:bold;">${b.date}</span>
+                    <span style="font-size:12px; font-weight:bold; color:var(--text-color);">${b.date}</span>
                     <div style="display:flex; gap:5px;">
                         <button class="btn-icon" onclick="copyCodeToClipboard('${b.code}')">📋</button>
                         <button class="btn-icon" style="color:var(--secondary);" onclick="restoreFromCode('${b.code}', true)">🔄</button>
@@ -1017,34 +1057,47 @@
         }
 
         function deleteLocalBackup(id) {
-            if(confirm("¿Eliminar este respaldo?")) { appData.backups = appData.backups.filter(b => b.id !== id); saveToLocalStorage(); renderBackupList(); }
+            if(confirm("¿Eliminar este respaldo global?")) { appData.backups = appData.backups.filter(b => b.id !== id); saveToLocalStorage(); renderBackupList(); }
         }
 
         function restoreFromCode(str, confirmReq) {
-            if (confirmReq && !confirm("¿Restaurar App Completa? Reemplazará todas las listas actuales.")) return false;
+            if (confirmReq && !confirm("¿Restaurar App Completa? Reemplazará todas las listas y pasillos actuales de la aplicación.")) return false;
             try {
                 let decrypted = JSON.parse(decodeURIComponent(escape(atob(str))));
-                if(decrypted.lists) { appData = decrypted; saveToLocalStorage(); loadCurrentList(); closeModals(); showToast("Sistema Restaurado"); return true; }
-                else { showToast("Código Inválido", true); return false; }
-            } catch(err) { showToast("Error de código", true); return false; }
+                if(decrypted.lists) { appData = decrypted; saveToLocalStorage(); loadCurrentList(); closeModals(); showToast("Sistema Restaurado Exitosamente"); return true; }
+                else { showToast("El Código de seguridad no es válido", true); return false; }
+            } catch(err) { showToast("Error al procesar el código", true); return false; }
         }
 
         function importManualBackup() {
             let str = document.getElementById("manual-import-string").value.trim();
-            if (!str) return showToast("Pega un código", true);
+            if (!str) return showToast("Por favor, pega un código de seguridad", true);
             restoreFromCode(str, true);
             document.getElementById("manual-import-string").value = '';
         }
 
         function shareWhatsApp() {
             let checkedItems = state.items.filter(i => i.checked && state.categories.find(c=>c.id===i.cat)?.active);
-            if (checkedItems.length === 0) return showToast("No hay compras marcadas", true);
+            if (checkedItems.length === 0) return showToast("No hay compras marcadas para enviar", true);
             let listName = appData.lists.find(l=>l.id===appData.currentListId).name;
             let text = `📋 *COMPRA: ${listName}*\n\n`;
             checkedItems.forEach(i => { text += `• ${i.name} (x${i.qty}) -> *$${(i.qty * i.real).toFixed(2)}*\n`; });
             let totalUSD = checkedItems.reduce((acc, i) => acc + (i.qty * i.real), 0);
             text += `\n💵 *Tasa Ref:* ${appData.rate.toFixed(2)} Bs.\n🛒 *TOTAL:* *$${totalUSD.toFixed(2)} / Bs. ${(totalUSD * appData.rate).toFixed(0)}*`;
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        function refreshOnline() {
+            if (confirm("¿Forzar actualización online desde GitHub?")) {
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistrations().then(regs => {
+                        for (let r of regs) r.unregister();
+                        window.location.reload(true);
+                    });
+                } else {
+                    window.location.reload(true);
+                }
+            }
         }
 
         window.onload = initApp;
