@@ -109,17 +109,18 @@
         .checkmark:after { content: "✓"; color: white; display: none; font-weight: bold; font-size: 14px; }
         .check-container input:checked ~ .checkmark:after { display: block; }
 
-        .item-name-group { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .item-name-group { flex: 1; display: flex; flex-direction: column; overflow: hidden; cursor: pointer; }
         .item-name { font-size: 16px; font-weight: 700; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .item-subtext { font-size: 11px; color: var(--text-muted); display: flex; gap: 6px; align-items: center; margin-top: 3px; font-weight: 500; }
         .item-tag { font-size: 10px; background: var(--chip-bg); border-radius: 4px; padding: 2px 4px; }
+        .iva-badge { font-size: 10px; background: var(--secondary); color: white; border-radius: 4px; padding: 2px 4px; font-weight: bold; }
         
-        .item-total-price { font-size: 16px; font-weight: 900; color: var(--text-color); }
+        .item-total-price { font-size: 16px; font-weight: 900; color: var(--text-color); text-align: right;}
         .item-card.checked .item-total-price { color: var(--primary); }
 
         /* Cuerpo de la Tarjeta (Inputs) */
         .item-card-body { display: flex; justify-content: space-between; align-items: center; padding-left: 38px; }
-        .item-inputs-inline { display: flex; gap: 8px; }
+        .item-inputs-inline { display: flex; gap: 8px; flex-wrap: wrap; }
         
         .mini-input-box { display: flex; align-items: center; background: var(--input-bg); border-radius: 8px; padding: 4px 8px; border: 1px solid var(--input-border); }
         .mini-input-box span { font-size: 11px; color: var(--text-muted); font-weight: 700; margin-right: 6px; }
@@ -136,12 +137,13 @@
         .drag-handle { color: var(--text-muted); cursor: grab; font-size: 20px; padding: 0 5px; touch-action: none;}
         .drag-handle:active { cursor: grabbing; color: var(--primary); }
         
-        .edit-item-info { flex: 1; overflow: hidden;}
+        .edit-item-info { flex: 1; overflow: hidden; cursor: pointer; }
         .edit-item-info p { margin: 0 0 2px 0; font-size: 15px; font-weight: 700; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         .edit-item-info span { font-size: 12px; color: var(--text-muted); font-weight: 500; }
         
         /* Botones Generales */
-        .btn { padding: 12px 16px; border-radius: 10px; font-size: 15px; font-weight: 700; border: none; cursor: pointer; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn { padding: 12px 16px; border-radius: 10px; font-size: 15px; font-weight: 700; border: none; cursor: pointer; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s;}
+        .btn:active { transform: scale(0.97); }
         .btn-full { width: 100%; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-secondary { background: var(--secondary); color: white; }
@@ -259,6 +261,11 @@
                 </div>
             </div>
 
+            <div class="config-card">
+                <h3>📥 Exportar y Respaldo</h3>
+                <button class="btn btn-outline btn-full" onclick="exportCatalogCSV()">📊 Exportar Catálogo a Excel (CSV)</button>
+            </div>
+
             <div class="sticky-header">
                 <div class="search-card" style="padding: 12px;">
                     <h3 style="margin: 0 0 8px 0; font-size: 14px; color: var(--text-muted);">Filtrar Catálogo:</h3>
@@ -278,7 +285,7 @@
         <div class="totals-row">
             <div class="rate-widget">
                 <span>BCV</span>
-                <input type="number" id="exchange-rate" value="40.00" step="0.01" onfocus="this.select()" onchange="handleRateChange()">
+                <input type="number" inputmode="decimal" id="exchange-rate" value="40.00" step="0.01" onfocus="this.select()" onchange="handleRateChange()">
                 <button onclick="fetchBCVRate()" id="btn-fetch-bcv">↻</button>
             </div>
             <div class="totals-info">
@@ -301,7 +308,7 @@
             <button class="nav-item" id="nav-settings" onclick="switchView('settings')">
                 <span class="nav-icon">⚙️</span><span>Ajustes</span>
             </button>
-            <button class="nav-item" onclick="shareWhatsApp()">
+            <button class="nav-item" onclick="shareWhatsAppReceipt()">
                 <span class="nav-icon">🟢</span><span>Enviar</span>
             </button>
             <button class="nav-item" onclick="toggleMenu()">
@@ -316,9 +323,10 @@
         <div class="sheet-handle"></div>
         <h3 style="margin-top:0; text-align:center; font-size:18px; font-weight:800; margin-bottom: 20px;">Opciones Avanzadas</h3>
         <div class="sheet-menu">
-            <button class="btn btn-primary" style="grid-column: span 2;" onclick="closePurchase(); toggleMenu();">✅ Cerrar Compra (Archivar)</button>
+            <button class="btn btn-primary" style="grid-column: span 2;" onclick="openClosePurchaseModal(); toggleMenu();">✅ Cerrar Compra (Archivar)</button>
             <button class="btn btn-outline" style="border-color:var(--primary); color:var(--primary);" onclick="openAnalytics(); toggleMenu();">📊 Analítica de Gastos</button>
             <button class="btn btn-outline" onclick="openPurchaseHistory(); toggleMenu();">📚 Compras Pasadas</button>
+            <button class="btn btn-outline" onclick="shareListWhatsApp(); toggleMenu();">📤 Exportar Lista (Para otra App)</button>
             <button class="btn btn-outline" onclick="toggleDarkMode(); toggleMenu();"><span id="dark-icon">🌙</span> Tema Oscuro</button>
             <button class="btn btn-outline" onclick="undoAction(); toggleMenu();">↩️ Deshacer</button>
             <button class="btn btn-outline" onclick="openBackupModal(); toggleMenu();">📦 Backups Técnicos</button>
@@ -328,11 +336,55 @@
         </div>
     </div>
 
+    <!-- MODAL DE CIERRE DE COMPRA -->
+    <div class="modal-overlay" id="close-purchase-modal">
+        <div class="modal-card">
+            <div class="modal-header">✅ Cerrar Compra</div>
+            
+            <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Lugar / Supermercado</label>
+            <input type="text" id="close-location" class="form-input" placeholder="Ej: Central Madeirense, Farmatodo...">
+            
+            <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Método de Pago</label>
+            <select id="close-payment-method" class="form-select">
+                <option value="Pago Móvil">📱 Pago Móvil</option>
+                <option value="Transferencia">🏦 Transferencia Bs</option>
+                <option value="Efectivo Divisas">💵 Efectivo Divisas</option>
+                <option value="Efectivo Bs">💸 Efectivo Bs</option>
+                <option value="Zelle">🟣 Zelle</option>
+                <option value="Zinli">🟠 Zinli</option>
+                <option value="Binance">🟡 Binance (USDT)</option>
+                <option value="Tarjeta">💳 Tarjeta de Débito/Crédito</option>
+            </select>
+
+            <div style="display:flex; gap:12px; align-items:center;">
+                <div style="flex:1;">
+                    <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Monto Final ($)</label>
+                    <input type="number" inputmode="decimal" id="close-total-usd" class="form-input" step="0.01" oninput="syncCloseTotals('usd')">
+                </div>
+                <div style="flex:1;">
+                    <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Monto Final (Bs)</label>
+                    <input type="number" inputmode="decimal" id="close-total-bs" class="form-input" step="0.01" oninput="syncCloseTotals('bs')">
+                </div>
+            </div>
+
+            <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:8px; display:block; margin-top:10px;">¿Qué hacer con los productos FALTANTES?</label>
+            <select id="close-action-pending" class="form-select">
+                <option value="keep">Mantenerlos en la lista actual (No resetear)</option>
+                <option value="reset">Resetear todo el carrito a 0</option>
+            </select>
+
+            <div class="modal-actions">
+                <button class="btn btn-outline" style="flex:1;" onclick="closeModals()">Cancelar</button>
+                <button class="btn btn-primary" style="flex:1;" onclick="executeClosePurchase()">Guardar y Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL DE RESET DE FÁBRICA -->
     <div class="modal-overlay" id="reset-modal">
         <div class="modal-card">
             <div class="modal-header">⚠️ Restablecer Catálogo</div>
-            <p style="font-size:14px; color:var(--text-muted); margin-top:-10px; margin-bottom: 20px; line-height: 1.4;">Elige cómo deseas restablecer <b>esta lista</b>. Tus productos personalizados seguirán guardados en el diccionario inteligente.</p>
+            <p style="font-size:14px; color:var(--text-muted); margin-top:-10px; margin-bottom: 20px; line-height: 1.4;">Elige cómo deseas restablecer <b>esta lista</b>. Los productos nuevos que hayas creado se mantendrán con sus precios previos.</p>
             <div style="display:flex; flex-direction:column; gap:12px;">
                 <button class="btn btn-primary" onclick="executeFactoryReset('default')">Restaurar con Cantidades Originales</button>
                 <button class="btn btn-secondary" onclick="executeFactoryReset('zero')">Restaurar Todo con 0 Unidades</button>
@@ -373,19 +425,35 @@
             <div style="display:flex; gap:12px;">
                 <div style="flex:1;">
                     <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Cant. Default</label>
-                    <input type="number" id="edit-qty" class="form-input" step="any" onfocus="this.select()">
+                    <input type="number" inputmode="decimal" id="edit-qty" class="form-input" step="any" onfocus="this.select()">
                 </div>
                 <div style="flex:1;">
-                    <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Precio ($)</label>
-                    <input type="number" id="edit-price" class="form-input" step="0.01" onfocus="this.select()">
+                    <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Precio Ref ($)</label>
+                    <input type="number" inputmode="decimal" id="edit-price" class="form-input" step="0.01" onfocus="this.select()" oninput="syncEditPrice('bs')">
                 </div>
             </div>
+
+            <div style="display:flex; gap:12px; align-items: flex-end;">
+                <div style="flex:1;">
+                    <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Precio (Bs)</label>
+                    <input type="number" inputmode="decimal" id="edit-price-bs" class="form-input" step="0.01" onfocus="this.select()" oninput="syncEditPrice('usd')">
+                </div>
+                <div style="flex:1; padding-bottom: 12px;">
+                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight: 700; cursor:pointer;">
+                        <input type="checkbox" id="edit-iva" style="transform: scale(1.2); margin:0;"> Lleva IVA (16%)
+                    </label>
+                </div>
+            </div>
+
+            <label style="display:flex; align-items:center; gap:8px; font-size:14px; font-weight: 700; cursor:pointer; margin-bottom: 15px; padding: 10px; background: var(--input-bg); border-radius: 10px;">
+                <input type="checkbox" id="edit-mark-bought" style="transform: scale(1.3); margin:0;"> Marcar como comprado de una vez
+            </label>
             
-            <div class="modal-actions">
+            <div class="modal-actions" style="margin-top: 10px;">
                 <button class="btn btn-outline" style="flex:1;" onclick="closeModals()">Cancelar</button>
                 <button class="btn btn-primary" style="flex:1;" onclick="saveItemEdits()">Guardar</button>
             </div>
-            <button class="btn btn-outline-danger btn-full" style="margin-top:12px;" id="btn-delete-item-modal" onclick="deleteItemFromModal()">🗑️ Eliminar Producto</button>
+            <button class="btn btn-outline-danger btn-full" style="margin-top:12px;" id="btn-delete-item-modal" onclick="deleteItemFromModal()">🗑️ Eliminar / Tachar Producto</button>
         </div>
     </div>
 
@@ -423,14 +491,14 @@
     <!-- MODAL DE HISTORIAL DE BACKUPS TÉCNICOS -->
     <div class="modal-overlay" id="backup-modal">
         <div class="modal-card" style="max-height: 85vh; overflow-y: auto;">
-            <div class="modal-header">📦 Backups del Sistema</div>
+            <div class="modal-header">📦 Backups e Importación</div>
             <div style="display: flex; gap: 4px; margin-bottom: 20px;">
                 <button type="button" class="btn btn-primary btn-full" onclick="createNewBackup()">💾 Crear Respaldo de Seguridad</button>
             </div>
             <div id="backups-list-container" style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;"></div>
             <div style="border-top:1px solid var(--border-color); padding-top:20px; margin-top:10px;">
-                <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Importar Código</label>
-                <input type="text" id="manual-import-string" class="form-input" placeholder="Pegar código..." style="text-align:left;" onfocus="this.select()">
+                <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Importar Código (Backup Completo o Lista Externa)</label>
+                <input type="text" id="manual-import-string" class="form-input" placeholder="Pegar código aquí..." style="text-align:left;" onfocus="this.select()">
                 <button class="btn btn-secondary btn-full" onclick="importManualBackup()">Importar Datos</button>
             </div>
             <button class="btn btn-outline btn-full" style="margin-top:12px;" onclick="closeModals()">Cerrar</button>
@@ -588,47 +656,47 @@
 
         // --- CATÁLOGO EXTENDIDO (OCULTO EN EL DICCIONARIO) ---
         const extendedDictionaryItems = [
-            { cat: 1, name: "Garbanzos 400 gr", est: 1.80, tag: '🛒' },
-            { cat: 1, name: "Aceite de Oliva", est: 8.00, tag: '🛒' },
-            { cat: 1, name: "Cereal de Chocolate", est: 4.50, tag: '🛒' },
-            { cat: 1, name: "Casabe", est: 1.50, tag: '🛒' },
-            { cat: 1, name: "Sopa en Sobre (Maggi/Knorr)", est: 1.20, tag: '🛒' },
-            { cat: 1, name: "Miel", est: 5.00, tag: '🛒' },
-            { cat: 1, name: "Quinoa", est: 3.50, tag: '🛒' },
-            { cat: 2, name: "Queso Guayanés / Telita", est: 6.50, tag: '🛒' },
-            { cat: 2, name: "Chorizo de Ajo / Ahumado", est: 5.50, tag: '🛒' },
-            { cat: 2, name: "Salchichón", est: 7.00, tag: '🛒' },
-            { cat: 2, name: "Tocino / Tocineta", est: 6.00, tag: '🛒' },
-            { cat: 2, name: "Carne Molida Especial / Magra", est: 14.00, tag: '🛒' },
-            { cat: 3, name: "Célery (Apio España)", est: 2.00, tag: '🛒' },
-            { cat: 3, name: "Berenjena", est: 1.50, tag: '🛒' },
-            { cat: 3, name: "Mandarinas", est: 2.50, tag: '🛒' },
-            { cat: 3, name: "Durazno / Melocotón", est: 3.50, tag: '🛒' },
-            { cat: 3, name: "Mango", est: 1.00, tag: '🛒' },
-            { cat: 3, name: "Uvas", est: 6.00, tag: '🛒' },
-            { cat: 3, name: "Champiñones", est: 4.50, tag: '🛒' },
-            { cat: 3, name: "Jengibre", est: 3.00, tag: '🛒' },
-            { cat: 4, name: "Salsa Teriyaki / BBQ", est: 4.50, tag: '🛒' },
-            { cat: 4, name: "Orégano / Laurel", est: 1.00, tag: '🛒' },
-            { cat: 4, name: "Curry / Paprika", est: 1.50, tag: '🛒' },
-            { cat: 4, name: "Adobo / Cubito", est: 1.50, tag: '🛒' },
-            { cat: 5, name: "Cloro Jabonoso", est: 2.00, tag: '🛒' },
-            { cat: 5, name: "Desengrasante", est: 3.50, tag: '🛒' },
-            { cat: 5, name: "Ambientador en Spray", est: 3.00, tag: '🛒' },
-            { cat: 5, name: "Bolsas Herméticas (Ziploc)", est: 2.50, tag: '🛒' },
-            { cat: 5, name: "Papel de Aluminio / Envoplast", est: 3.00, tag: '🛒' },
-            { cat: 5, name: "Envases Plásticos", est: 1.00, tag: '🛒' },
-            { cat: 5, name: "Escoba / Recogedor", est: 4.00, tag: '🛒' },
-            { cat: 6, name: "Enjuague bucal Infantil", est: 3.50, tag: '🛒' },
-            { cat: 6, name: "Hilo Dental", est: 2.00, tag: '🛒' },
-            { cat: 6, name: "Hisopos", est: 1.00, tag: '🛒' },
-            { cat: 6, name: "Gel Fijador / Cera", est: 4.00, tag: '🛒' },
-            { cat: 6, name: "Crema de Peinar", est: 5.00, tag: '🛒' },
-            { cat: 6, name: "Protector Solar / Labial", est: 8.00, tag: '🛒' }
+            { cat: 1, name: "Garbanzos 400 gr", est: 1.80, tag: '🛒', iva: false },
+            { cat: 1, name: "Aceite de Oliva", est: 8.00, tag: '🛒', iva: false },
+            { cat: 1, name: "Cereal de Chocolate", est: 4.50, tag: '🛒', iva: false },
+            { cat: 1, name: "Casabe", est: 1.50, tag: '🛒', iva: false },
+            { cat: 1, name: "Sopa en Sobre (Maggi/Knorr)", est: 1.20, tag: '🛒', iva: false },
+            { cat: 1, name: "Miel", est: 5.00, tag: '🛒', iva: false },
+            { cat: 1, name: "Quinoa", est: 3.50, tag: '🛒', iva: false },
+            { cat: 2, name: "Queso Guayanés / Telita", est: 6.50, tag: '🛒', iva: false },
+            { cat: 2, name: "Chorizo de Ajo / Ahumado", est: 5.50, tag: '🛒', iva: false },
+            { cat: 2, name: "Salchichón", est: 7.00, tag: '🛒', iva: false },
+            { cat: 2, name: "Tocino / Tocineta", est: 6.00, tag: '🛒', iva: false },
+            { cat: 2, name: "Carne Molida Especial / Magra", est: 14.00, tag: '🛒', iva: false },
+            { cat: 3, name: "Célery (Apio España)", est: 2.00, tag: '🛒', iva: false },
+            { cat: 3, name: "Berenjena", est: 1.50, tag: '🛒', iva: false },
+            { cat: 3, name: "Mandarinas", est: 2.50, tag: '🛒', iva: false },
+            { cat: 3, name: "Durazno / Melocotón", est: 3.50, tag: '🛒', iva: false },
+            { cat: 3, name: "Mango", est: 1.00, tag: '🛒', iva: false },
+            { cat: 3, name: "Uvas", est: 6.00, tag: '🛒', iva: false },
+            { cat: 3, name: "Champiñones", est: 4.50, tag: '🛒', iva: false },
+            { cat: 3, name: "Jengibre", est: 3.00, tag: '🛒', iva: false },
+            { cat: 4, name: "Salsa Teriyaki / BBQ", est: 4.50, tag: '🛒', iva: false },
+            { cat: 4, name: "Orégano / Laurel", est: 1.00, tag: '🛒', iva: false },
+            { cat: 4, name: "Curry / Paprika", est: 1.50, tag: '🛒', iva: false },
+            { cat: 4, name: "Adobo / Cubito", est: 1.50, tag: '🛒', iva: false },
+            { cat: 5, name: "Cloro Jabonoso", est: 2.00, tag: '🛒', iva: true },
+            { cat: 5, name: "Desengrasante", est: 3.50, tag: '🛒', iva: true },
+            { cat: 5, name: "Ambientador en Spray", est: 3.00, tag: '🛒', iva: true },
+            { cat: 5, name: "Bolsas Herméticas (Ziploc)", est: 2.50, tag: '🛒', iva: true },
+            { cat: 5, name: "Papel de Aluminio / Envoplast", est: 3.00, tag: '🛒', iva: true },
+            { cat: 5, name: "Envases Plásticos", est: 1.00, tag: '🛒', iva: true },
+            { cat: 5, name: "Escoba / Recogedor", est: 4.00, tag: '🛒', iva: true },
+            { cat: 6, name: "Enjuague bucal Infantil", est: 3.50, tag: '🛒', iva: true },
+            { cat: 6, name: "Hilo Dental", est: 2.00, tag: '🛒', iva: true },
+            { cat: 6, name: "Hisopos", est: 1.00, tag: '🛒', iva: true },
+            { cat: 6, name: "Gel Fijador / Cera", est: 4.00, tag: '🛒', iva: true },
+            { cat: 6, name: "Crema de Peinar", est: 5.00, tag: '🛒', iva: true },
+            { cat: 6, name: "Protector Solar / Labial", est: 8.00, tag: '🛒', iva: true }
         ];
 
         // --- SISTEMA BASE Y ESTADOS ---
-        let appData = { lists: [], currentListId: 1, backups: [], purchaseHistory: [], customDictionary: [], rate: 40.00, darkMode: false };
+        let appData = { lists: [], currentListId: 1, backups: [], purchaseHistory: [], customDictionary: [], userAddedDefaults: [], rate: 40.00, darkMode: false };
         let state = { items: [], categories: [], currentView: 'list', selectedCatFilter: 'all' };
         let undoStack = [];
         let globalDictionary = [];
@@ -656,21 +724,34 @@
         }
 
         function initApp() {
-            let savedAppData = localStorage.getItem('compras_pro_appData_v19');
-            if (savedAppData) {
-                appData = JSON.parse(savedAppData);
-                appData.purchaseHistory = appData.purchaseHistory || [];
-                appData.customDictionary = appData.customDictionary || [];
-            } else {
+            try {
+                let savedAppData = localStorage.getItem('compras_pro_appData_v19');
+                if (savedAppData) {
+                    let parsed = JSON.parse(savedAppData);
+                    appData = { ...appData, ...parsed }; // Merge to preserve new keys if any
+                    appData.purchaseHistory = appData.purchaseHistory || [];
+                    appData.customDictionary = appData.customDictionary || [];
+                    appData.userAddedDefaults = appData.userAddedDefaults || [];
+                } else {
+                    appData.lists = [{ 
+                        id: 1, name: "Mercado Principal", 
+                        items: JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false, tag: '🛒', iva: false})), 
+                        categories: JSON.parse(JSON.stringify(defaultCategories)) 
+                    }];
+                    appData.currentListId = 1;
+                    appData.purchaseHistory = [];
+                    appData.customDictionary = [];
+                    appData.userAddedDefaults = [];
+                }
+            } catch(err) {
+                console.error("Error cargando datos locales, inicializando limpios.", err);
                 appData.lists = [{ 
                     id: 1, name: "Mercado Principal", 
-                    items: JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false, tag: '🛒'})), 
+                    items: JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false, tag: '🛒', iva: false})), 
                     categories: JSON.parse(JSON.stringify(defaultCategories)) 
                 }];
-                appData.currentListId = 1;
-                appData.purchaseHistory = [];
-                appData.customDictionary = [];
             }
+            
             buildDictionary();
             applyDarkMode(appData.darkMode);
             loadCurrentList();
@@ -699,11 +780,13 @@
             buildDictionary();
         }
 
-        // --- DICCIONARIO INTELIGENTE ---
+        // --- DICCIONARIO INTELIGENTE Y CATÁLOGO ---
         function buildDictionary() {
             let dictMap = new Map();
-            defaultItems.forEach(i => dictMap.set(i.name.toLowerCase(), {...i, tag: '🛒'}));
+            defaultItems.forEach(i => dictMap.set(i.name.toLowerCase(), {...i, tag: '🛒', iva: false}));
             extendedDictionaryItems.forEach(i => dictMap.set(i.name.toLowerCase(), i));
+            appData.userAddedDefaults.forEach(i => dictMap.set(i.name.toLowerCase(), i));
+            
             if (appData.customDictionary) {
                 appData.customDictionary.forEach(i => dictMap.set(i.name.toLowerCase(), i));
             }
@@ -724,13 +807,15 @@
             matches.forEach(m => {
                 let div = document.createElement("div");
                 div.className = "autocomplete-suggestion";
-                div.innerHTML = `<span>${m.name}</span><span style="color:var(--text-muted); font-size:11px;">$${m.est.toFixed(2)}</span>`;
+                div.innerHTML = `<span>${m.name}</span><span style="color:var(--text-muted); font-size:11px;">$${(m.est || m.real).toFixed(2)}</span>`;
                 div.onclick = () => {
                     document.getElementById("edit-name").value = m.name;
                     document.getElementById("edit-cat").value = m.cat;
                     document.getElementById("edit-qty").value = m.est_qty || m.qty || 1;
-                    document.getElementById("edit-price").value = m.est.toFixed(2);
+                    document.getElementById("edit-price").value = (m.est || m.real).toFixed(2);
                     document.getElementById("edit-tag").value = m.tag || '🛒';
+                    document.getElementById("edit-iva").checked = !!m.iva;
+                    syncEditPrice('bs');
                     listContainer.style.display = 'none';
                 };
                 listContainer.appendChild(div);
@@ -738,12 +823,20 @@
             listContainer.style.display = 'block';
         }
 
-        function addToCustomDictionary(cat, name, est, tag) {
+        function addToCustomDictionary(cat, name, est, tag, qty, iva) {
             let existsInDefaults = defaultItems.some(d => d.name.toLowerCase() === name.toLowerCase());
-            let existsInExtended = extendedDictionaryItems.some(d => d.name.toLowerCase() === name.toLowerCase());
-            let existsInCustom = appData.customDictionary.some(d => d.name.toLowerCase() === name.toLowerCase());
-            if (!existsInDefaults && !existsInExtended && !existsInCustom) {
-                appData.customDictionary.push({ cat, name, est, est_qty: 1, tag });
+            let existsInUser = appData.userAddedDefaults.some(d => d.name.toLowerCase() === name.toLowerCase());
+            
+            if (!existsInDefaults) {
+                let newItem = { id: Date.now() + Math.random(), cat, name, est, qty, est_qty: qty, real: est, tag, iva, checked: false };
+                
+                // Actualizar si ya existe, si no, agregar
+                if (existsInUser) {
+                    let idx = appData.userAddedDefaults.findIndex(d => d.name.toLowerCase() === name.toLowerCase());
+                    appData.userAddedDefaults[idx] = newItem;
+                } else {
+                    appData.userAddedDefaults.push(newItem);
+                }
             }
         }
 
@@ -756,11 +849,27 @@
         function createNewList() {
             let name = prompt("Nombre de la nueva lista:"); if(!name) return;
             let useCatalog = confirm("¿Iniciar con el catálogo base de supermercado?");
-            let newItems = useCatalog ? JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false, tag: '🛒'})) : [];
+            let newItems = [];
+            if (useCatalog) {
+                newItems = JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false, tag: '🛒', iva: false}));
+                // Agregar también los productos nuevos creados por el usuario
+                appData.userAddedDefaults.forEach(ui => {
+                    newItems.push({...ui, id: Date.now() + Math.random(), checked: false});
+                });
+            }
             let newCats = JSON.parse(JSON.stringify(defaultCategories));
             saveToLocalStorage();
             let newList = { id: Date.now(), name: name, items: newItems, categories: newCats };
             appData.lists.push(newList); appData.currentListId = newList.id; loadCurrentList(); showToast("Lista creada");
+        }
+
+        function deleteCurrentList() {
+            if (appData.lists.length <= 1) return showToast("No puedes borrar tu única lista", true);
+            if (confirm(`¿Borrar permanentemente la lista "${appData.lists.find(l=>l.id===appData.currentListId).name}"?`)) {
+                appData.lists = appData.lists.filter(l => l.id !== appData.currentListId);
+                appData.currentListId = appData.lists[0].id;
+                saveToLocalStorage(); loadCurrentList(); showToast("Lista eliminada");
+            }
         }
 
         // --- SISTEMA DE PÍLDORAS ---
@@ -791,20 +900,21 @@
         function executeFactoryReset(mode) {
             saveToHistory();
             state.categories = JSON.parse(JSON.stringify(defaultCategories));
+            let baseItems = JSON.parse(JSON.stringify(defaultItems)).map(item => ({...item, checked: false, tag: '🛒', iva: false}));
+            
+            // Integrar los productos que el usuario creó para que no se pierdan
+            appData.userAddedDefaults.forEach(ui => {
+                baseItems.push({...ui, id: Date.now() + Math.random(), checked: false});
+            });
+
             if (mode === 'zero') {
-                state.items = JSON.parse(JSON.stringify(defaultItems)).map(item => ({...item, est_qty: 0, qty: 0, real: item.est, checked: false, tag: '🛒'}));
+                state.items = baseItems.map(item => ({...item, est_qty: 0, qty: 0, real: item.est}));
             } else {
-                state.items = JSON.parse(JSON.stringify(defaultItems)).map(item => ({...item, est_qty: item.qty, real: item.est, checked: false, tag: '🛒'}));
+                state.items = baseItems.map(item => ({...item, est_qty: item.qty, real: item.est}));
             }
             state.selectedCatFilter = 'all'; saveToLocalStorage(); closeModals(); renderAll(); showToast("Catálogo restablecido");
         }
 
-        function resetChecklistValues() {
-            if (confirm("¿Limpiar todo el carrito (Desmarcar todo)?")) {
-                saveToHistory(); state.items.forEach(item => { item.checked = false; item.qty = item.est_qty; item.real = item.est; });
-                saveToLocalStorage(); renderAll(); showToast("Carrito limpio");
-            }
-        }
         function handleRateChange() { appData.rate = parseFloat(document.getElementById('exchange-rate').value) || 1; saveToLocalStorage(); calculateTotals(); }
         
         function fetchBCVRate() {
@@ -842,6 +952,7 @@
             document.getElementById('purchase-history-modal').classList.remove('show'); 
             document.getElementById('purchase-details-modal').classList.remove('show');
             document.getElementById('reset-modal').classList.remove('show');
+            document.getElementById('close-purchase-modal').classList.remove('show');
             document.getElementById('autocomplete-list').style.display = 'none';
         }
 
@@ -874,7 +985,10 @@
         function addNewCategory() { let input = document.getElementById("new-cat-name"); let name = input.value.trim(); if(!name) return; saveToHistory(); state.categories.push({ id: Date.now(), name: name, active: true }); saveToLocalStorage(); input.value = ''; renderAll(); showToast("Pasillo creado"); }
 
         function initDragAndDrop() {
-            if (typeof Sortable === 'undefined') return;
+            if (typeof Sortable === 'undefined') {
+                console.warn("Modo Offline: SortableJS no cargado. Reordenamiento visual desactivado hasta reconexión.");
+                return;
+            }
             const catList = document.getElementById('settings-categories-visibility');
             if(catList) {
                 Sortable.create(catList, { handle: '.drag-handle', animation: 150, onEnd: function (evt) {
@@ -912,6 +1026,8 @@
             let activeCats = state.categories.filter(c => c.active);
             if (state.selectedCatFilter !== 'all') activeCats = activeCats.filter(c => c.id === state.selectedCatFilter);
 
+            let renderComprados = !document.getElementById("hide-completed-check").checked;
+
             activeCats.forEach(category => {
                 let catItems = state.items.filter(i => i.cat == category.id);
                 if (catItems.length === 0) return;
@@ -922,6 +1038,7 @@
                     let rowClass = item.checked ? 'checked' : '';
                     let priceAlertClass = (item.checked && item.real === 0) ? 'price-alert-box' : '';
                     let tagHtml = item.tag ? `<span class="item-tag">${item.tag}</span>` : '';
+                    let ivaHtml = item.iva ? `<span class="iva-badge">+IVA</span>` : '';
                     
                     let inflationHTML = '';
                     if(item.real > 0 && item.est > 0 && item.real !== item.est) {
@@ -931,25 +1048,28 @@
                         inflationHTML = `<span class="inflation-badge" style="color: ${color};">${sign}${diff.toFixed(1)}% ${icon}</span>`;
                     }
 
+                    // Calculo considerando IVA
+                    let subtotal = (item.qty * item.real) * (item.iva ? 1.16 : 1);
+
                     html += `
                     <div class="item-card ${rowClass}" id="item-row-${item.id}">
                         <div class="item-card-header">
                             <label class="check-container"><input type="checkbox" ${item.checked ? 'checked' : ''} onchange="updateItemChecked(${item.id}, this.checked)"><span class="checkmark"></span></label>
                             <div class="item-name-group" onclick="openItemModal(${item.id})">
                                 <div class="item-name">${item.name}</div>
-                                <div class="item-subtext">${tagHtml} <span>Est: $${item.est.toFixed(2)}</span> ${inflationHTML}</div>
+                                <div class="item-subtext">${tagHtml} ${ivaHtml} <span>Est: $${item.est.toFixed(2)}</span> ${inflationHTML}</div>
                             </div>
-                            <div class="item-total-price" id="subtotal-${item.id}">$${(item.qty * item.real).toFixed(2)}</div>
+                            <div class="item-total-price" id="subtotal-${item.id}">$${subtotal.toFixed(2)}</div>
                         </div>
                         <div class="item-card-body">
                             <div class="item-inputs-inline">
                                 <div class="mini-input-box">
                                     <span>Cant</span>
-                                    <input type="number" value="${item.qty}" step="any" onfocus="this.select()" onchange="updateItemQty(${item.id}, this.value)" onkeydown="handleEnterKey(event)">
+                                    <input type="number" inputmode="decimal" value="${item.qty}" step="any" onfocus="this.select()" onchange="updateItemQty(${item.id}, this.value)" onkeydown="handleEnterKey(event)">
                                 </div>
                                 <div class="mini-input-box ${priceAlertClass}" id="price-box-${item.id}">
                                     <span>$</span>
-                                    <input type="number" class="item-price" value="${item.real.toFixed(2)}" step="0.01" onfocus="this.select()" onchange="updateItemPrice(${item.id}, this.value)" onkeydown="handleEnterKey(event)">
+                                    <input type="number" inputmode="decimal" class="item-price" value="${item.real.toFixed(2)}" step="0.01" onfocus="this.select()" onchange="updateItemPrice(${item.id}, this.value)" onkeydown="handleEnterKey(event)">
                                 </div>
                             </div>
                         </div>
@@ -972,17 +1092,18 @@
                 let html = `
                 <div style="display:flex; justify-content:space-between; align-items:center; margin: 15px 0 10px 0; border-bottom: 2px solid var(--border-color); padding-bottom:5px;">
                     <h4 style="margin:0; color:var(--text-color); font-size:15px; font-weight:800;">${category.name}</h4>
-                    <button class="btn-delete-cat" onclick="deleteCategory(${category.id})">🗑 Borrar</button>
+                    <button class="btn-delete-cat" onclick="deleteCategory(${category.id})">🗑 Borrar Pasillo</button>
                 </div>
                 <div class="settings-items-container" data-cat-id="${category.id}">`;
 
                 catItems.forEach(item => {
                     let tagHtml = item.tag ? item.tag : '🛒';
+                    let ivaHtml = item.iva ? ' (IVA)' : '';
                     html += `
                     <div class="edit-item-row" data-id="${item.id}" onclick="openItemModal(${item.id})">
                         <span class="drag-handle">☰</span>
                         <div class="edit-item-info">
-                            <p>${tagHtml} ${item.name}</p>
+                            <p>${tagHtml} ${item.name}${ivaHtml}</p>
                             <span>Ref: ${item.est_qty} | Est: $${item.est.toFixed(2)}</span>
                         </div>
                         <div style="color:var(--text-muted); font-size:12px; font-weight:bold;">✏️</div>
@@ -1004,6 +1125,9 @@
                 document.getElementById("edit-tag").value = item.tag || '🛒';
                 document.getElementById("edit-qty").value = item.est_qty;
                 document.getElementById("edit-price").value = item.est.toFixed(2);
+                document.getElementById("edit-iva").checked = !!item.iva;
+                document.getElementById("edit-mark-bought").checked = item.checked;
+                syncEditPrice('bs');
                 document.getElementById("btn-delete-item-modal").style.display = 'block';
             } else {
                 document.getElementById("modal-item-title").textContent = "Agregar Producto";
@@ -1013,9 +1137,23 @@
                 document.getElementById("edit-tag").value = '🛒';
                 document.getElementById("edit-qty").value = 1;
                 document.getElementById("edit-price").value = "";
+                document.getElementById("edit-price-bs").value = "";
+                document.getElementById("edit-iva").checked = false;
+                document.getElementById("edit-mark-bought").checked = false;
                 document.getElementById("btn-delete-item-modal").style.display = 'none';
             }
             document.getElementById("edit-modal").classList.add("show");
+        }
+
+        function syncEditPrice(target) {
+            let rate = appData.rate;
+            if(target === 'bs') {
+                let usd = parseFloat(document.getElementById("edit-price").value) || 0;
+                document.getElementById("edit-price-bs").value = (usd * rate).toFixed(2);
+            } else {
+                let bs = parseFloat(document.getElementById("edit-price-bs").value) || 0;
+                document.getElementById("edit-price").value = (bs / rate).toFixed(2);
+            }
         }
 
         function saveItemEdits() {
@@ -1028,26 +1166,43 @@
             let tag = document.getElementById("edit-tag").value;
             let nQty = parseFloat(document.getElementById("edit-qty").value) || 1;
             let nPrice = parseFloat(document.getElementById("edit-price").value) || 0;
+            let iva = document.getElementById("edit-iva").checked;
+            let isBought = document.getElementById("edit-mark-bought").checked;
 
             if(idVal) {
                 let item = state.items.find(i => i.id === parseInt(idVal));
                 if(item) {
                     item.name = name; item.cat = cat; item.tag = tag;
                     item.est_qty = nQty; item.qty = nQty; item.est = nPrice; item.real = nPrice;
+                    item.iva = iva; item.checked = isBought;
                 }
             } else {
-                state.items.push({ id: Date.now(), cat, tag, name, qty: nQty, est_qty: nQty, est: nPrice, real: nPrice, checked: false });
+                state.items.push({ id: Date.now(), cat, tag, name, qty: nQty, est_qty: nQty, est: nPrice, real: nPrice, checked: isBought, iva: iva });
             }
             
-            // Añadir al diccionario local para que sobreviva el reset
-            addToCustomDictionary(cat, name, nPrice, tag);
+            // Añadir a la configuración global de predeterminados para que sobreviva al reset
+            addToCustomDictionary(cat, name, nPrice, tag, nQty, iva);
             
             saveToLocalStorage(); closeModals(); renderAll(); showToast("Guardado con éxito");
         }
 
         function deleteItemFromModal() {
             let id = parseInt(document.getElementById("edit-id").value);
-            if (confirm(`¿Eliminar este producto de forma definitiva?`)) { saveToHistory(); state.items = state.items.filter(i => i.id !== id); saveToLocalStorage(); closeModals(); renderAll(); showToast("Producto eliminado"); }
+            let confirmDel = confirm("¿Deseas ELIMINAR este producto por completo de tu lista?\n\n(Pulsa Cancelar si solo quieres TACHARLO / poner su cantidad en 0)");
+            
+            saveToHistory();
+            if (confirmDel) {
+                state.items = state.items.filter(i => i.id !== id);
+                showToast("Producto eliminado de la lista");
+            } else {
+                let item = state.items.find(i => i.id === id);
+                if(item) {
+                    item.qty = 0;
+                    item.checked = false;
+                }
+                showToast("Producto tachado (Cantidad a 0)");
+            }
+            saveToLocalStorage(); closeModals(); renderAll();
         }
 
         // --- ACTUALIZACIONES DE CARRITO ---
@@ -1072,10 +1227,21 @@
             state.categories.forEach(c => catCounters[c.id] = {c:0, t:0});
 
             state.items.forEach(item => {
-                let subtotal = item.qty * item.real; let isActiveCat = state.categories.find(c => c.id === item.cat)?.active;
-                if (isActiveCat) { listTotalUSD += subtotal; if (item.checked) checkedTotalUSD += subtotal; }
-                let cell = document.getElementById(`subtotal-${item.id}`); if (cell) cell.textContent = "$" + subtotal.toFixed(2);
-                if (catCounters[item.cat]) { catCounters[item.cat].t++; if (item.checked) catCounters[item.cat].c++; }
+                let subtotal = (item.qty * item.real) * (item.iva ? 1.16 : 1);
+                let isActiveCat = state.categories.find(c => c.id === item.cat)?.active;
+                
+                if (isActiveCat) { 
+                    listTotalUSD += subtotal; 
+                    if (item.checked) checkedTotalUSD += subtotal; 
+                }
+                
+                let cell = document.getElementById(`subtotal-${item.id}`); 
+                if (cell) cell.textContent = "$" + subtotal.toFixed(2);
+                
+                if (catCounters[item.cat]) { 
+                    catCounters[item.cat].t++; 
+                    if (item.checked) catCounters[item.cat].c++; 
+                }
             });
 
             Object.keys(catCounters).forEach(catId => { let badge = document.getElementById(`badge-cat-${catId}`); if (badge) badge.textContent = `${catCounters[catId].c}/${catCounters[catId].t}`; });
@@ -1091,28 +1257,75 @@
         }
 
         // --- CERRAR COMPRA Y DETALLES DE COMPRAS PASADAS ---
-        function closePurchase() {
+        function openClosePurchaseModal() {
             let checkedItems = state.items.filter(i => i.checked && state.categories.find(c=>c.id===i.cat)?.active);
-            if (checkedItems.length === 0) return showToast("No hay artículos tildados", true);
-            
-            if(confirm("¿Archivar compra y limpiar el carrito actual?")) {
-                let totalUSD = checkedItems.reduce((acc, i) => acc + (i.qty * i.real), 0);
-                let now = new Date();
-                let dateStr = now.toLocaleDateString('es-VE') + ' ' + now.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
-                
-                appData.purchaseHistory.push({
-                    id: Date.now(),
-                    date: dateStr,
-                    listName: appData.lists.find(l=>l.id===appData.currentListId).name,
-                    totalUSD: totalUSD,
-                    totalBs: totalUSD * appData.rate,
-                    itemsCount: checkedItems.length,
-                    items: JSON.parse(JSON.stringify(checkedItems))
-                });
+            if (checkedItems.length === 0) return showToast("No hay artículos comprados (tildados)", true);
 
-                state.items.forEach(item => { item.checked = false; item.qty = item.est_qty; item.real = item.est; });
-                saveToLocalStorage(); renderAll(); showToast("Compra Archivada y Carrito Limpio");
+            let totalUSD = checkedItems.reduce((acc, i) => acc + (i.qty * i.real) * (i.iva ? 1.16 : 1), 0);
+            
+            document.getElementById("close-location").value = "";
+            document.getElementById("close-payment-method").value = "Pago Móvil";
+            document.getElementById("close-total-usd").value = totalUSD.toFixed(2);
+            syncCloseTotals('usd');
+            document.getElementById("close-action-pending").value = "keep";
+
+            document.getElementById("close-purchase-modal").classList.add("show");
+        }
+
+        function syncCloseTotals(target) {
+            let rate = appData.rate;
+            if(target === 'usd') {
+                let usd = parseFloat(document.getElementById("close-total-usd").value) || 0;
+                document.getElementById("close-total-bs").value = (usd * rate).toFixed(2);
+            } else {
+                let bs = parseFloat(document.getElementById("close-total-bs").value) || 0;
+                document.getElementById("close-total-usd").value = (bs / rate).toFixed(2);
             }
+        }
+
+        function executeClosePurchase() {
+            let checkedItems = state.items.filter(i => i.checked && state.categories.find(c=>c.id===i.cat)?.active);
+            let finalUSD = parseFloat(document.getElementById("close-total-usd").value) || 0;
+            let finalBs = parseFloat(document.getElementById("close-total-bs").value) || 0;
+            let location = document.getElementById("close-location").value || "Supermercado General";
+            let paymentMethod = document.getElementById("close-payment-method").value;
+            let actionPending = document.getElementById("close-action-pending").value;
+
+            let now = new Date();
+            let dateStr = now.toLocaleDateString('es-VE') + ' ' + now.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
+            
+            saveToHistory();
+
+            // Guardar Historial
+            appData.purchaseHistory.push({
+                id: Date.now(),
+                date: dateStr,
+                location: location,
+                paymentMethod: paymentMethod,
+                listName: appData.lists.find(l=>l.id===appData.currentListId).name,
+                totalUSD: finalUSD,
+                totalBs: finalBs,
+                itemsCount: checkedItems.length,
+                items: JSON.parse(JSON.stringify(checkedItems))
+            });
+
+            // Procesar lista actual según selección
+            if (actionPending === 'reset') {
+                // Desmarcar y poner a cantidad por defecto TODO
+                state.items.forEach(item => { item.checked = false; item.qty = item.est_qty; item.real = item.est; });
+            } else {
+                // Mantener los pendientes. Solo desmarcar los que ya se compraron
+                state.items.forEach(item => {
+                    if(item.checked) {
+                        item.checked = false; 
+                    }
+                });
+            }
+
+            saveToLocalStorage(); 
+            closeModals(); 
+            renderAll(); 
+            showToast("Compra Archivada y Procesada");
         }
 
         function openPurchaseHistory() {
@@ -1122,12 +1335,16 @@
             } else {
                 let html = "";
                 [...appData.purchaseHistory].reverse().forEach(p => {
+                    let loc = p.location ? `📍 ${p.location}` : '';
+                    let pay = p.paymentMethod ? `💳 ${p.paymentMethod}` : '';
+
                     html += `
                     <div style="background:var(--input-bg); border:1px solid var(--border-color); border-radius:12px; padding:15px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                             <span style="font-size:12px; color:var(--text-muted); font-weight: 600;">${p.date}</span>
                             <span style="font-size:10px; background:var(--primary); color:white; padding:3px 8px; border-radius:12px; font-weight: bold;">${p.listName}</span>
                         </div>
+                        <div style="font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom: 8px;">${loc} | ${pay}</div>
                         <div style="display:flex; justify-content:space-between; align-items:flex-end;">
                             <span style="font-size:13px; font-weight:800;">🛒 ${p.itemsCount} Artículos</span>
                             <div style="text-align:right;">
@@ -1153,15 +1370,19 @@
             let html = `<div style="margin-bottom:15px; border-bottom:1px solid var(--border-color); padding-bottom:12px;">
                             <div style="font-size:18px; font-weight:900;">${purchase.listName}</div>
                             <div style="font-size:13px; color:var(--text-muted); font-weight:600;">${purchase.date}</div>
+                            <div style="font-size:13px; color:var(--text-muted); font-weight:600; margin-top:5px;">📍 ${purchase.location || 'N/A'} - ${purchase.paymentMethod || 'N/A'}</div>
                         </div>`;
             
             purchase.items.forEach(i => {
+                let sub = (i.qty * i.real) * (i.iva ? 1.16 : 1);
+                let iva = i.iva ? '<span style="font-size:9px; color:var(--secondary);">+IVA</span>' : '';
                 html += `<div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px; border-bottom:1px dashed var(--border-color); padding-bottom:6px;">
-                            <div><span style="font-weight:800; color:var(--primary);">${i.qty}x</span> ${i.name}</div>
-                            <div style="font-weight:800;">$${(i.qty * i.real).toFixed(2)}</div>
+                            <div><span style="font-weight:800; color:var(--primary);">${i.qty}x</span> ${i.name} ${iva}</div>
+                            <div style="font-weight:800;">$${sub.toFixed(2)}</div>
                          </div>`;
             });
             html += `<div style="text-align:right; margin-top:20px; font-size:20px; font-weight:900; color:var(--primary);">Total: $${purchase.totalUSD.toFixed(2)}</div>`;
+            html += `<div style="text-align:right; font-size:14px; font-weight:700; color:var(--text-muted);">Total: ${purchase.totalBs.toFixed(0)} Bs</div>`;
             
             document.getElementById("btn-delete-single-purchase").onclick = () => deletePurchase(purchase.id, true);
             document.getElementById("purchase-details-container").innerHTML = html;
@@ -1188,11 +1409,11 @@
             if(checkedItems.length === 0) {
                 container.innerHTML = `<p style="text-align:center; font-size:13px; color:var(--text-muted); margin-top:20px;">El carrito está vacío. Tilda productos para analizar tus gastos.</p>`;
             } else {
-                let totalUSD = checkedItems.reduce((acc, i) => acc + (i.qty * i.real), 0);
+                let totalUSD = checkedItems.reduce((acc, i) => acc + (i.qty * i.real) * (i.iva ? 1.16 : 1), 0);
                 let html = `<div style="text-align:center; margin-bottom:20px;"><span style="font-size:13px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Total Gastado</span><div style="font-size:32px; font-weight:900; color:var(--text-color);">$${totalUSD.toFixed(2)}</div></div>`;
                 
                 state.categories.filter(c => c.active).forEach(c => {
-                    let catTotal = checkedItems.filter(i => i.cat === c.id).reduce((acc, i) => acc + (i.qty * i.real), 0);
+                    let catTotal = checkedItems.filter(i => i.cat === c.id).reduce((acc, i) => acc + (i.qty * i.real) * (i.iva ? 1.16 : 1), 0);
                     if(catTotal > 0) {
                         let pct = (catTotal / totalUSD) * 100;
                         html += `
@@ -1210,13 +1431,52 @@
             document.getElementById("analytics-modal").classList.add("show");
         }
 
+        // --- EXPORTAR EXCEL ---
+        function exportCatalogCSV() {
+            let csv = "Pasillo,Nombre,Cantidad Defecto,Precio Ref USD,Lleva IVA\n";
+            let itemsToExport = state.items; // Exporta los productos de la lista actual
+            
+            itemsToExport.forEach(i => {
+                let catName = state.categories.find(c => c.id === i.cat)?.name || 'General';
+                catName = catName.replace(/,/g, ''); // Evitar comas en CSV
+                let name = i.name.replace(/,/g, '');
+                let ivaStr = i.iva ? "Si" : "No";
+                csv += `"${catName}","${name}",${i.est_qty},${i.est},${ivaStr}\n`;
+            });
+
+            const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csv], { type: 'text/csv;charset=utf-8;' }); // UTF-8 BOM
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "Catalogo_Compras.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Catálogo descargado");
+        }
+
         // --- BACKUPS TÉCNICOS ---
         function openBackupModal() { renderBackupList(); document.getElementById('backup-modal').classList.add('show'); }
+        
         function createNewBackup() {
-            saveToLocalStorage(); let code = btoa(unescape(encodeURIComponent(JSON.stringify(appData)))); let now = new Date();
-            let dateStr = now.toLocaleDateString('es-VE') + ' ' + now.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
-            appData.backups.push({ id: Date.now(), date: dateStr, code: code }); saveToLocalStorage(); openBackupModal(); showToast("Backup Global creado");
+            showToast("Creando backup... ⏳");
+            // Usamos setTimeout para no congelar la UI
+            setTimeout(() => {
+                try {
+                    saveToLocalStorage(); 
+                    let code = btoa(unescape(encodeURIComponent(JSON.stringify(appData)))); 
+                    let now = new Date();
+                    let dateStr = now.toLocaleDateString('es-VE') + ' ' + now.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
+                    appData.backups.push({ id: Date.now(), date: dateStr, code: code }); 
+                    saveToLocalStorage(); 
+                    openBackupModal(); 
+                    showToast("Backup Global creado exitosamente");
+                } catch(e) {
+                    showToast("Error al crear backup (Lista muy grande)", true);
+                }
+            }, 50);
         }
+
         function renderBackupList() {
             const container = document.getElementById("backups-list-container");
             if (appData.backups.length === 0) { container.innerHTML = `<p style="text-align:center; font-size:13px; color:var(--text-muted); margin-top:20px;">No hay respaldos guardados.</p>`; return; }
@@ -1231,22 +1491,77 @@
         }
         function copyCodeToClipboard(code) { navigator.clipboard.writeText(code).then(() => showToast("Código copiado")).catch(() => { let el = document.createElement('textarea'); el.value = code; document.body.appendChild(el); el.select(); document.execCommand('copy'); el.remove(); showToast("Código copiado"); }); }
         function deleteLocalBackup(id) { if(confirm("¿Eliminar este respaldo global?")) { appData.backups = appData.backups.filter(b => b.id !== id); saveToLocalStorage(); renderBackupList(); } }
+        
         function restoreFromCode(str, confirmReq) {
+            // Verificar si es una lista importada de otra app
+            if(str.startsWith("APP_COMPRAS_PRO_LISTA:")) {
+                let b64 = str.split(":")[1];
+                try {
+                    let listData = JSON.parse(decodeURIComponent(escape(atob(b64))));
+                    if(listData.items && listData.name) {
+                        listData.id = Date.now();
+                        appData.lists.push(listData);
+                        appData.currentListId = listData.id;
+                        saveToLocalStorage(); loadCurrentList(); closeModals();
+                        showToast("Lista externa importada con éxito");
+                        return true;
+                    }
+                } catch(e) { showToast("Código de lista no válido", true); return false; }
+            }
+
             if (confirmReq && !confirm("¿Restaurar App Completa? Reemplazará todas las listas y pasillos actuales de la aplicación.")) return false;
-            try { let decrypted = JSON.parse(decodeURIComponent(escape(atob(str)))); if(decrypted.lists) { appData = decrypted; saveToLocalStorage(); loadCurrentList(); closeModals(); showToast("Sistema Restaurado"); return true; } else { showToast("Código no válido", true); return false; } } catch(err) { showToast("Error al procesar el código", true); return false; }
+            try { 
+                let decrypted = JSON.parse(decodeURIComponent(escape(atob(str)))); 
+                if(decrypted.lists) { 
+                    appData = decrypted; saveToLocalStorage(); loadCurrentList(); closeModals(); showToast("Sistema Restaurado"); 
+                    return true; 
+                } else { showToast("Código no válido", true); return false; } 
+            } catch(err) { showToast("Error al procesar el código", true); return false; }
         }
-        function importManualBackup() { let str = document.getElementById("manual-import-string").value.trim(); if (!str) return showToast("Pega un código de seguridad", true); restoreFromCode(str, true); document.getElementById("manual-import-string").value = ''; }
+
+        function importManualBackup() { let str = document.getElementById("manual-import-string").value.trim(); if (!str) return showToast("Pega un código", true); restoreFromCode(str, true); document.getElementById("manual-import-string").value = ''; }
 
         // --- ENVÍO A WHATSAPP ---
-        function shareWhatsApp() {
+        function shareWhatsAppReceipt() {
             let checkedItems = state.items.filter(i => i.checked && state.categories.find(c=>c.id===i.cat)?.active);
             if (checkedItems.length === 0) return showToast("No hay compras marcadas para enviar", true);
             let listName = appData.lists.find(l=>l.id===appData.currentListId).name; let now = new Date();
             let dateStr = now.toLocaleDateString('es-VE'); let timeStr = now.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
-            let text = `📋 *COMPRA: ${listName}*\n📅 *Fecha:* ${dateStr} a las ${timeStr}\n\n`;
-            checkedItems.forEach(i => { text += `• ${i.name} (x${i.qty}) -> *$${(i.qty * i.real).toFixed(2)}*\n`; });
-            let totalUSD = checkedItems.reduce((acc, i) => acc + (i.qty * i.real), 0);
-            text += `\n💵 *Tasa Ref:* ${appData.rate.toFixed(2)} Bs.\n🛒 *TOTAL:* *$${totalUSD.toFixed(2)} / Bs. ${(totalUSD * appData.rate).toFixed(0)}*`;
+            
+            let text = `📋 *COMPRA: ${listName}*\n📅 *Fecha:* ${dateStr} a las ${timeStr} (Tasa: ${appData.rate.toFixed(2)} Bs)\n\n`;
+            
+            checkedItems.forEach(i => { 
+                let subUSD = (i.qty * i.real) * (i.iva ? 1.16 : 1);
+                let subBS = subUSD * appData.rate;
+                let unitUSD = i.real * (i.iva ? 1.16 : 1);
+                
+                text += `• ${i.name} (x${i.qty})\n`;
+                text += `  └ $${subUSD.toFixed(2)} | ${subBS.toFixed(0)} Bs (Unit: $${unitUSD.toFixed(2)})\n`;
+            });
+            
+            let totalUSD = checkedItems.reduce((acc, i) => acc + ((i.qty * i.real) * (i.iva ? 1.16 : 1)), 0);
+            let totalBS = totalUSD * appData.rate;
+            text += `\n💵 *Tasa BCV:* ${appData.rate.toFixed(2)} Bs.\n🛒 *TOTAL:* *$${totalUSD.toFixed(2)} / Bs. ${totalBS.toFixed(0)}*`;
+            
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        // Exportar solo la lista configurada (sin estar comprada) como base64 para que otro la importe
+        function shareListWhatsApp() {
+            let activeList = appData.lists.find(l => l.id === appData.currentListId);
+            
+            // Construimos un objeto ligero
+            let exportData = {
+                name: activeList.name + " (Compartida)",
+                categories: activeList.categories,
+                items: activeList.items.map(i => ({...i, checked: false, real: i.est})) // Quitamos el estado checked
+            };
+            
+            let b64 = btoa(unescape(encodeURIComponent(JSON.stringify(exportData))));
+            let code = `APP_COMPRAS_PRO_LISTA:${b64}`;
+            
+            let text = `🛒 *Lista de Compras Compartida: ${activeList.name}*\n\nCopia el código que está abajo de este mensaje y pégalo en el botón "Importar Código" dentro de la App Compras Pro para cargar esta lista exacta con las cantidades y productos configurados.\n\n👇 *CÓDIGO DE IMPORTACIÓN:*\n\n${code}`;
+            
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
         }
 
