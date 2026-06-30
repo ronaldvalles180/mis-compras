@@ -7,79 +7,111 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2c3e50">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 8px; background-color: #f4f6f9; color: #333; padding-bottom: 260px; }
-        h1 { text-align: center; color: #2c3e50; margin-top: 5px; margin-bottom: 2px; font-size: 20px; }
+        /* VARIABLES PARA MODO CLARO/OSCURO */
+        :root {
+            --bg-color: #f4f6f9;
+            --text-color: #333;
+            --box-bg: white;
+            --border-color: #edf2f7;
+            --input-border: #cbd5e1;
+            --input-bg: white;
+            --th-bg: #f8f9fa;
+            --th-text: #4a5568;
+            --hover-bg: #f8fafc;
+            --checked-bg: #e8f8f5;
+            --h2-bg: #27ae60;
+            --sum-bg: #2c3e50;
+            --tab-bg: #e2e8f0;
+            --tab-text: #4a5568;
+        }
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --box-bg: #1e1e1e;
+            --border-color: #333;
+            --input-border: #444;
+            --input-bg: #2d2d2d;
+            --th-bg: #2a2a2a;
+            --th-text: #aaa;
+            --hover-bg: #2a2a2a;
+            --checked-bg: #0f3d26;
+            --h2-bg: #1e8449;
+            --sum-bg: #111820;
+            --tab-bg: #333;
+            --tab-text: #aaa;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 8px; background-color: var(--bg-color); color: var(--text-color); padding-bottom: 260px; transition: background-color 0.3s, color 0.3s; }
+        h1 { text-align: center; color: var(--h2-bg); margin-top: 5px; margin-bottom: 2px; font-size: 20px; }
         
-        /* Buscador optimizado con botón X de limpieza rápida */
-        .top-tools { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 15px; display: flex; flex-direction: column; gap: 8px; }
+        /* Barra de Pestañas (Listas) */
+        .tabs-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; }
+        .tabs-container { display: flex; overflow-x: auto; gap: 6px; flex: 1; padding-bottom: 4px; white-space: nowrap; scrollbar-width: none; }
+        .tabs-container::-webkit-scrollbar { display: none; }
+        
+        .top-tools { background: var(--box-bg); padding: 10px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 15px; display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--border-color); }
         .search-wrapper { display: flex; gap: 6px; width: 100%; }
-        .search-box { flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
-        .btn-clear-search { background: #e2e8f0; border: none; padding: 0 15px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; color: #4a5568; }
-        .filter-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 500; color: #4a5568; }
+        .search-box { flex: 1; padding: 10px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); border-radius: 6px; font-size: 16px; box-sizing: border-box; }
+        .btn-clear-search { background: var(--tab-bg); border: none; padding: 0 15px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; color: var(--tab-text); }
+        .filter-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 500; color: var(--th-text); }
         
         .view-panel { display: none; }
         .view-panel.active { display: block; }
         
-        .table-container { width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-radius: 6px; margin-bottom: 20px; overflow: hidden; }
+        .table-container { width: 100%; background: var(--box-bg); box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 6px; margin-bottom: 20px; overflow: hidden; border: 1px solid var(--border-color); }
         table { width: 100%; table-layout: fixed; border-collapse: collapse; }
-        th, td { padding: 8px 1px; text-align: left; border-bottom: 1px solid #edf2f7; font-size: 11px; word-wrap: break-word; vertical-align: middle; }
-        th { background-color: #f8f9fa; font-weight: 600; color: #4a5568; text-align: center; font-size: 10px; }
-        tr:hover { background-color: #f8fafc; }
+        th, td { padding: 8px 1px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 11px; word-wrap: break-word; vertical-align: middle; }
+        th { background-color: var(--th-bg); font-weight: 600; color: var(--th-text); text-align: center; font-size: 10px; }
+        tr:hover { background-color: var(--hover-bg); }
         .center { text-align: center; }
         .right { text-align: right; padding-right: 4px; }
         
         input[type="checkbox"] { transform: scale(1.1); cursor: pointer; accent-color: #27ae60; vertical-align: middle; }
         
-        /* Inputs a 16px nativos: Detiene por completo el zoom automático de iPhone */
-        input[type="number"], .edit-input, .select-input { 
-            width: 100%; 
-            padding: 4px 2px; 
-            border: 1px solid #cbd5e1; 
-            border-radius: 4px; 
-            font-size: 16px; 
-            text-align: center; 
-            font-weight: bold; 
-            box-sizing: border-box; 
-            display: block;
+        /* Inputs a 16px nativos anti-zoom iPhone */
+        input[type="number"], input[type="text"], .edit-input, .select-input { 
+            width: 100%; padding: 4px 2px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color);
+            border-radius: 4px; font-size: 16px; text-align: center; font-weight: bold; box-sizing: border-box; display: block; 
         }
         select.select-input { text-align-last: center; padding: 6px; }
-        
-        /* Select compacto para mover items de categoría */
-        select.category-mover { font-size: 10px; padding: 2px; border: 1px solid #95a5a6; border-radius: 3px; font-weight: normal; margin-top: 4px; width: 95%; text-align-last: left; background-color: #f8f9fa; }
-        
+        select.category-mover { font-size: 10px; padding: 2px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); border-radius: 3px; margin-top: 4px; width: 95%; text-align-last: left; }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         
+        /* Alerta de Precio Cero Olvidado */
+        .price-alert { border: 2px solid #e74c3c !important; color: #e74c3c !important; background-color: #fadbd8 !important; }
+        [data-theme="dark"] .price-alert { background-color: #4a1919 !important; color: #ff9999 !important; border-color: #e74c3c !important; }
+
         .item-price { color: #2e7d32; }
+        [data-theme="dark"] .item-price { color: #2ecc71; }
         .est-price-cell { color: #7f8c8d; font-style: italic; text-align: center; font-weight: 500; }
-        .item-subtotal { font-weight: bold; color: #2c3e50; }
+        .item-subtotal { font-weight: bold; color: var(--text-color); }
         
-        /* Título de Categoría con Indicador de Progreso Interno */
-        h2 { background-color: #27ae60; color: white; padding: 8px; border-radius: 6px; margin-top: 20px; font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+        h2 { background-color: var(--h2-bg); color: white; padding: 8px; border-radius: 6px; margin-top: 20px; font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
         h2 span.progress-badge { background: rgba(255,255,255,0.25); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; }
         
-        .checked-row { background-color: #e8f8f5 !important; }
+        .checked-row { background-color: var(--checked-bg) !important; }
         .hidden-item { display: none !important; }
 
-        .config-box { background: white; padding: 12px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        .config-box h3 { margin-top: 0; margin-bottom: 8px; font-size: 14px; color: #2c3e50; border-bottom: 1px solid #edf2f7; padding-bottom: 4px; }
-        textarea { width: 100%; height: 70px; font-family: monospace; font-size: 12px; box-sizing: border-box; padding: 6px; border: 1px solid #cbd5e1; border-radius: 6px; resize: none; }
+        .config-box { background: var(--box-bg); padding: 12px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 15px; border: 1px solid var(--border-color); }
+        .config-box h3 { margin-top: 0; margin-bottom: 8px; font-size: 14px; color: var(--text-color); border-bottom: 1px solid var(--border-color); padding-bottom: 4px; }
+        textarea { width: 100%; height: 70px; font-family: monospace; font-size: 12px; box-sizing: border-box; padding: 6px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); border-radius: 6px; resize: none; }
 
-        .btn-delete-row { background: none; border: none; color: #e74c3c; font-size: 15px; cursor: pointer; padding: 0; display: inline-block; width: 100%; text-align: center; font-weight: bold; }
+        .btn-delete-row { background: none; border: none; color: #e74c3c; font-size: 14px; cursor: pointer; padding: 0; display: inline-block; width: 100%; text-align: center; font-weight: bold; }
         .btn-delete-cat { background: transparent; border: 1px solid #e74c3c; color: #e74c3c; padding: 3px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; }
+        .btn-move { background: var(--tab-bg); border: none; color: var(--text-color); font-size: 9px; padding: 2px 6px; border-radius: 3px; cursor: pointer; }
 
-        /* Barra Inferior Organizada en una Matriz de Botones Grandes */
-        .summary-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2c3e50; color: white; padding: 12px 8px; box-shadow: 0 -2px 8px rgba(0,0,0,0.2); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; box-sizing: border-box; gap: 8px; }
+        .summary-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--sum-bg); color: white; padding: 12px 8px; box-shadow: 0 -2px 8px rgba(0,0,0,0.3); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; box-sizing: border-box; gap: 8px; transition: background 0.3s; }
         .summary-row-data { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 5px; }
         .summary-box { text-align: center; font-size: 11px; flex: 1; }
         .summary-box span { font-weight: bold; font-size: 14px; display: block; margin-top: 1px; }
         .checked-total-style { color: #2ecc71; }
         .list-total-style { color: #bdc3c7; }
         
-        .rate-box { background: #34495e; padding: 4px 6px; border-radius: 4px; text-align: center; border: 1px solid #455a64; }
+        .rate-box { background: rgba(0,0,0,0.3); padding: 4px 6px; border-radius: 4px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
         .rate-box label { font-weight: bold; font-size: 9px; color: #f1c40f; display: block; }
         .rate-input-wrapper { display: flex; align-items: center; gap: 3px; margin-top: 2px; }
-        .rate-box input { width: 55px; padding: 2px; font-size: 16px; font-weight: bold; text-align: center; border-radius: 3px; border: none; background: white; color: #333; }
-        .btn-fetch-bcv { background: #27ae60; border: none; color: white; padding: 5px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .rate-box input { width: 60px; padding: 2px; font-size: 16px; font-weight: bold; text-align: center; border-radius: 3px; border: none; background: white; color: #333; }
+        .btn-fetch-bcv { background: #27ae60; border: none; color: white; padding: 5px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
 
         .actions-wrapper { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: 100%; }
         .btn-action { color: white; border: none; padding: 12px 2px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -89,60 +121,77 @@
         .btn-green { background-color: #27ae60; }
         .btn-teal { background-color: #1abc9c; }
         .btn-whatsapp { background-color: #128c7e; }
+        .btn-gray { background-color: #7f8c8d; }
 
         @media print {
-            body { background: white; margin: 0; padding-bottom: 0; }
+            body { background: white; margin: 0; padding-bottom: 0; color: black; }
             .summary-bar { position: relative; background: #34495e; margin-top: 20px; box-shadow: none; color: white; display: block; text-align: center; }
             .summary-box span { color: white !important; display: inline-block; margin-left: 5px; }
-            .btn-action, .rate-box label, .actions-wrapper, .top-tools, .btn-fetch-bcv { display: none; }
+            .btn-action, .rate-box label, .actions-wrapper, .top-tools, .btn-fetch-bcv, .tabs-header { display: none; }
             h2 { background: #34495e !important; color: white; -webkit-print-color-adjust: exact; }
-            input[type="number"], .rate-box input { border: none; background: transparent; }
+            input[type="number"], .rate-box input { border: none; background: transparent; color: black; }
             table { table-layout: auto; }
             td:last-child, th:last-child { display: none; }
             select.category-mover { display: none; }
+            .btn-move { display: none; }
         }
     </style>
 </head>
 <body>
 
+    <!-- Gestor de Múltiples Listas y Modo Oscuro -->
+    <div class="tabs-header">
+        <div class="tabs-container" id="tabs-container">
+            <!-- Pestañas generadas por JS -->
+        </div>
+        <button class="btn-action btn-green" style="padding: 8px 12px; font-size: 16px;" onclick="createNewList()">+</button>
+        <button id="btn-dark-mode" class="btn-action btn-blue" style="padding: 8px 12px; font-size: 14px;" onclick="toggleDarkMode()">🌙</button>
+    </div>
+
     <div class="top-tools" id="global-tools">
         <div class="search-wrapper">
-            <input type="text" id="search-input" class="search-box" placeholder="🔍 Buscar producto en tiempo real..." oninput="filterList()">
+            <input type="text" id="search-input" class="search-box" placeholder="🔍 Buscar en esta lista..." oninput="filterList()">
             <button type="button" class="btn-clear-search" onclick="clearSearch()">✕</button>
         </div>
         <div class="filter-row">
             <label><input type="checkbox" id="hide-completed-check" checked onchange="filterList()"> Ocultar comprados</label>
-            <span id="items-count-label">0 / 0 Productos</span>
+            <span id="items-count-label">0 / 0</span>
         </div>
     </div>
 
-    <!-- VISTA 1: CHECKLIST DE COMPRAS -->
+    <!-- VISTA 1: CHECKLIST PRINCIPAL -->
     <div id="view-list" class="view-panel active">
-        <h1>📋 Mi Checklist de Compras</h1>
+        <h1 id="main-title">📋 Mi Checklist</h1>
         <div id="categories-container"></div>
     </div>
 
-    <!-- VISTA 2: PANEL DE CONFIGURACIÓN -->
+    <!-- VISTA 2: PANEL DE CONFIGURACIÓN DE LA LISTA ACTIVA -->
     <div id="view-settings" class="view-panel">
-        <h1>⚙️ Catálogo y Valores de Referencia</h1>
+        <h1 id="settings-title">⚙️ Configurar Lista</h1>
         
-        <!-- Seleccionar qué categorías ver en la compra -->
+        <div class="config-box" style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:13px; font-weight:bold;">🗑️ ¿Ya no usas esta lista?</span>
+            <button type="button" class="btn-action btn-red" style="padding:8px; font-size:11px;" onclick="deleteCurrentList()">Borrar Lista Actual</button>
+        </div>
+
         <div class="config-box">
-            <h3>👁️ Categorías a Comprar Hoy</h3>
-            <p style="font-size: 11px; color: #555; margin-bottom: 8px;">Tilda solo las categorías que necesitas para esta compra:</p>
-            <div id="settings-categories-visibility" style="display: flex; flex-direction: column; gap: 8px;">
-                <!-- Checkboxes generados por JS -->
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3>👁️ Categorías a Comprar Hoy</h3>
+            </div>
+            <p style="font-size: 11px; color: #7f8c8d; margin-bottom: 8px;">Tilda los pasillos que necesitas para esta compra:</p>
+            <div id="settings-categories-visibility" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;"></div>
+            
+            <div style="display: flex; gap: 6px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                <input type="text" id="new-cat-name" class="edit-input" placeholder="Nueva Categoría" style="text-align: left; padding-left: 8px;">
+                <button type="button" class="btn-action btn-blue" style="padding: 6px 10px;" onclick="addNewCategory()">Crear</button>
             </div>
         </div>
 
-        <!-- Formulario para agregar productos al vuelo -->
         <div class="config-box">
-            <h3>➕ Agregar Nuevo Producto</h3>
+            <h3>➕ Agregar Producto al Catálogo</h3>
             <div style="display: flex; flex-direction: column; gap: 6px;">
                 <input type="text" id="new-item-name" class="edit-input" placeholder="Nombre del artículo" style="text-align: left; padding-left: 8px;">
-                <select id="new-item-cat" class="select-input">
-                    <!-- Opciones generadas dinámicamente -->
-                </select>
+                <select id="new-item-cat" class="select-input"></select>
                 <div style="display: flex; gap: 6px;">
                     <input type="number" id="new-item-qty" class="edit-input" placeholder="Cant. Ref" step="any">
                     <input type="number" id="new-item-price" class="edit-input" placeholder="Precio Est. ($)" step="0.01">
@@ -151,28 +200,26 @@
             </div>
         </div>
 
-        <!-- Historial de Copias de Seguridad por Fecha -->
         <div class="config-box">
-            <h3>📦 Historial de Copias de Seguridad</h3>
+            <h3>📦 Copias de Seguridad Generales</h3>
             <div style="display: flex; gap: 4px; margin-bottom: 10px;">
                 <button type="button" class="btn-action btn-teal" onclick="createNewBackup()">💾 Crear Copia (Hoy)</button>
                 <button type="button" class="btn-action btn-red" onclick="factoryResetCatalog()">🔄 Rest. Fábrica</button>
             </div>
-            
-            <div id="backups-history-list" style="margin-bottom: 12px; max-height: 160px; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px; background: #f8f9fa;"></div>
-
-            <p style="font-size: 11px; color: #555; margin-bottom: 4px;">📂 Para importar datos desde otro equipo, pega el código aquí:</p>
+            <div id="backups-history-list" style="margin-bottom: 12px; max-height: 160px; overflow-y: auto; border: 1px solid var(--input-border); border-radius: 6px; padding: 4px; background: var(--input-bg);"></div>
+            <p style="font-size: 11px; color: #7f8c8d; margin-bottom: 4px;">📂 Importar datos desde otro equipo:</p>
             <input type="text" id="manual-import-string" class="edit-input" placeholder="Pega el código cifrado aquí..." style="margin-bottom: 6px; text-align: left; padding-left: 8px; font-size: 14px;">
             <button type="button" class="btn-action btn-blue" style="width: 100%; padding: 10px;" onclick="importManualBackup()">📥 Importar Código Externo</button>
         </div>
 
         <div class="config-box">
-            <h3>✏️ Editar Catálogo de Referencia</h3>
+            <h3>✏️ Reordenar y Editar Catálogo</h3>
+            <p style="font-size: 11px; color: #7f8c8d; margin-bottom: 10px;">Usa las flechas (▲/▼) para organizar pasillos y productos.</p>
             <div id="settings-prices-container"></div>
         </div>
     </div>
 
-    <!-- BARRA DE ACCIONES INFERIOR -->
+    <!-- BARRA INFERIOR -->
     <div class="summary-bar">
         <div class="summary-row-data">
             <div class="rate-box">
@@ -182,14 +229,8 @@
                     <button type="button" id="btn-fetch-bcv" class="btn-fetch-bcv" onclick="fetchBCVRate()">BCV</button>
                 </div>
             </div>
-            <div class="summary-box">
-                🛒 COMPRA REAL:
-                <span id="checked-total" class="checked-total-style">$0.00 / 0 Bs.</span>
-            </div>
-            <div class="summary-box">
-                📋 TOTAL LISTA:
-                <span id="list-total" class="list-total-style">$0.00 / 0 Bs.</span>
-            </div>
+            <div class="summary-box">🛒 REAL: <span id="checked-total" class="checked-total-style">$0.00</span></div>
+            <div class="summary-box">📋 TOTAL: <span id="list-total" class="list-total-style">$0.00</span></div>
         </div>
         
         <div class="actions-wrapper">
@@ -212,7 +253,7 @@
             { id: 6, name: "6. CUIDADO PERSONAL Y SALUD", active: true }
         ];
 
-        let defaultItems = [
+        const defaultItems = [
             { id: 1, cat: 1, name: "Arroz (Blanco y vaporizado)", qty: 6.00, est: 2.60 },
             { id: 2, cat: 1, name: "Pasta (Larga y corta)", qty: 6.00, est: 1.85 },
             { id: 3, cat: 1, name: "Harina de maíz", qty: 20.00, est: 1.30 },
@@ -347,7 +388,17 @@
             { id: 132, cat: 6, name: "Protección femenina", qty: 2, est: 2.00 }
         ];
 
-        let state = { items: [], categories: [], backups: [], rate: 40.00, currentView: 'list' };
+        // ESTRUCTURA PRINCIPAL DE DATOS: Soporte para múltiples listas (Tabs) y Modo Oscuro
+        let appData = {
+            lists: [],
+            currentListId: 1,
+            backups: [],
+            rate: 40.00,
+            darkMode: false
+        };
+
+        // Punteros a la lista activa para que el resto del código fluya
+        let state = { items: [], categories: [], currentView: 'list' };
         let undoStack = [];
 
         function saveToHistory() {
@@ -365,34 +416,111 @@
         }
 
         function initApp() {
-            let savedState = localStorage.getItem('compras_pro_app_state_v7');
-            let savedCats = localStorage.getItem('compras_pro_app_cats_v7');
-            let savedRate = localStorage.getItem('compras_pro_app_rate');
-            let savedBackups = localStorage.getItem('compras_pro_app_backups');
+            let savedAppData = localStorage.getItem('compras_pro_appData_v9');
+            let legacyState = localStorage.getItem('compras_pro_app_state_v7') || localStorage.getItem('compras_pro_app_state_final');
             
-            if (savedRate) state.rate = parseFloat(savedRate) || 40.00;
-            document.getElementById('exchange-rate').value = state.rate.toFixed(2);
-
-            try { state.backups = savedBackups ? JSON.parse(savedBackups) : []; } catch(e) { state.backups = []; }
-            try { state.categories = savedCats ? JSON.parse(savedCats) : JSON.parse(JSON.stringify(defaultCategories)); } catch(e) { state.categories = JSON.parse(JSON.stringify(defaultCategories)); }
-
-            if (state.categories.length === 0) state.categories = JSON.parse(JSON.stringify(defaultCategories));
-
-            if (savedState) {
-                try {
-                    let parsed = JSON.parse(savedState);
-                    if (Array.isArray(parsed) && parsed.length > 0) {
-                        state.items = parsed;
-                    } else {
-                        resetToDefaults();
-                    }
-                } catch(e) { resetToDefaults(); }
+            if (savedAppData) {
+                appData = JSON.parse(savedAppData);
+            } else if (legacyState) {
+                // Migrar desde versión anterior
+                let oldCats = localStorage.getItem('compras_pro_app_cats_v7');
+                appData.rate = parseFloat(localStorage.getItem('compras_pro_app_rate')) || 40.00;
+                let mCats = oldCats ? JSON.parse(oldCats) : JSON.parse(JSON.stringify(defaultCategories));
+                appData.lists = [{ id: 1, name: "Principal", items: JSON.parse(legacyState), categories: mCats }];
+                appData.currentListId = 1;
             } else {
-                resetToDefaults();
+                // Primera vez absoluto
+                appData.lists = [{ 
+                    id: 1, name: "Principal", 
+                    items: JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false})), 
+                    categories: JSON.parse(JSON.stringify(defaultCategories)) 
+                }];
+                appData.currentListId = 1;
             }
+            
+            applyDarkMode(appData.darkMode);
+            loadCurrentList();
+        }
+
+        function applyDarkMode(isDark) {
+            if(isDark) document.documentElement.setAttribute('data-theme', 'dark');
+            else document.documentElement.removeAttribute('data-theme');
+            document.getElementById('btn-dark-mode').textContent = isDark ? '☀️' : '🌙';
+        }
+
+        function toggleDarkMode() {
+            appData.darkMode = !appData.darkMode;
+            applyDarkMode(appData.darkMode);
+            saveToLocalStorage();
+        }
+
+        // CARGA LA LISTA ACTIVA EN LOS PUNTEROS DEL SISTEMA
+        function loadCurrentList() {
+            let list = appData.lists.find(l => l.id === appData.currentListId) || appData.lists[0];
+            state.items = list.items;
+            state.categories = list.categories;
+            document.getElementById('exchange-rate').value = appData.rate.toFixed(2);
+            document.getElementById('main-title').textContent = `📋 ${list.name}`;
+            document.getElementById('settings-title').textContent = `⚙️ Configurar: ${list.name}`;
             renderAll();
         }
 
+        function saveToLocalStorage() {
+            let listIdx = appData.lists.findIndex(l => l.id === appData.currentListId);
+            if(listIdx > -1) {
+                appData.lists[listIdx].items = state.items;
+                appData.lists[listIdx].categories = state.categories;
+            }
+            appData.rate = parseFloat(document.getElementById('exchange-rate').value) || 1;
+            localStorage.setItem('compras_pro_appData_v9', JSON.stringify(appData));
+        }
+
+        // --- MANEJO DE MÚLTIPLES LISTAS (TABS) ---
+        function renderTabs() {
+            const container = document.getElementById("tabs-container");
+            container.innerHTML = appData.lists.map(l => `
+                <button type="button" class="btn-action ${l.id === appData.currentListId ? 'btn-orange' : 'btn-gray'}" 
+                        style="padding: 6px 12px; font-size: 13px; flex: none; opacity: ${l.id === appData.currentListId ? '1' : '0.7'}" 
+                        onclick="switchList(${l.id})">
+                    ${l.name}
+                </button>
+            `).join('');
+        }
+
+        function switchList(id) {
+            if(id === appData.currentListId) return;
+            saveToLocalStorage();
+            appData.currentListId = id;
+            loadCurrentList();
+        }
+
+        function createNewList() {
+            let name = prompt("Nombre de la nueva lista (ej. Viaje, Repuestos):");
+            if(!name) return;
+            
+            let useCatalog = confirm("¿Quieres iniciar con el catálogo base de supermercado? (Dale Cancelar si prefieres una lista completamente vacía)");
+            
+            let newItems = useCatalog ? JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false})) : [];
+            let newCats = JSON.parse(JSON.stringify(defaultCategories));
+            
+            saveToLocalStorage();
+            let newList = { id: Date.now(), name: name, items: newItems, categories: newCats };
+            appData.lists.push(newList);
+            appData.currentListId = newList.id;
+            loadCurrentList();
+        }
+
+        function deleteCurrentList() {
+            if(appData.lists.length <= 1) return alert("No puedes eliminar tu única lista restante.");
+            if(confirm("¿Seguro que deseas eliminar esta lista por completo?")) {
+                appData.lists = appData.lists.filter(l => l.id !== appData.currentListId);
+                appData.currentListId = appData.lists[0].id;
+                loadCurrentList();
+                toggleView();
+            }
+        }
+
+        // --- SISTEMA ORIGINAL ADAPTADO ---
         function resetToDefaults() {
             state.categories = JSON.parse(JSON.stringify(defaultCategories));
             state.items = JSON.parse(JSON.stringify(defaultItems)).map(item => ({
@@ -402,44 +530,30 @@
         }
 
         function factoryResetCatalog() {
-            if (confirm("¿Estás seguro de volver a los valores de fábrica? Se restaurarán las categorías e ítems originales y se perderán tus modificaciones.")) {
+            if (confirm("¿Volver a los valores de fábrica? Se restaurarán categorías y productos originales para ESTA LISTA.")) {
                 saveToHistory();
                 resetToDefaults();
                 renderAll();
-                alert("Restauración de fábrica completada.");
+                alert("Restauración completada.");
             }
         }
 
         function resetChecklistValues() {
-            if (confirm("¿Desmarcar todo y restablecer cantidades/precios reales a los de referencia?")) {
+            if (confirm("¿Desmarcar todo y restablecer cantidades/precios a los de referencia?")) {
                 saveToHistory();
-                state.items.forEach(item => {
-                    item.checked = false;
-                    item.qty = item.est_qty;
-                    item.real = item.est;
-                });
+                state.items.forEach(item => { item.checked = false; item.qty = item.est_qty; item.real = item.est; });
                 saveToLocalStorage();
                 renderAll();
             }
         }
 
         function handleBottomReset() {
-            if (state.currentView === 'settings') {
-                factoryResetCatalog();
-            } else {
-                resetChecklistValues();
-            }
-        }
-
-        function saveToLocalStorage() {
-            localStorage.setItem('compras_pro_app_state_v7', JSON.stringify(state.items));
-            localStorage.setItem('compras_pro_app_cats_v7', JSON.stringify(state.categories));
-            localStorage.setItem('compras_pro_app_rate', state.rate);
-            localStorage.setItem('compras_pro_app_backups', JSON.stringify(state.backups));
+            if (state.currentView === 'settings') factoryResetCatalog();
+            else resetChecklistValues();
         }
 
         function handleRateChange() {
-            state.rate = parseFloat(document.getElementById('exchange-rate').value) || 1;
+            appData.rate = parseFloat(document.getElementById('exchange-rate').value) || 1;
             saveToLocalStorage();
             calculateTotals();
         }
@@ -451,7 +565,7 @@
             btn.disabled = true;
 
             fetch('https://bcv-api.rafnixg.dev/rates/')
-            .then(res => { if (!res.ok) throw new Error("API Principal"); return res.json(); })
+            .then(res => { if (!res.ok) throw new Error("API"); return res.json(); })
             .then(data => {
                 let bcvUSD = data?.rates?.USD || data?.USD || data?.usd;
                 if (bcvUSD) {
@@ -468,10 +582,9 @@
                     if (price) {
                         document.getElementById('exchange-rate').value = parseFloat(price).toFixed(2);
                         handleRateChange();
-                        alert(`¡Tasa BCV (Servidor 2): ${parseFloat(price).toFixed(2)} Bs.!`);
-                    } else alert("No se pudo obtener el valor automatizado.");
-                })
-                .catch(() => alert("Sin conexión a servidores. Escribe el valor manual."));
+                        alert(`¡Tasa BCV (Espejo): ${parseFloat(price).toFixed(2)} Bs.!`);
+                    } else alert("Fallo automático.");
+                }).catch(() => alert("Sin conexión."));
             })
             .finally(() => { btn.textContent = originalText; btn.disabled = false; });
         }
@@ -502,6 +615,7 @@
         }
 
         function renderAll() {
+            renderTabs();
             renderDynamicSelects();
             if (state.currentView === 'list') {
                 renderChecklist();
@@ -518,7 +632,7 @@
             
             if (visibilityContainer) {
                 visibilityContainer.innerHTML = state.categories.map(c => `
-                    <label style="display:flex; align-items:center; gap:8px; font-size:14px; border-bottom:1px solid #edf2f7; padding-bottom:4px;">
+                    <label style="display:flex; align-items:center; gap:8px; font-size:14px; border-bottom:1px solid var(--border-color); padding-bottom:4px;">
                         <input type="checkbox" style="transform: scale(1.3); margin:0;" ${c.active ? 'checked' : ''} onchange="toggleCategoryActive(${c.id}, this.checked)">
                         ${c.name}
                     </label>
@@ -536,6 +650,17 @@
             saveToLocalStorage();
         }
 
+        function addNewCategory() {
+            let input = document.getElementById("new-cat-name");
+            let name = input.value.trim();
+            if(!name) return;
+            saveToHistory();
+            state.categories.push({ id: Date.now(), name: name, active: true });
+            saveToLocalStorage();
+            input.value = '';
+            renderAll();
+        }
+
         function deleteCategory(id) {
             let cat = state.categories.find(c => c.id === id);
             if (!cat) return;
@@ -545,6 +670,58 @@
                 state.items = state.items.filter(i => i.cat !== id);
                 saveToLocalStorage();
                 renderAll();
+            }
+        }
+
+        // --- SISTEMA DE REORDENAMIENTO ↕️ ---
+        function moveCategoryUp(id) {
+            let idx = state.categories.findIndex(c => c.id === id);
+            if (idx > 0) {
+                saveToHistory();
+                let temp = state.categories[idx];
+                state.categories[idx] = state.categories[idx - 1];
+                state.categories[idx - 1] = temp;
+                saveToLocalStorage(); renderAll();
+            }
+        }
+        function moveCategoryDown(id) {
+            let idx = state.categories.findIndex(c => c.id === id);
+            if (idx > -1 && idx < state.categories.length - 1) {
+                saveToHistory();
+                let temp = state.categories[idx];
+                state.categories[idx] = state.categories[idx + 1];
+                state.categories[idx + 1] = temp;
+                saveToLocalStorage(); renderAll();
+            }
+        }
+        function moveItemUp(id) {
+            let item = state.items.find(i => i.id === id);
+            let catItems = state.items.filter(i => i.cat === item.cat);
+            let localIdx = catItems.findIndex(i => i.id === id);
+            if(localIdx > 0) {
+                saveToHistory();
+                let prevItem = catItems[localIdx - 1];
+                let g1 = state.items.findIndex(i => i.id === item.id);
+                let g2 = state.items.findIndex(i => i.id === prevItem.id);
+                let temp = state.items[g1];
+                state.items[g1] = state.items[g2];
+                state.items[g2] = temp;
+                saveToLocalStorage(); renderAll();
+            }
+        }
+        function moveItemDown(id) {
+            let item = state.items.find(i => i.id === id);
+            let catItems = state.items.filter(i => i.cat === item.cat);
+            let localIdx = catItems.findIndex(i => i.id === id);
+            if(localIdx > -1 && localIdx < catItems.length - 1) {
+                saveToHistory();
+                let nextItem = catItems[localIdx + 1];
+                let g1 = state.items.findIndex(i => i.id === item.id);
+                let g2 = state.items.findIndex(i => i.id === nextItem.id);
+                let temp = state.items[g1];
+                state.items[g1] = state.items[g2];
+                state.items[g2] = temp;
+                saveToLocalStorage(); renderAll();
             }
         }
 
@@ -585,13 +762,16 @@
 
                 catItems.forEach(item => {
                     let rowClass = item.checked ? 'checked-row' : '';
+                    // 🚨 Alerta Inteligente de Precio Olvidado
+                    let priceAlertClass = (item.checked && item.real === 0) ? 'price-alert' : '';
+
                     html += `
                     <tr class="item-row ${rowClass}" id="item-row-${item.id}">
                         <td class="center"><input type="checkbox" class="item-check" ${item.checked ? 'checked' : ''} onchange="updateItemChecked(${item.id}, this.checked)"></td>
                         <td>${item.name}</td>
                         <td class="center"><input type="number" class="item-qty" value="${item.qty}" step="any" onchange="updateItemQty(${item.id}, this.value)" onkeydown="handleEnterKey(event)"></td>
                         <td class="est-price-cell">${item.est_qty}</td>
-                        <td class="center"><input type="number" class="item-price" value="${item.real.toFixed(2)}" step="0.01" onchange="updateItemPrice(${item.id}, this.value)" onkeydown="handleEnterKey(event)"></td>
+                        <td class="center"><input type="number" class="item-price ${priceAlertClass}" value="${item.real.toFixed(2)}" step="0.01" onchange="updateItemPrice(${item.id}, this.value)" onkeydown="handleEnterKey(event)"></td>
                         <td class="est-price-cell">$${item.est.toFixed(2)}</td>
                         <td class="right item-subtotal" id="subtotal-${item.id}">$0.00</td>
                         <td class="center"><button type="button" class="btn-delete-row" onclick="deleteItem(${item.id})">✕</button></td>
@@ -610,10 +790,17 @@
 
             state.categories.forEach(category => {
                 let catItems = state.items.filter(i => i.cat == category.id);
+                let catOptions = state.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
                 
                 let html = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin: 18px 0 6px 0;">
-                    <h4 style="margin:0; color:#27ae60;">${category.name}</h4>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin: 18px 0 6px 0; border-bottom: 2px solid var(--border-color); padding-bottom:4px;">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <div style="display:flex; flex-direction:column; gap:2px;">
+                            <button type="button" class="btn-move" onclick="moveCategoryUp(${category.id})">▲</button>
+                            <button type="button" class="btn-move" onclick="moveCategoryDown(${category.id})">▼</button>
+                        </div>
+                        <h4 style="margin:0; color:var(--h2-bg);">${category.name}</h4>
+                    </div>
                     <button type="button" class="btn-delete-cat" onclick="deleteCategory(${category.id})">🗑 Borrar Toda</button>
                 </div>
                 <div class="table-container">
@@ -642,14 +829,19 @@
                     let orig = defaultItems.find(d => d.id === item.id);
                     let origQty = orig ? orig.qty : '-';
                     let origPrice = orig ? '$' + orig.est.toFixed(2) : '-';
-                    
-                    let catOptions = state.categories.map(c => `<option value="${c.id}" ${c.id == item.cat ? 'selected' : ''}>Mover a: ${c.name}</option>`).join('');
 
                     html += `
                     <tr>
                         <td style="font-size:11px; padding-left: 2px;">
-                            <div style="font-weight:bold;">${item.name}</div>
+                            <div style="display:flex; align-items:center; gap:4px;">
+                                <div style="display:flex; flex-direction:column; gap:1px;">
+                                    <button type="button" style="border:none; background:var(--tab-bg); color:var(--text-color); font-size:8px; padding:2px 4px; border-radius:2px;" onclick="moveItemUp(${item.id})">▲</button>
+                                    <button type="button" style="border:none; background:var(--tab-bg); color:var(--text-color); font-size:8px; padding:2px 4px; border-radius:2px;" onclick="moveItemDown(${item.id})">▼</button>
+                                </div>
+                                <div style="font-weight:bold;">${item.name}</div>
+                            </div>
                             <select class="category-mover" onchange="moveItemCategory(${item.id}, this.value)">
+                                <option value="" disabled selected>Mover a...</option>
                                 ${catOptions}
                             </select>
                         </td>
@@ -667,6 +859,7 @@
         }
 
         function moveItemCategory(itemId, newCatId) {
+            if(!newCatId) return;
             saveToHistory();
             let item = state.items.find(i => i.id === itemId);
             if (item) item.cat = parseInt(newCatId);
@@ -685,30 +878,20 @@
             let qty = parseFloat(qtyField.value) || 1;
             let est = parseFloat(priceField.value) || 0;
 
-            if (!name) return alert("Por favor ingresa un nombre.");
+            if (!name) return alert("Ingresa un nombre.");
 
             saveToHistory();
-            state.items.push({
-                id: Date.now(),
-                cat: cat,
-                name: name,
-                qty: qty,
-                est_qty: qty,
-                est: est,
-                real: est,
-                checked: false
-            });
+            state.items.push({ id: Date.now(), cat: cat, name: name, qty: qty, est_qty: qty, est: est, real: est, checked: false });
             saveToLocalStorage();
             
             nameField.value = ''; qtyField.value = ''; priceField.value = '';
-            alert(`"${name}" agregado.`);
             renderAll();
         }
 
         function deleteItem(id) {
             let item = state.items.find(i => i.id === id);
             if (!item) return;
-            if (confirm(`¿Eliminar "${item.name}" por completo?`)) {
+            if (confirm(`¿Eliminar "${item.name}"?`)) {
                 saveToHistory();
                 state.items = state.items.filter(i => i.id !== id);
                 saveToLocalStorage();
@@ -720,14 +903,8 @@
             saveToHistory();
             let item = state.items.find(i => i.id === id);
             item.checked = isChecked;
-            let row = document.getElementById(`item-row-${id}`);
-            if(row) {
-                if(isChecked) row.classList.add('checked-row');
-                else row.classList.remove('checked-row');
-            }
             saveToLocalStorage();
-            calculateTotals();
-            filterList();
+            renderAll(); // Forzamos renderizado para pintar la Alerta de Precio Cero si aplica
         }
 
         function updateItemQty(id, val) {
@@ -743,7 +920,7 @@
             let item = state.items.find(i => i.id === id);
             item.real = parseFloat(val) || 0;
             saveToLocalStorage();
-            calculateTotals();
+            renderAll(); // Refresca para quitar Alerta de Precio si aplica
         }
 
         function updateItemEstQty(id, val) {
@@ -762,14 +939,9 @@
             saveToLocalStorage();
         }
 
-        function handleEnterKey(event) {
-            if (event.key === "Enter") event.target.blur();
-        }
+        function handleEnterKey(event) { if (event.key === "Enter") event.target.blur(); }
 
-        function clearSearch() {
-            document.getElementById("search-input").value = '';
-            filterList();
-        }
+        function clearSearch() { document.getElementById("search-input").value = ''; filterList(); }
 
         function filterList() {
             if (state.currentView !== 'list') return;
@@ -779,10 +951,8 @@
             state.items.forEach(item => {
                 let row = document.getElementById(`item-row-${item.id}`);
                 if (!row) return;
-
                 let matchesSearch = item.name.toLowerCase().includes(query);
                 let matchesHide = !hideCompleted || !item.checked;
-
                 if (matchesSearch && matchesHide) row.classList.remove("hidden-item");
                 else row.classList.add("hidden-item");
             });
@@ -816,39 +986,42 @@
                 if (badge) badge.textContent = `(${catCounters[catId].c} / ${catCounters[catId].t})`;
             });
 
-            let checkedTotalLocal = checkedTotalUSD * state.rate;
-            let listTotalLocal = listTotalUSD * state.rate;
+            let checkedTotalLocal = checkedTotalUSD * appData.rate;
+            let listTotalLocal = listTotalUSD * appData.rate;
 
             document.getElementById("checked-total").textContent = "$" + checkedTotalUSD.toFixed(2) + " / " + checkedTotalLocal.toFixed(0) + " Bs.";
             document.getElementById("list-total").textContent = "$" + listTotalUSD.toFixed(2) + " / " + listTotalLocal.toFixed(0) + " Bs.";
             
             let activeItemsCount = state.items.filter(i => state.categories.find(c => c.id === i.cat)?.active).length;
             let checkedItemsCount = state.items.filter(i => i.checked && state.categories.find(c => c.id === i.cat)?.active).length;
-            document.getElementById("items-count-label").textContent = `${checkedItemsCount} / ${activeItemsCount} Comprados`;
+            document.getElementById("items-count-label").textContent = `${checkedItemsCount} / ${activeItemsCount} Prod.`;
         }
 
+        // --- SISTEMA GLOBAL DE COPIAS DE SEGURIDAD ---
         function createNewBackup() {
-            let backupData = { rate: state.rate, items: state.items, categories: state.categories };
+            saveToLocalStorage();
+            let backupData = appData;
             let code = btoa(unescape(encodeURIComponent(JSON.stringify(backupData))));
             let now = new Date();
             let dateStr = now.toLocaleString('es-VE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-            state.backups.push({ id: Date.now(), date: dateStr, code: code });
+            appData.backups.push({ id: Date.now(), date: dateStr, code: code });
             saveToLocalStorage();
             renderBackupList();
-            alert("Copia guardada: " + dateStr);
+            alert("Copia Global guardada con éxito.");
         }
 
         function renderBackupList() {
             const container = document.getElementById("backups-history-list");
             if (!container) return;
-            if (state.backups.length === 0) {
-                container.innerHTML = `<p style="text-align:center; font-size:11px; color:#7f8c8d; margin:10px 0;">No hay copias guardadas.</p>`;
+            if (appData.backups.length === 0) {
+                container.innerHTML = `<p style="text-align:center; font-size:11px; margin:10px 0;">No hay copias guardadas.</p>`;
                 return;
             }
-            let html = `<table style="min-width:100%; table-layout:auto; margin-bottom:0;"><thead><tr style="background:#e2e8f0;"><th style="padding:4px; font-size:10px; text-align:center;">Fecha de Registro</th><th style="padding:4px; font-size:10px; text-align:center;">Acciones</th></tr></thead><tbody>`;
-            for (let i = state.backups.length - 1; i >= 0; i--) {
-                let b = state.backups[i];
-                html += `<tr style="border-bottom:1px solid #cbd5e1;"><td style="padding:6px; font-size:11px; font-weight:bold; text-align:center; color:#2c3e50;">${b.date}</td><td style="padding:4px; text-align:center; display:flex; gap:4px; justify-content:center;"><button type="button" class="btn-action btn-teal" style="padding:5px 6px; font-size:10px; flex:none; border-radius:4px;" onclick="copyCodeToClipboard('${b.code}')">📋 Copiar</button><button type="button" class="btn-action btn-blue" style="padding:5px 6px; font-size:10px; flex:none; border-radius:4px;" onclick="restoreFromCode('${b.code}', true)">🔄 Usar</button><button type="button" class="btn-action btn-red" style="padding:5px 4px; font-size:10px; flex:none; background:#e74c3c; border-radius:4px;" onclick="deleteLocalBackup(${b.id})">✕</button></td></tr>`;
+            let html = `<table style="min-width:100%; table-layout:auto; margin-bottom:0;"><thead><tr style="background:var(--th-bg);">
+                <th style="padding:4px; font-size:10px; text-align:center;">Fecha</th><th style="padding:4px; font-size:10px; text-align:center;">Acciones</th></tr></thead><tbody>`;
+            for (let i = appData.backups.length - 1; i >= 0; i--) {
+                let b = appData.backups[i];
+                html += `<tr style="border-bottom:1px solid var(--border-color);"><td style="padding:6px; font-size:11px; font-weight:bold; text-align:center;">${b.date}</td><td style="padding:4px; text-align:center; display:flex; gap:4px; justify-content:center;"><button type="button" class="btn-action btn-teal" style="padding:5px 6px; font-size:10px; flex:none; border-radius:4px;" onclick="copyCodeToClipboard('${b.code}')">📋</button><button type="button" class="btn-action btn-blue" style="padding:5px 6px; font-size:10px; flex:none; border-radius:4px;" onclick="restoreFromCode('${b.code}', true)">🔄 Usar</button><button type="button" class="btn-action btn-red" style="padding:5px 4px; font-size:10px; flex:none; border-radius:4px;" onclick="deleteLocalBackup(${b.id})">✕</button></td></tr>`;
             }
             html += `</tbody></table>`;
             container.innerHTML = html;
@@ -861,25 +1034,20 @@
         }
 
         function deleteLocalBackup(id) {
-            if(confirm("¿Quieres eliminar esta copia?")) {
-                state.backups = state.backups.filter(b => b.id !== id);
-                saveToLocalStorage();
-                renderBackupList();
+            if(confirm("¿Eliminar esta copia de seguridad?")) {
+                appData.backups = appData.backups.filter(b => b.id !== id);
+                saveToLocalStorage(); renderBackupList();
             }
         }
 
         function restoreFromCode(str, confirmRequired) {
-            if (confirmRequired && !confirm("¿Quieres cargar esta copia de seguridad? Se sobrescribirá tu lista actual.")) return false;
+            if (confirmRequired && !confirm("¿Cargar esta copia? Se sobrescribirá TODO en la App.")) return false;
             try {
                 let decrypted = JSON.parse(decodeURIComponent(escape(atob(str))));
-                if(decrypted.items && Array.isArray(decrypted.items)) {
-                    saveToHistory();
-                    state.rate = decrypted.rate || 40.00;
-                    state.items = decrypted.items;
-                    if(decrypted.categories) state.categories = decrypted.categories;
-                    document.getElementById('exchange-rate').value = state.rate.toFixed(2);
+                if(decrypted.lists && Array.isArray(decrypted.lists)) {
+                    appData = decrypted;
                     saveToLocalStorage();
-                    renderAll();
+                    loadCurrentList();
                     return true;
                 } else { alert("Catálogo no compatible."); return false; }
             } catch(err) { alert("Error al procesar el código."); return false; }
@@ -893,12 +1061,11 @@
 
         function shareWhatsApp() {
             let checkedItems = state.items.filter(i => i.checked && state.categories.find(c=>c.id===i.cat)?.active);
-            if (checkedItems.length === 0) return alert("No hay artículos tildados para compartir.");
-            let text = `📋 *RESUMEN DE COMPRA REAL*\n\n`;
+            if (checkedItems.length === 0) return alert("No hay artículos tildados en categorías activas.");
+            let text = `📋 *COMPRA: ${appData.lists.find(l=>l.id===appData.currentListId).name}*\n\n`;
             checkedItems.forEach(i => { text += `• ${i.name} (x${i.qty}) -> *$${(i.qty * i.real).toFixed(2)}*\n`; });
-            let rateInput = parseFloat(document.getElementById('exchange-rate').value) || 1;
             let totalUSD = checkedItems.reduce((acc, i) => acc + (i.qty * i.real), 0);
-            text += `\n💵 *Tasa Ref:* ${rateInput.toFixed(2)} Bs.\n🛒 *TOTAL:* *$${totalUSD.toFixed(2)} / Bs. ${(totalUSD * rateInput).toFixed(0)}*`;
+            text += `\n💵 *Tasa Ref:* ${appData.rate.toFixed(2)} Bs.\n🛒 *TOTAL:* *$${totalUSD.toFixed(2)} / Bs. ${(totalUSD * appData.rate).toFixed(0)}*`;
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
         }
 
