@@ -20,7 +20,7 @@
         .view-panel { display: none; }
         .view-panel.active { display: block; }
         
-        .table-container { width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-radius: 6px; margin-bottom: 20px; }
+        .table-container { width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-radius: 6px; margin-bottom: 20px; overflow: hidden; }
         table { width: 100%; table-layout: fixed; border-collapse: collapse; }
         th, td { padding: 8px 1px; text-align: left; border-bottom: 1px solid #edf2f7; font-size: 11px; word-wrap: break-word; vertical-align: middle; }
         th { background-color: #f8f9fa; font-weight: 600; color: #4a5568; text-align: center; font-size: 10px; }
@@ -43,6 +43,10 @@
             display: block;
         }
         select.select-input { text-align-last: center; padding: 6px; }
+        
+        /* Select compacto para mover items de categoría */
+        select.category-mover { font-size: 10px; padding: 2px; border: 1px solid #95a5a6; border-radius: 3px; font-weight: normal; margin-top: 4px; width: 95%; text-align-last: left; background-color: #f8f9fa; }
+        
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         
         .item-price { color: #2e7d32; }
@@ -60,8 +64,8 @@
         .config-box h3 { margin-top: 0; margin-bottom: 8px; font-size: 14px; color: #2c3e50; border-bottom: 1px solid #edf2f7; padding-bottom: 4px; }
         textarea { width: 100%; height: 70px; font-family: monospace; font-size: 12px; box-sizing: border-box; padding: 6px; border: 1px solid #cbd5e1; border-radius: 6px; resize: none; }
 
-        /* Botón de Eliminación Rápida <span> */
-        .btn-delete-row { background: none; border: none; color: #e74c3c; font-size: 14px; cursor: pointer; padding: 0; display: inline-block; width: 100%; text-align: center; font-weight: bold; }
+        .btn-delete-row { background: none; border: none; color: #e74c3c; font-size: 15px; cursor: pointer; padding: 0; display: inline-block; width: 100%; text-align: center; font-weight: bold; }
+        .btn-delete-cat { background: transparent; border: 1px solid #e74c3c; color: #e74c3c; padding: 3px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; }
 
         /* Barra Inferior Organizada en una Matriz de Botones Grandes */
         .summary-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #2c3e50; color: white; padding: 12px 8px; box-shadow: 0 -2px 8px rgba(0,0,0,0.2); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; box-sizing: border-box; gap: 8px; }
@@ -74,10 +78,9 @@
         .rate-box { background: #34495e; padding: 4px 6px; border-radius: 4px; text-align: center; border: 1px solid #455a64; }
         .rate-box label { font-weight: bold; font-size: 9px; color: #f1c40f; display: block; }
         .rate-input-wrapper { display: flex; align-items: center; gap: 3px; margin-top: 2px; }
-        .rate-box input { width: 60px; padding: 2px; font-size: 16px; font-weight: bold; text-align: center; border-radius: 3px; border: none; background: white; color: #333; }
+        .rate-box input { width: 55px; padding: 2px; font-size: 16px; font-weight: bold; text-align: center; border-radius: 3px; border: none; background: white; color: #333; }
         .btn-fetch-bcv { background: #27ae60; border: none; color: white; padding: 5px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
 
-        /* Matriz de Acciones: 2 filas de 3 botones de tamaño ideal */
         .actions-wrapper { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: 100%; }
         .btn-action { color: white; border: none; padding: 12px 2px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .btn-orange { background-color: #e67e22; }
@@ -95,7 +98,8 @@
             h2 { background: #34495e !important; color: white; -webkit-print-color-adjust: exact; }
             input[type="number"], .rate-box input { border: none; background: transparent; }
             table { table-layout: auto; }
-            td:last-child, th:last-child { display: none; } /* Oculta columna borrar en impresión */
+            td:last-child, th:last-child { display: none; }
+            select.category-mover { display: none; }
         }
     </style>
 </head>
@@ -107,7 +111,7 @@
             <button type="button" class="btn-clear-search" onclick="clearSearch()">✕</button>
         </div>
         <div class="filter-row">
-            <label><input type="checkbox" id="hide-completed-check" onchange="filterList()"> Ocultar comprados</label>
+            <label><input type="checkbox" id="hide-completed-check" checked onchange="filterList()"> Ocultar comprados</label>
             <span id="items-count-label">0 / 0 Productos</span>
         </div>
     </div>
@@ -122,18 +126,22 @@
     <div id="view-settings" class="view-panel">
         <h1>⚙️ Catálogo y Valores de Referencia</h1>
         
+        <!-- Seleccionar qué categorías ver en la compra -->
+        <div class="config-box">
+            <h3>👁️ Categorías a Comprar Hoy</h3>
+            <p style="font-size: 11px; color: #555; margin-bottom: 8px;">Tilda solo las categorías que necesitas para esta compra:</p>
+            <div id="settings-categories-visibility" style="display: flex; flex-direction: column; gap: 8px;">
+                <!-- Checkboxes generados por JS -->
+            </div>
+        </div>
+
         <!-- Formulario para agregar productos al vuelo -->
         <div class="config-box">
-            <h3>➕ Agregar Nuevo Producto al Catálogo</h3>
+            <h3>➕ Agregar Nuevo Producto</h3>
             <div style="display: flex; flex-direction: column; gap: 6px;">
-                <input type="text" id="new-item-name" class="edit-input" placeholder="Nombre del artículo (ej. Nutella)" style="text-align: left; padding-left: 8px;">
+                <input type="text" id="new-item-name" class="edit-input" placeholder="Nombre del artículo" style="text-align: left; padding-left: 8px;">
                 <select id="new-item-cat" class="select-input">
-                    <option value="1">1. DESPENSA Y VÍVERES</option>
-                    <option value="2">2. CHARCUTERÍA Y PROTEÍNAS</option>
-                    <option value="3">3. FRUTAS Y VERDURAS</option>
-                    <option value="4">4. CONDIMENTOS Y SALSAS</option>
-                    <option value="5">5. LIMPIEZA Y HOGAR</option>
-                    <option value="6">6. CUIDADO PERSONAL Y SALUD</option>
+                    <!-- Opciones generadas dinámicamente -->
                 </select>
                 <div style="display: flex; gap: 6px;">
                     <input type="number" id="new-item-qty" class="edit-input" placeholder="Cant. Ref" step="any">
@@ -143,12 +151,12 @@
             </div>
         </div>
 
-        <!-- Seccion Historial de Copias por Fecha -->
+        <!-- Historial de Copias de Seguridad por Fecha -->
         <div class="config-box">
             <h3>📦 Historial de Copias de Seguridad</h3>
             <div style="display: flex; gap: 4px; margin-bottom: 10px;">
-                <button type="button" class="btn-action btn-teal" onclick="createNewBackup()">💾 Crear Nueva Copia (Hoy)</button>
-                <button type="button" class="btn-action btn-red" onclick="factoryResetCatalog()">🔄 Restaurar Fábrica</button>
+                <button type="button" class="btn-action btn-teal" onclick="createNewBackup()">💾 Crear Copia (Hoy)</button>
+                <button type="button" class="btn-action btn-red" onclick="factoryResetCatalog()">🔄 Rest. Fábrica</button>
             </div>
             
             <div id="backups-history-list" style="margin-bottom: 12px; max-height: 160px; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px; background: #f8f9fa;"></div>
@@ -187,7 +195,6 @@
         <div class="actions-wrapper">
             <button type="button" id="btn-toggle-view" class="btn-action btn-blue" onclick="toggleView()">Configurar</button>
             <button type="button" class="btn-action btn-orange" onclick="undoAction()">↩️ Deshacer</button>
-            <!-- BOTÓN RESET INTELIGENTE DEPENDIENDO DE LA VISTA -->
             <button type="button" class="btn-action btn-red" onclick="handleBottomReset()">🔄 Reset</button>
             <button type="button" class="btn-action btn-teal" style="background-color: #8e44ad;" onclick="refreshOnline()">🔄 Web</button>
             <button type="button" class="btn-action btn-whatsapp" onclick="shareWhatsApp()">🟢 WhatsApp</button>
@@ -196,17 +203,16 @@
     </div>
 
     <script>
-        const categories = {
-            1: "1. DESPENSA Y VÍVERES",
-            2: "2. CHARCUTERÍA Y PROTEÍNAS",
-            3: "3. FRUTAS Y VERDURAS",
-            4: "4. CONDIMENTOS Y SALSAS",
-            5: "5. LIMPIEZA Y HOGAR",
-            6: "6. CUIDADO PERSONAL Y SALUD"
-        };
+        const defaultCategories = [
+            { id: 1, name: "1. DESPENSA Y VÍVERES", active: true },
+            { id: 2, name: "2. CHARCUTERÍA Y PROTEÍNAS", active: true },
+            { id: 3, name: "3. FRUTAS Y VERDURAS", active: true },
+            { id: 4, name: "4. CONDIMENTOS Y SALSAS", active: true },
+            { id: 5, name: "5. LIMPIEZA Y HOGAR", active: true },
+            { id: 6, name: "6. CUIDADO PERSONAL Y SALUD", active: true }
+        ];
 
         let defaultItems = [
-            // DESPENSA
             { id: 1, cat: 1, name: "Arroz (Blanco y vaporizado)", qty: 6.00, est: 2.60 },
             { id: 2, cat: 1, name: "Pasta (Larga y corta)", qty: 6.00, est: 1.85 },
             { id: 3, cat: 1, name: "Harina de maíz", qty: 20.00, est: 1.30 },
@@ -236,7 +242,6 @@
             { id: 27, cat: 1, name: "Guasacaca", qty: 1, est: 2.80 },
             { id: 28, cat: 1, name: "Fororo", qty: 1, est: 1.50 },
             { id: 29, cat: 1, name: "Maicena 200 gr", qty: 1, est: 1.80 },
-            // CHARCUTERÍA
             { id: 30, cat: 2, name: "Jamón (Pierna, pavo o espalda)", qty: 1.50, est: 11.00 },
             { id: 31, cat: 2, name: "Queso (Duro, amarillo, mozzarella)", qty: 1.50, est: 11.00 },
             { id: 32, cat: 2, name: "Queso Blanco", qty: 6.00, est: 8.00 },
@@ -265,7 +270,6 @@
             { id: 55, cat: 2, name: "Lagarto", qty: 1.00, est: 12.00 },
             { id: 56, cat: 2, name: "Mondongo", qty: 0.500, est: 3.00 },
             { id: 57, cat: 2, name: "Costilla", qty: 0.400, est: 9.00 },
-            // FRUTAS Y VERDURAS
             { id: 58, cat: 3, name: "Cebolla Normal", qty: 1.87, est: 1.00 },
             { id: 59, cat: 3, name: "Cebolla Morada", qty: 0.520, est: 3.00 },
             { id: 60, cat: 3, name: "Ajo (Cabezas o pelado)", qty: 0.280, est: 13.27 },
@@ -303,7 +307,6 @@
             { id: 93, cat: 3, name: "Guayaba", qty: 1.17, est: 1.20 },
             { id: 94, cat: 3, name: "Romero", qty: 0.165, est: 5.00 },
             { id: 133, cat: 3, name: "Ruda", qty: 0.165, est: 3.00 },
-            // CONDIMENTOS
             { id: 95, cat: 4, name: "Mayonesa 500 gr", qty: 2, est: 4.50 },
             { id: 96, cat: 4, name: "Mostaza", qty: 1, est: 2.15 },
             { id: 97, cat: 4, name: "Salsa de tomate (Ketchup)", qty: 2, est: 2.63 },
@@ -314,7 +317,6 @@
             { id: 102, cat: 4, name: "Especias (Pimienta, comino, etc)", qty: 4, est: 1.00 },
             { id: 103, cat: 4, name: "Sopa Maggi", qty: 2, est: 1.70 },
             { id: 104, cat: 4, name: "Cubito Maggi", qty: 1, est: 3.10 },
-            // LIMPIEZA
             { id: 105, cat: 5, name: "Jabón de ropa en Polvo 400 gr", qty: 10, est: 1.50 },
             { id: 106, cat: 5, name: "Suavizante de telas 180 ml", qty: 1, est: 2.50 },
             { id: 107, cat: 5, name: "Blanqueador (Cloro)", qty: 2, est: 1.60 },
@@ -330,7 +332,6 @@
             { id: 117, cat: 5, name: "Servilletas de papel", qty: 1, est: 1.50 },
             { id: 118, cat: 5, name: "Coletos", qty: 2, est: 2.50 },
             { id: 119, cat: 5, name: "Paños de Cocina", qty: 2, est: 2.00 },
-            // CUIDADO PERSONAL
             { id: 120, cat: 6, name: "Jabón de baño (Barra o líquida)", qty: 12, est: 2.50 },
             { id: 121, cat: 6, name: "Champú", qty: 3, est: 7.00 },
             { id: 122, cat: 6, name: "Acondicionador", qty: 1, est: 7.00 },
@@ -346,62 +347,46 @@
             { id: 132, cat: 6, name: "Protección femenina", qty: 2, est: 2.00 }
         ];
 
-        let state = { items: [], backups: [], rate: 40.00, currentView: 'list' };
+        let state = { items: [], categories: [], backups: [], rate: 40.00, currentView: 'list' };
         let undoStack = [];
 
         function saveToHistory() {
-            undoStack.push(JSON.stringify(state.items));
+            undoStack.push(JSON.stringify({items: state.items, categories: state.categories}));
             if (undoStack.length > 25) undoStack.shift();
         }
 
         function undoAction() {
             if (undoStack.length === 0) return alert("No hay acciones por deshacer.");
-            state.items = JSON.parse(undoStack.pop());
+            let parsed = JSON.parse(undoStack.pop());
+            state.items = parsed.items;
+            state.categories = parsed.categories;
             saveToLocalStorage();
             renderAll();
         }
 
         function initApp() {
-            let savedState = localStorage.getItem('compras_pro_app_state_final');
+            let savedState = localStorage.getItem('compras_pro_app_state_v7');
+            let savedCats = localStorage.getItem('compras_pro_app_cats_v7');
             let savedRate = localStorage.getItem('compras_pro_app_rate');
             let savedBackups = localStorage.getItem('compras_pro_app_backups');
             
             if (savedRate) state.rate = parseFloat(savedRate) || 40.00;
             document.getElementById('exchange-rate').value = state.rate.toFixed(2);
 
-            if (savedBackups) {
-                try {
-                    state.backups = JSON.parse(savedBackups) || [];
-                } catch(e) {
-                    state.backups = [];
-                }
-            }
+            try { state.backups = savedBackups ? JSON.parse(savedBackups) : []; } catch(e) { state.backups = []; }
+            try { state.categories = savedCats ? JSON.parse(savedCats) : JSON.parse(JSON.stringify(defaultCategories)); } catch(e) { state.categories = JSON.parse(JSON.stringify(defaultCategories)); }
+
+            if (state.categories.length === 0) state.categories = JSON.parse(JSON.stringify(defaultCategories));
 
             if (savedState) {
                 try {
                     let parsed = JSON.parse(savedState);
                     if (Array.isArray(parsed) && parsed.length > 0) {
-                        state.items = parsed.map(item => {
-                            let orig = defaultItems.find(d => d.id === item.id);
-                            let baseQty = typeof item.qty === 'number' ? item.qty : (orig ? orig.qty : 1);
-                            let baseEst = typeof item.est === 'number' ? item.est : (orig ? orig.est : 0);
-                            return {
-                                id: item.id,
-                                cat: item.cat || (orig ? orig.cat : 1),
-                                name: item.name || (orig ? orig.name : "Artículo"),
-                                qty: baseQty,
-                                est_qty: typeof item.est_qty === 'number' ? item.est_qty : baseQty,
-                                est: baseEst,
-                                real: typeof item.real === 'number' ? item.real : baseEst,
-                                checked: !!item.checked
-                            };
-                        });
+                        state.items = parsed;
                     } else {
                         resetToDefaults();
                     }
-                } catch(e) {
-                    resetToDefaults();
-                }
+                } catch(e) { resetToDefaults(); }
             } else {
                 resetToDefaults();
             }
@@ -409,29 +394,24 @@
         }
 
         function resetToDefaults() {
-            // Genera una copia 100% limpia e independiente del array por defecto
+            state.categories = JSON.parse(JSON.stringify(defaultCategories));
             state.items = JSON.parse(JSON.stringify(defaultItems)).map(item => ({
-                ...item,
-                est_qty: item.qty,
-                real: item.est,
-                checked: false
+                ...item, est_qty: item.qty, real: item.est, checked: false
             }));
             saveToLocalStorage();
         }
 
-        /* FUNCIÓN PRINCIPAL DE FÁBRICA: Restaura eliminados y borra los manuales */
         function factoryResetCatalog() {
-            if (confirm("¿Estás seguro de volver a los valores de fábrica? Esto restaurará los productos originales eliminados y borrará los nuevos.")) {
+            if (confirm("¿Estás seguro de volver a los valores de fábrica? Se restaurarán las categorías e ítems originales y se perderán tus modificaciones.")) {
                 saveToHistory();
                 resetToDefaults();
                 renderAll();
-                alert("Catálogo de fábrica restaurado con éxito.");
+                alert("Restauración de fábrica completada.");
             }
         }
 
-        /* FUNCIÓN SECUNDARIA DE LIMPIEZA: Solo limpia montos para el día a día */
         function resetChecklistValues() {
-            if (confirm("¿Desmarcar todo y restablecer cantidades/precios reales a los valores de referencia (Est)?")) {
+            if (confirm("¿Desmarcar todo y restablecer cantidades/precios reales a los de referencia?")) {
                 saveToHistory();
                 state.items.forEach(item => {
                     item.checked = false;
@@ -443,7 +423,6 @@
             }
         }
 
-        /* CONTROL INTELIGENTE DEL BOTÓN INFERIOR SEGÚN LA VISTA */
         function handleBottomReset() {
             if (state.currentView === 'settings') {
                 factoryResetCatalog();
@@ -453,7 +432,8 @@
         }
 
         function saveToLocalStorage() {
-            localStorage.setItem('compras_pro_app_state_final', JSON.stringify(state.items));
+            localStorage.setItem('compras_pro_app_state_v7', JSON.stringify(state.items));
+            localStorage.setItem('compras_pro_app_cats_v7', JSON.stringify(state.categories));
             localStorage.setItem('compras_pro_app_rate', state.rate);
             localStorage.setItem('compras_pro_app_backups', JSON.stringify(state.backups));
         }
@@ -467,24 +447,18 @@
         function fetchBCVRate() {
             const btn = document.getElementById("btn-fetch-bcv");
             const originalText = btn.textContent;
-            btn.textContent = "⏳...";
+            btn.textContent = "⏳";
             btn.disabled = true;
 
             fetch('https://bcv-api.rafnixg.dev/rates/')
-            .then(res => {
-                if (!res.ok) throw new Error("Error en API principal");
-                return res.json();
-            })
+            .then(res => { if (!res.ok) throw new Error("API Principal"); return res.json(); })
             .then(data => {
                 let bcvUSD = data?.rates?.USD || data?.USD || data?.usd;
                 if (bcvUSD) {
-                    let parsedRate = parseFloat(bcvUSD);
-                    document.getElementById('exchange-rate').value = parsedRate.toFixed(2);
+                    document.getElementById('exchange-rate').value = parseFloat(bcvUSD).toFixed(2);
                     handleRateChange();
-                    alert("¡Tasa BCV obtenida con éxito: " + parsedRate.toFixed(2) + " Bs.!");
-                } else {
-                    throw new Error("Formato inválido");
-                }
+                    alert(`¡Tasa BCV obtenida: ${parseFloat(bcvUSD).toFixed(2)} Bs.!`);
+                } else throw new Error("Inválido");
             })
             .catch(err => {
                 fetch('https://pydolarvenezuela-api.vercel.io/api/v1/dollar?page=bcv')
@@ -492,22 +466,14 @@
                 .then(data => {
                     let price = data?.monitors?.bcv?.price;
                     if (price) {
-                        let parsedRate = parseFloat(price);
-                        document.getElementById('exchange-rate').value = parsedRate.toFixed(2);
+                        document.getElementById('exchange-rate').value = parseFloat(price).toFixed(2);
                         handleRateChange();
-                        alert("¡Tasa BCV cargada (Servidor Espejo): " + parsedRate.toFixed(2) + " Bs.!");
-                    } else {
-                        alert("No se pudo obtener el valor automatizado. Escribe la tasa manualmente.");
-                    }
+                        alert(`¡Tasa BCV (Servidor 2): ${parseFloat(price).toFixed(2)} Bs.!`);
+                    } else alert("No se pudo obtener el valor automatizado.");
                 })
-                .catch(() => {
-                    alert("Sin conexión temporal a los servidores de tasa oficial. Escribe el valor manual.");
-                });
+                .catch(() => alert("Sin conexión a servidores. Escribe el valor manual."));
             })
-            .finally(() => {
-                btn.textContent = originalText;
-                btn.disabled = false;
-            });
+            .finally(() => { btn.textContent = originalText; btn.disabled = false; });
         }
 
         function toggleView() {
@@ -536,6 +502,7 @@
         }
 
         function renderAll() {
+            renderDynamicSelects();
             if (state.currentView === 'list') {
                 renderChecklist();
             } else {
@@ -545,13 +512,51 @@
             calculateTotals();
         }
 
+        function renderDynamicSelects() {
+            const visibilityContainer = document.getElementById("settings-categories-visibility");
+            const newCatSelect = document.getElementById("new-item-cat");
+            
+            if (visibilityContainer) {
+                visibilityContainer.innerHTML = state.categories.map(c => `
+                    <label style="display:flex; align-items:center; gap:8px; font-size:14px; border-bottom:1px solid #edf2f7; padding-bottom:4px;">
+                        <input type="checkbox" style="transform: scale(1.3); margin:0;" ${c.active ? 'checked' : ''} onchange="toggleCategoryActive(${c.id}, this.checked)">
+                        ${c.name}
+                    </label>
+                `).join('');
+            }
+            if (newCatSelect) {
+                newCatSelect.innerHTML = state.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            }
+        }
+
+        function toggleCategoryActive(id, isActive) {
+            saveToHistory();
+            let cat = state.categories.find(c => c.id === id);
+            if (cat) cat.active = isActive;
+            saveToLocalStorage();
+        }
+
+        function deleteCategory(id) {
+            let cat = state.categories.find(c => c.id === id);
+            if (!cat) return;
+            if (confirm(`¿Eliminar la categoría COMPLETA "${cat.name}" y todos sus productos?`)) {
+                saveToHistory();
+                state.categories = state.categories.filter(c => c.id !== id);
+                state.items = state.items.filter(i => i.cat !== id);
+                saveToLocalStorage();
+                renderAll();
+            }
+        }
+
         function renderChecklist() {
             const container = document.getElementById('categories-container');
             container.innerHTML = '';
 
-            Object.keys(categories).forEach(catId => {
-                let catItems = state.items.filter(i => i.cat == catId);
-                let html = `<h2>${categories[catId]} <span class="progress-badge" id="badge-cat-${catId}">(0/0)</span></h2>
+            state.categories.filter(c => c.active).forEach(category => {
+                let catItems = state.items.filter(i => i.cat == category.id);
+                if (catItems.length === 0) return;
+
+                let html = `<h2>${category.name} <span class="progress-badge" id="badge-cat-${category.id}">(0/0)</span></h2>
                 <div class="table-container">
                     <table>
                         <colgroup>
@@ -603,9 +608,14 @@
             const container = document.getElementById('settings-prices-container');
             container.innerHTML = '';
 
-            Object.keys(categories).forEach(catId => {
-                let catItems = state.items.filter(i => i.cat == catId);
-                let html = `<h4 style="margin: 15px 0 5px 0; color:#27ae60;">${categories[catId]}</h4>
+            state.categories.forEach(category => {
+                let catItems = state.items.filter(i => i.cat == category.id);
+                
+                let html = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin: 18px 0 6px 0;">
+                    <h4 style="margin:0; color:#27ae60;">${category.name}</h4>
+                    <button type="button" class="btn-delete-cat" onclick="deleteCategory(${category.id})">🗑 Borrar Toda</button>
+                </div>
                 <div class="table-container">
                     <table>
                         <colgroup>
@@ -632,10 +642,17 @@
                     let orig = defaultItems.find(d => d.id === item.id);
                     let origQty = orig ? orig.qty : '-';
                     let origPrice = orig ? '$' + orig.est.toFixed(2) : '-';
+                    
+                    let catOptions = state.categories.map(c => `<option value="${c.id}" ${c.id == item.cat ? 'selected' : ''}>Mover a: ${c.name}</option>`).join('');
 
                     html += `
                     <tr>
-                        <td style="font-size:11px; padding-left: 2px;">${item.name}</td>
+                        <td style="font-size:11px; padding-left: 2px;">
+                            <div style="font-weight:bold;">${item.name}</div>
+                            <select class="category-mover" onchange="moveItemCategory(${item.id}, this.value)">
+                                ${catOptions}
+                            </select>
+                        </td>
                         <td class="center"><input type="number" class="edit-input" value="${item.est_qty}" step="any" onchange="updateItemEstQty(${item.id}, this.value)" onkeydown="handleEnterKey(event)"></td>
                         <td class="est-price-cell">${origQty}</td>
                         <td class="center"><input type="number" class="edit-input" value="${item.est.toFixed(2)}" step="0.01" onchange="updateItemEstPrice(${item.id}, this.value)" onkeydown="handleEnterKey(event)"></td>
@@ -649,6 +666,14 @@
             });
         }
 
+        function moveItemCategory(itemId, newCatId) {
+            saveToHistory();
+            let item = state.items.find(i => i.id === itemId);
+            if (item) item.cat = parseInt(newCatId);
+            saveToLocalStorage();
+            renderAll();
+        }
+
         function addNewItemToCatalog() {
             const nameField = document.getElementById("new-item-name");
             const catField = document.getElementById("new-item-cat");
@@ -660,10 +685,10 @@
             let qty = parseFloat(qtyField.value) || 1;
             let est = parseFloat(priceField.value) || 0;
 
-            if (!name) return alert("Por favor ingresa un nombre para el artículo.");
+            if (!name) return alert("Por favor ingresa un nombre.");
 
             saveToHistory();
-            let newItem = {
+            state.items.push({
                 id: Date.now(),
                 cat: cat,
                 name: name,
@@ -672,24 +697,18 @@
                 est: est,
                 real: est,
                 checked: false
-            };
-
-            state.items.push(newItem);
+            });
             saveToLocalStorage();
             
-            nameField.value = '';
-            qtyField.value = '';
-            priceField.value = '';
-            
-            alert(`"${name}" agregado correctamente.`);
+            nameField.value = ''; qtyField.value = ''; priceField.value = '';
+            alert(`"${name}" agregado.`);
             renderAll();
         }
 
         function deleteItem(id) {
             let item = state.items.find(i => i.id === id);
             if (!item) return;
-
-            if (confirm(`¿Quieres eliminar "${item.name}" de tu lista de forma permanente?`)) {
+            if (confirm(`¿Eliminar "${item.name}" por completo?`)) {
                 saveToHistory();
                 state.items = state.items.filter(i => i.id !== id);
                 saveToLocalStorage();
@@ -708,7 +727,7 @@
             }
             saveToLocalStorage();
             calculateTotals();
-            filterList(); // Auto-oculta en vivo
+            filterList();
         }
 
         function updateItemQty(id, val) {
@@ -731,8 +750,7 @@
             saveToHistory();
             let item = state.items.find(i => i.id === id);
             let parsed = parseFloat(val) || 0;
-            item.est_qty = parsed;
-            item.qty = parsed;
+            item.est_qty = parsed; item.qty = parsed;
             saveToLocalStorage();
         }
 
@@ -740,8 +758,7 @@
             saveToHistory();
             let item = state.items.find(i => i.id === id);
             let parsed = parseFloat(val) || 0;
-            item.est = parsed;
-            item.real = parsed;
+            item.est = parsed; item.real = parsed;
             saveToLocalStorage();
         }
 
@@ -772,15 +789,18 @@
         }
 
         function calculateTotals() {
-            let checkedTotalUSD = 0;
-            let listTotalUSD = 0;
-
-            let catCounters = {1: {c:0, t:0}, 2: {c:0, t:0}, 3: {c:0, t:0}, 4: {c:0, t:0}, 5: {c:0, t:0}, 6: {c:0, t:0}};
+            let checkedTotalUSD = 0; let listTotalUSD = 0;
+            let catCounters = {};
+            state.categories.forEach(c => catCounters[c.id] = {c:0, t:0});
 
             state.items.forEach(item => {
                 let subtotal = item.qty * item.real;
-                listTotalUSD += subtotal;
-                if (item.checked) checkedTotalUSD += subtotal;
+                let isActiveCat = state.categories.find(c => c.id === item.cat)?.active;
+
+                if (isActiveCat) {
+                    listTotalUSD += subtotal;
+                    if (item.checked) checkedTotalUSD += subtotal;
+                }
 
                 let cell = document.getElementById(`subtotal-${item.id}`);
                 if (cell) cell.textContent = "$" + subtotal.toFixed(2);
@@ -799,81 +819,49 @@
             let checkedTotalLocal = checkedTotalUSD * state.rate;
             let listTotalLocal = listTotalUSD * state.rate;
 
-            document.getElementById("checked-total").textContent = 
-                "$" + checkedTotalUSD.toFixed(2) + " / " + checkedTotalLocal.toFixed(0) + " Bs.";
+            document.getElementById("checked-total").textContent = "$" + checkedTotalUSD.toFixed(2) + " / " + checkedTotalLocal.toFixed(0) + " Bs.";
+            document.getElementById("list-total").textContent = "$" + listTotalUSD.toFixed(2) + " / " + listTotalLocal.toFixed(0) + " Bs.";
             
-            document.getElementById("list-total").textContent = 
-                "$" + listTotalUSD.toFixed(2) + " / " + listTotalLocal.toFixed(0) + " Bs.";
-
-            document.getElementById("items-count-label").textContent = `${state.items.filter(i=>i.checked).length} / ${state.items.length} Comprados`;
+            let activeItemsCount = state.items.filter(i => state.categories.find(c => c.id === i.cat)?.active).length;
+            let checkedItemsCount = state.items.filter(i => i.checked && state.categories.find(c => c.id === i.cat)?.active).length;
+            document.getElementById("items-count-label").textContent = `${checkedItemsCount} / ${activeItemsCount} Comprados`;
         }
 
-        // --- GESTIÓN DE COPIAS DE SEGURIDAD HISTÓRICO ---
         function createNewBackup() {
-            let backupData = { rate: state.rate, items: state.items };
+            let backupData = { rate: state.rate, items: state.items, categories: state.categories };
             let code = btoa(unescape(encodeURIComponent(JSON.stringify(backupData))));
-            
             let now = new Date();
-            let dateStr = now.toLocaleString('es-VE', { 
-                day: '2-digit', month: '2-digit', year: 'numeric', 
-                hour: '2-digit', minute: '2-digit' 
-            });
-
+            let dateStr = now.toLocaleString('es-VE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             state.backups.push({ id: Date.now(), date: dateStr, code: code });
             saveToLocalStorage();
             renderBackupList();
-            alert("Copia guardada en el dispositivo con la fecha: " + dateStr);
+            alert("Copia guardada: " + dateStr);
         }
 
         function renderBackupList() {
             const container = document.getElementById("backups-history-list");
             if (!container) return;
-
             if (state.backups.length === 0) {
                 container.innerHTML = `<p style="text-align:center; font-size:11px; color:#7f8c8d; margin:10px 0;">No hay copias guardadas.</p>`;
                 return;
             }
-
-            let html = `<table style="min-width:100%; table-layout:auto; margin-bottom:0;">
-                <thead>
-                    <tr style="background:#e2e8f0;">
-                        <th style="padding:4px; font-size:10px; text-align:center;">Fecha de Registro</th>
-                        <th style="padding:4px; font-size:10px; text-align:center;">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-
+            let html = `<table style="min-width:100%; table-layout:auto; margin-bottom:0;"><thead><tr style="background:#e2e8f0;"><th style="padding:4px; font-size:10px; text-align:center;">Fecha de Registro</th><th style="padding:4px; font-size:10px; text-align:center;">Acciones</th></tr></thead><tbody>`;
             for (let i = state.backups.length - 1; i >= 0; i--) {
                 let b = state.backups[i];
-                html += `<tr style="border-bottom:1px solid #cbd5e1;">
-                    <td style="padding:6px; font-size:11px; font-weight:bold; text-align:center; color:#2c3e50;">${b.date}</td>
-                    <td style="padding:4px; text-align:center; display:flex; gap:4px; justify-content:center;">
-                        <button type="button" class="btn-action btn-teal" style="padding:5px 6px; font-size:10px; flex:none; border-radius:4px;" onclick="copyCodeToClipboard('${b.code}')">📋 Copiar</button>
-                        <button type="button" class="btn-action btn-blue" style="padding:5px 6px; font-size:10px; flex:none; border-radius:4px;" onclick="restoreFromCode('${b.code}', true)">🔄 Usar</button>
-                        <button type="button" class="btn-action btn-red" style="padding:5px 4px; font-size:10px; flex:none; background:#e74c3c; border-radius:4px;" onclick="deleteLocalBackup(${b.id})">✕</button>
-                    </td>
-                </tr>`;
+                html += `<tr style="border-bottom:1px solid #cbd5e1;"><td style="padding:6px; font-size:11px; font-weight:bold; text-align:center; color:#2c3e50;">${b.date}</td><td style="padding:4px; text-align:center; display:flex; gap:4px; justify-content:center;"><button type="button" class="btn-action btn-teal" style="padding:5px 6px; font-size:10px; flex:none; border-radius:4px;" onclick="copyCodeToClipboard('${b.code}')">📋 Copiar</button><button type="button" class="btn-action btn-blue" style="padding:5px 6px; font-size:10px; flex:none; border-radius:4px;" onclick="restoreFromCode('${b.code}', true)">🔄 Usar</button><button type="button" class="btn-action btn-red" style="padding:5px 4px; font-size:10px; flex:none; background:#e74c3c; border-radius:4px;" onclick="deleteLocalBackup(${b.id})">✕</button></td></tr>`;
             }
             html += `</tbody></table>`;
             container.innerHTML = html;
         }
 
         function copyCodeToClipboard(code) {
-            navigator.clipboard.writeText(code).then(() => {
-                alert("¡Código copiado al portapapeles!");
-            }).catch(() => {
-                let el = document.createElement('textarea');
-                el.value = code;
-                document.body.appendChild(el);
-                el.select();
-                document.execCommand('copy');
-                document.body.removeChild(el);
-                alert("¡Código copiado!");
+            navigator.clipboard.writeText(code).then(() => { alert("¡Código copiado al portapapeles!"); }).catch(() => {
+                let el = document.createElement('textarea'); el.value = code; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); alert("¡Código copiado!");
             });
         }
 
         function deleteLocalBackup(id) {
-            if(confirm("¿Quieres eliminar esta copia de seguridad?")) {
+            if(confirm("¿Quieres eliminar esta copia?")) {
                 state.backups = state.backups.filter(b => b.id !== id);
                 saveToLocalStorage();
                 renderBackupList();
@@ -888,59 +876,37 @@
                     saveToHistory();
                     state.rate = decrypted.rate || 40.00;
                     state.items = decrypted.items;
+                    if(decrypted.categories) state.categories = decrypted.categories;
                     document.getElementById('exchange-rate').value = state.rate.toFixed(2);
                     saveToLocalStorage();
                     renderAll();
                     return true;
-                } else {
-                    alert("Catálogo no compatible.");
-                    return false;
-                }
-            } catch(err) {
-                alert("Error al procesar el código.");
-                return false;
-            }
+                } else { alert("Catálogo no compatible."); return false; }
+            } catch(err) { alert("Error al procesar el código."); return false; }
         }
 
         function importManualBackup() {
             let str = document.getElementById("manual-import-string").value.trim();
-            if (!str) return alert("Por favor ingresa un código válido.");
-            if(restoreFromCode(str, false)) {
-                document.getElementById("manual-import-string").value = '';
-                alert("¡Importado con éxito!");
-                toggleView();
-            }
+            if (!str) return alert("Ingresa un código válido.");
+            if(restoreFromCode(str, false)) { document.getElementById("manual-import-string").value = ''; alert("¡Importado con éxito!"); toggleView(); }
         }
 
         function shareWhatsApp() {
-            let checkedItems = state.items.filter(i => i.checked);
+            let checkedItems = state.items.filter(i => i.checked && state.categories.find(c=>c.id===i.cat)?.active);
             if (checkedItems.length === 0) return alert("No hay artículos tildados para compartir.");
-
             let text = `📋 *RESUMEN DE COMPRA REAL*\n\n`;
-            checkedItems.forEach(i => {
-                text += `• ${i.name} (x${i.qty}) -> *$${(i.qty * i.real).toFixed(2)}*\n`;
-            });
-
+            checkedItems.forEach(i => { text += `• ${i.name} (x${i.qty}) -> *$${(i.qty * i.real).toFixed(2)}*\n`; });
             let rateInput = parseFloat(document.getElementById('exchange-rate').value) || 1;
             let totalUSD = checkedItems.reduce((acc, i) => acc + (i.qty * i.real), 0);
-            let totalBs = totalUSD * rateInput;
-
-            text += `\n💵 *Tasa Ref:* ${rateInput.toFixed(2)} Bs.\n`;
-            text += `🛒 *TOTAL:* *$${totalUSD.toFixed(2)} / Bs. ${totalBs.toFixed(0)}*`;
-
+            text += `\n💵 *Tasa Ref:* ${rateInput.toFixed(2)} Bs.\n🛒 *TOTAL:* *$${totalUSD.toFixed(2)} / Bs. ${(totalUSD * rateInput).toFixed(0)}*`;
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
         }
 
         function refreshOnline() {
             if (confirm("¿Forzar actualización online desde GitHub?")) {
                 if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.getRegistrations().then(regs => {
-                        for (let r of regs) r.unregister();
-                        window.location.reload(true);
-                    });
-                } else {
-                    window.location.reload(true);
-                }
+                    navigator.serviceWorker.getRegistrations().then(regs => { for (let r of regs) r.unregister(); window.location.reload(true); });
+                } else { window.location.reload(true); }
             }
         }
 
