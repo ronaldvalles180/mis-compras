@@ -7,30 +7,36 @@
     
     <title>Compras Pro</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2c3e50">
+    <meta name="theme-color" content="#f2f4f7">
 
     <style>
-        /* === VARIABLES DE TEMA === */
+        /* === VARIABLES DE TEMA MEJORADAS (ESTILO PREMIUM iOS) === */
         :root {
             --bg-color: #f2f4f7;
             --text-color: #1c1c1e;
             --text-muted: #86868b;
             --card-bg: #ffffff;
-            --border-color: #e5e5ea;
+            --border-color: rgba(60, 60, 67, 0.1);
             --primary: #34c759;
             --primary-hover: #28a745;
+            --primary-light: rgba(52, 199, 89, 0.15);
             --secondary: #007aff;
             --danger: #ff3b30;
             --alert-bg: #ffeceb;
-            --nav-bg: #ffffff;
+            --nav-bg: rgba(255, 255, 255, 0.85); /* Glassmorphism */
+            --header-bg: rgba(242, 244, 247, 0.85); /* Glassmorphism */
             --nav-active: #34c759;
             --nav-inactive: #8e8e93;
             --input-bg: #f2f2f7;
-            --input-border: #d1d1d6;
-            --toast-bg: #333333;
+            --input-border: transparent;
+            --toast-bg: rgba(28, 28, 30, 0.95);
             --toast-text: #ffffff;
             --chip-bg: #e5e5ea;
             --chip-text: #1c1c1e;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
+            --radius-md: 14px;
+            --radius-lg: 20px;
         }
 
         [data-theme="dark"] {
@@ -38,190 +44,212 @@
             --text-color: #f5f5f7;
             --text-muted: #98989d;
             --card-bg: #1c1c1e;
-            --border-color: #38383a;
+            --border-color: rgba(235, 235, 245, 0.1);
             --primary: #30d158;
             --primary-hover: #34c759;
+            --primary-light: rgba(48, 209, 88, 0.2);
             --secondary: #0a84ff;
             --danger: #ff453a;
             --alert-bg: #3a1c1c;
-            --nav-bg: #1c1c1e;
+            --nav-bg: rgba(28, 28, 30, 0.85); /* Glassmorphism oscuro */
+            --header-bg: rgba(0, 0, 0, 0.85); /* Glassmorphism oscuro */
             --nav-active: #30d158;
             --nav-inactive: #8e8e93;
             --input-bg: #2c2c2e;
-            --input-border: #48484a;
-            --toast-bg: #e5e5ea;
+            --input-border: transparent;
+            --toast-bg: rgba(229, 229, 234, 0.95);
             --toast-text: #000000;
             --chip-bg: #2c2c2e;
             --chip-text: #f5f5f7;
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.3);
+            --shadow-md: 0 12px 32px rgba(0,0,0,0.4);
         }
 
         /* === ESTILOS BASE === */
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; padding-top: 60px; padding-bottom: 140px; background-color: var(--bg-color); color: var(--text-color); transition: background-color 0.3s; -webkit-tap-highlight-color: transparent; }
+        html { scroll-behavior: smooth; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; padding-top: 60px; padding-bottom: 140px; background-color: var(--bg-color); color: var(--text-color); transition: background-color 0.3s ease; -webkit-tap-highlight-color: transparent; }
         * { box-sizing: border-box; }
         
-        /* === PESTAÑAS SUPERIORES === */
-        .tabs-header { position: fixed; top: 0; left: 0; width: 100%; height: 55px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; padding: 0 10px; gap: 8px; z-index: 100; }
-        .tabs-container { display: flex; overflow-x: auto; gap: 8px; flex: 1; padding-bottom: 2px; scrollbar-width: none; }
+        /* === PESTAÑAS SUPERIORES (GLASSMORPHISM) === */
+        .tabs-header { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: var(--nav-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; padding: 0 15px; gap: 10px; z-index: 100; transition: all 0.3s ease; }
+        .tabs-container { display: flex; overflow-x: auto; gap: 10px; flex: 1; padding-bottom: 2px; scrollbar-width: none; align-items: center; }
         .tabs-container::-webkit-scrollbar { display: none; }
-        .tab-btn { background: var(--input-bg); color: var(--text-muted); border: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: 0.2s; }
-        .tab-btn.active { background: var(--primary); color: white; }
+        .tab-btn { background: transparent; color: var(--text-muted); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 0.2s ease; }
+        .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px var(--primary-light); }
         
-        .header-actions { display: flex; gap: 6px; flex-shrink: 0; }
-        .btn-header { font-size: 12px; font-weight: bold; border: none; border-radius: 15px; padding: 6px 12px; cursor: pointer; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .btn-header.green { background: var(--primary); }
-        .btn-header.blue { background: var(--secondary); }
+        .header-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .btn-header { font-size: 13px; font-weight: 700; border: none; border-radius: 16px; padding: 8px 14px; cursor: pointer; color: white; transition: transform 0.2s; }
+        .btn-header:active { transform: scale(0.92); }
+        .btn-header.green { background: var(--primary); box-shadow: 0 4px 10px var(--primary-light); }
+        .btn-header.blue { background: var(--secondary); box-shadow: 0 4px 10px rgba(0, 122, 255, 0.2); }
 
         /* === CONTENEDORES === */
         .container { padding: 0 15px; }
-        .view-panel { display: none; animation: fadeIn 0.3s; }
+        .view-panel { display: none; animation: smoothFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .view-panel.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes smoothFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* === BUSCADOR Y PÍLDORAS FLOTANTES === */
-        .sticky-header { position: sticky; top: 55px; z-index: 90; background: var(--bg-color); padding: 10px 0 5px 0; margin-top: -5px; }
-        .search-card { background: var(--card-bg); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--border-color); }
+        .sticky-header { position: sticky; top: 60px; z-index: 90; background: var(--header-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 12px 0 8px 0; margin-top: -5px; transition: all 0.3s ease; }
+        .search-card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 14px; display: flex; flex-direction: column; gap: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
         
-        .filter-tabs { display: flex; background: var(--input-bg); border-radius: 10px; padding: 4px; gap: 4px; }
-        .ftab { flex: 1; background: transparent; border: none; padding: 8px 4px; font-size: 13px; font-weight: 700; color: var(--text-muted); border-radius: 8px; cursor: pointer; transition: 0.2s; white-space: nowrap; }
-        .ftab.active { background: var(--card-bg); color: var(--text-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .filter-tabs { display: flex; background: var(--input-bg); border-radius: 12px; padding: 4px; gap: 4px; }
+        .ftab { flex: 1; background: transparent; border: none; padding: 8px 4px; font-size: 13px; font-weight: 700; color: var(--text-muted); border-radius: 10px; cursor: pointer; transition: all 0.25s ease; white-space: nowrap; }
+        .ftab.active { background: var(--card-bg); color: var(--text-color); box-shadow: var(--shadow-sm); }
 
-        .search-row { display: flex; gap: 8px; align-items: center; }
-        .search-input { flex: 1; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-color); padding: 10px 15px; border-radius: 10px; font-size: 16px; outline: none; }
-        .btn-clear { background: var(--chip-bg); border: none; color: var(--chip-text); width: 42px; height: 42px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;}
+        .search-row { display: flex; gap: 10px; align-items: center; }
+        .search-input { flex: 1; background: var(--input-bg); border: 2px solid transparent; color: var(--text-color); padding: 12px 16px; border-radius: var(--radius-md); font-size: 16px; outline: none; transition: all 0.2s ease; }
+        .search-input:focus { border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 3px var(--primary-light); }
+        .btn-clear { background: var(--chip-bg); border: none; color: var(--chip-text); width: 44px; height: 44px; border-radius: var(--radius-md); font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s;}
+        .btn-clear:active { background: var(--border-color); }
         
-        .filter-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-muted); font-weight: 500; padding: 0 5px; }
+        .filter-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-muted); font-weight: 600; padding: 0 5px; }
 
-        .category-chips { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 2px; scrollbar-width: none; }
+        .category-chips { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 4px; scrollbar-width: none; }
         .category-chips::-webkit-scrollbar { display: none; }
-        .chip { background: var(--chip-bg); color: var(--chip-text); border: 1px solid transparent; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; transition: 0.2s; }
-        .chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .chip { background: var(--chip-bg); color: var(--chip-text); border: 1px solid transparent; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: all 0.2s ease; }
+        .chip.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px var(--primary-light); }
 
         /* === NUEVO DISEÑO PREMIUM DE TARJETAS (CHECKLIST) === */
-        h2 { font-size: 16px; color: var(--text-color); margin: 20px 0 12px 5px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; }
-        h2 .badge { background: var(--input-bg); color: var(--text-muted); padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; }
+        h2 { font-size: 18px; color: var(--text-color); margin: 24px 0 14px 5px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; letter-spacing: -0.3px; }
+        h2 .badge { background: var(--input-bg); color: var(--text-muted); padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; border: 1px solid var(--border-color); }
 
-        .item-card { background: var(--card-bg); border-radius: 16px; padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 12px; transition: all 0.2s ease; }
-        .item-card.checked { background: var(--bg-color); opacity: 0.85; border-color: transparent; }
+        .item-card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 14px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 14px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        /* Efecto premium al marcar como comprado */
+        .item-card.checked { background: transparent; border-color: transparent; box-shadow: none; transform: scale(0.98); opacity: 0.65; }
+        .item-card.checked .item-name { text-decoration: line-through; color: var(--text-muted); }
         .hidden-item { display: none !important; }
         
         /* Cabecera de la Tarjeta */
-        .item-card-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .item-card-header { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
         
-        .check-container { position: relative; width: 26px; height: 26px; flex-shrink: 0; }
+        .check-container { position: relative; width: 28px; height: 28px; flex-shrink: 0; cursor: pointer; }
         .check-container input { opacity: 0; width: 0; height: 0; }
-        .checkmark { position: absolute; top: 0; left: 0; width: 26px; height: 26px; background-color: var(--input-bg); border: 2px solid var(--input-border); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .checkmark { position: absolute; top: 0; left: 0; width: 28px; height: 28px; background-color: var(--input-bg); border: 2px solid var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.25s ease; }
+        .check-container:active .checkmark { transform: scale(0.85); }
         .check-container input:checked ~ .checkmark { background-color: var(--primary); border-color: var(--primary); }
-        .checkmark:after { content: "✓"; color: white; display: none; font-weight: bold; font-size: 14px; }
-        .check-container input:checked ~ .checkmark:after { display: block; }
+        .checkmark:after { content: ""; width: 6px; height: 12px; border: solid white; border-width: 0 2.5px 2.5px 0; transform: rotate(45deg); display: none; margin-bottom: 2px; }
+        .check-container input:checked ~ .checkmark:after { display: block; animation: checkPop 0.3s ease; }
+        @keyframes checkPop { 0% { transform: scale(0) rotate(45deg); } 100% { transform: scale(1) rotate(45deg); } }
 
         .item-name-group { flex: 1; display: flex; flex-direction: column; overflow: hidden; cursor: pointer; }
-        .item-name { font-size: 16px; font-weight: 700; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .item-subtext { font-size: 11px; color: var(--text-muted); display: flex; gap: 6px; align-items: center; margin-top: 3px; font-weight: 500; }
-        .item-tag { font-size: 10px; background: var(--chip-bg); border-radius: 4px; padding: 2px 4px; }
-        .iva-badge { font-size: 10px; background: var(--secondary); color: white; border-radius: 4px; padding: 2px 4px; font-weight: bold; }
+        .item-name { font-size: 16px; font-weight: 700; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.3s; letter-spacing: -0.2px; }
+        .item-subtext { font-size: 12px; color: var(--text-muted); display: flex; gap: 8px; align-items: center; margin-top: 5px; font-weight: 600; }
+        .item-tag { font-size: 10px; background: var(--input-bg); border-radius: 6px; padding: 3px 6px; border: 1px solid var(--border-color); }
+        .iva-badge { font-size: 10px; background: var(--secondary); color: white; border-radius: 6px; padding: 3px 6px; font-weight: 800; }
         
-        .item-total-price { font-size: 16px; font-weight: 900; color: var(--text-color); text-align: right;}
+        .item-total-price { font-size: 17px; font-weight: 800; color: var(--text-color); text-align: right; transition: color 0.3s;}
         .item-card.checked .item-total-price { color: var(--primary); }
 
-        .btn-delete-inline { background: var(--alert-bg); color: var(--danger); border: none; border-radius: 8px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-left: 6px;}
-        .btn-delete-inline:active { transform: scale(0.9); }
+        .btn-delete-inline { background: var(--alert-bg); color: var(--danger); border: none; border-radius: 10px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; cursor: pointer; transition: transform 0.2s; margin-left: 8px;}
+        .btn-delete-inline:active { transform: scale(0.85); }
 
         /* Cuerpo de la Tarjeta (Inputs) */
-        .item-card-body { display: flex; justify-content: space-between; align-items: center; padding-left: 38px; }
-        .item-inputs-inline { display: flex; gap: 8px; flex-wrap: wrap; }
+        .item-card-body { display: flex; justify-content: space-between; align-items: center; padding-left: 42px; }
+        .item-inputs-inline { display: flex; gap: 10px; flex-wrap: wrap; }
         
-        .mini-input-box { display: flex; align-items: center; background: var(--input-bg); border-radius: 8px; padding: 4px 8px; border: 1px solid var(--input-border); }
-        .mini-input-box span { font-size: 11px; color: var(--text-muted); font-weight: 700; margin-right: 6px; }
-        .mini-input-box input { width: 50px; border: none; background: transparent; color: var(--text-color); font-size: 15px; font-weight: 800; text-align: center; outline: none; padding: 0; }
+        .mini-input-box { display: flex; align-items: center; background: var(--input-bg); border-radius: 10px; padding: 6px 10px; border: 1px solid var(--input-border); transition: all 0.2s; }
+        .mini-input-box:focus-within { border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 2px var(--primary-light); }
+        .mini-input-box span { font-size: 12px; color: var(--text-muted); font-weight: 700; margin-right: 8px; }
+        .mini-input-box input { width: 55px; border: none; background: transparent; color: var(--text-color); font-size: 16px; font-weight: 800; text-align: center; outline: none; padding: 0; }
         
         .price-alert-box { border: 1px solid var(--danger) !important; background-color: var(--alert-bg) !important; }
         .inflation-badge { font-size: 11px; font-weight: 800; padding: 4px 8px; border-radius: 6px; background: var(--input-bg); }
 
         /* === TARJETAS DE CONFIGURACIÓN === */
-        .config-card { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid var(--border-color); }
-        .config-card h3 { margin: 0 0 12px 0; font-size: 16px; font-weight: 800; color: var(--text-color); border-bottom: 1px solid var(--border-color); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+        .config-card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 18px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+        .config-card h3 { margin: 0 0 14px 0; font-size: 17px; font-weight: 800; color: var(--text-color); border-bottom: 1px solid var(--border-color); padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center;}
         
-        .edit-item-row { display: flex; align-items: center; padding: 12px 10px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 8px; gap: 12px; transition: 0.2s;}
+        .edit-item-row { display: flex; align-items: center; padding: 14px 12px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 10px; gap: 14px; transition: transform 0.2s; box-shadow: var(--shadow-sm);}
+        .edit-item-row:active { transform: scale(0.98); }
         .drag-handle { color: var(--text-muted); cursor: grab; font-size: 20px; padding: 0 5px; touch-action: none;}
         .drag-handle:active { cursor: grabbing; color: var(--primary); }
         
         .edit-item-info { flex: 1; overflow: hidden; cursor: pointer; }
-        .edit-item-info p { margin: 0 0 2px 0; font-size: 15px; font-weight: 700; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-        .edit-item-info span { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+        .edit-item-info p { margin: 0 0 4px 0; font-size: 16px; font-weight: 700; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .edit-item-info span { font-size: 13px; color: var(--text-muted); font-weight: 500; }
         
         /* Botones Generales */
-        .btn { padding: 12px 16px; border-radius: 10px; font-size: 15px; font-weight: 700; border: none; cursor: pointer; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s;}
-        .btn:active { transform: scale(0.97); }
+        .btn { padding: 14px 18px; border-radius: var(--radius-md); font-size: 15px; font-weight: 700; border: none; cursor: pointer; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease;}
+        .btn:active { transform: scale(0.96); opacity: 0.9; }
         .btn-full { width: 100%; }
-        .btn-primary { background: var(--primary); color: white; border: 1px solid var(--primary); }
-        .btn-secondary { background: var(--secondary); color: white; border: 1px solid var(--secondary); }
-        .btn-danger { background: var(--danger); color: white; border: 1px solid var(--danger); }
-        .btn-outline { background: transparent; border: 1px solid var(--input-border); color: var(--text-color); }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px var(--primary-light); }
+        .btn-secondary { background: var(--secondary); color: white; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2); }
+        .btn-danger { background: var(--danger); color: white; box-shadow: 0 4px 12px rgba(255, 59, 48, 0.2); }
+        .btn-outline { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color); box-shadow: var(--shadow-sm); }
+        .btn-outline:active { background: var(--input-bg); }
         .btn-outline-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
-        .btn-icon { padding: 8px; font-size: 16px; border-radius: 8px; background: var(--input-bg); border: none; color: var(--text-color); cursor: pointer; }
-        .btn-delete-cat { background: transparent; color: var(--danger); font-size: 12px; cursor: pointer; font-weight: 700; border: none; }
+        .btn-icon { padding: 10px; font-size: 16px; border-radius: 12px; background: var(--input-bg); border: none; color: var(--text-color); cursor: pointer; transition: transform 0.2s; }
+        .btn-icon:active { transform: scale(0.9); }
+        .btn-delete-cat { background: transparent; color: var(--danger); font-size: 13px; cursor: pointer; font-weight: 700; border: none; padding: 6px 10px; border-radius: 8px;}
+        .btn-delete-cat:active { background: var(--alert-bg); }
 
-        .form-input, .form-select { width: 100%; padding: 12px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); border-radius: 10px; font-size: 16px; margin-bottom: 12px; outline: none; font-weight: 600;}
+        .form-input, .form-select { width: 100%; padding: 14px; border: 2px solid transparent; background: var(--input-bg); color: var(--text-color); border-radius: var(--radius-md); font-size: 16px; margin-bottom: 14px; outline: none; font-weight: 600; transition: all 0.2s ease;}
+        .form-input:focus, .form-select:focus { border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 3px var(--primary-light); }
 
-        /* === BARRA INFERIOR NATIVA === */
-        .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--nav-bg); border-top: 1px solid var(--border-color); z-index: 1000; padding-bottom: env(safe-area-inset-bottom); box-shadow: 0 -4px 12px rgba(0,0,0,0.03); }
-        .totals-row { display: flex; padding: 12px 15px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); align-items: center; gap: 12px; }
+        /* === BARRA INFERIOR NATIVA (GLASSMORPHISM) === */
+        .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--nav-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border-color); z-index: 1000; padding-bottom: env(safe-area-inset-bottom); box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
+        .totals-row { display: flex; padding: 12px 15px; border-bottom: 1px solid var(--border-color); align-items: center; gap: 12px; }
         
-        .rate-widget { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; display: flex; align-items: center; padding: 4px; }
-        .rate-widget span { font-size: 12px; font-weight: 800; color: var(--text-muted); padding: 0 6px; }
-        .rate-widget input { width: 65px; border: none; background: transparent; color: var(--text-color); font-weight: 800; font-size: 16px; text-align: center; outline: none; }
-        .rate-widget button { background: var(--primary); border: none; color: white; font-size: 14px; font-weight: 800; border-radius: 8px; padding: 6px 12px; margin-left: 2px; cursor: pointer; }
+        .rate-widget { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; display: flex; align-items: center; padding: 4px; transition: border-color 0.2s; }
+        .rate-widget:focus-within { border-color: var(--primary); }
+        .rate-widget span { font-size: 12px; font-weight: 800; color: var(--text-muted); padding: 0 8px; }
+        .rate-widget input { width: 70px; border: none; background: transparent; color: var(--text-color); font-weight: 800; font-size: 16px; text-align: center; outline: none; }
+        .rate-widget button { background: var(--primary); border: none; color: white; font-size: 15px; font-weight: 800; border-radius: 10px; padding: 8px 14px; margin-left: 4px; cursor: pointer; transition: transform 0.2s; }
+        .rate-widget button:active { transform: scale(0.9); }
         
         .totals-info { flex: 1; display: flex; justify-content: space-around; text-align: center; }
         .total-box { display: flex; flex-direction: column; }
-        .total-box label { font-size: 10px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 2px; }
-        .total-box span { font-size: 15px; font-weight: 900; color: var(--text-color); }
-        .total-box .real-val { color: var(--primary); }
+        .total-box label { font-size: 10px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px; }
+        .total-box span { font-size: 16px; font-weight: 900; color: var(--text-color); }
+        .total-box .real-val { color: var(--primary); font-size: 18px;}
 
-        .nav-row { display: flex; justify-content: space-around; padding: 8px 0; background: var(--nav-bg); }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--nav-inactive); background: transparent; border: none; font-size: 10px; font-weight: 700; cursor: pointer; flex: 1; gap: 4px; }
+        .nav-row { display: flex; justify-content: space-around; padding: 10px 0; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--nav-inactive); background: transparent; border: none; font-size: 11px; font-weight: 700; cursor: pointer; flex: 1; gap: 6px; transition: color 0.2s; }
         .nav-item.active { color: var(--nav-active); }
-        .nav-icon { font-size: 22px; }
+        .nav-icon { font-size: 24px; transition: transform 0.2s; }
+        .nav-item:active .nav-icon { transform: scale(0.85); }
 
-        /* === AUTOCOMPLETADO (DICCIONARIO) === */
+        /* === AUTOCOMPLETADO === */
         .autocomplete-wrapper { position: relative; width: 100%; }
-        .autocomplete-suggestions { position: absolute; top: 100%; left: 0; z-index: 3001; background: var(--card-bg); width: 100%; border: 1px solid var(--border-color); max-height: 180px; overflow-y: auto; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: none; }
-        .autocomplete-suggestion { padding: 14px; border-bottom: 1px solid var(--border-color); font-size: 15px; font-weight: 600; cursor: pointer; color: var(--text-color); display: flex; justify-content: space-between; }
-        .autocomplete-suggestion:active { background: var(--input-bg); }
+        .autocomplete-suggestions { position: absolute; top: calc(100% + 4px); left: 0; z-index: 3001; background: var(--card-bg); width: 100%; border: 1px solid var(--border-color); max-height: 200px; overflow-y: auto; border-radius: 14px; box-shadow: var(--shadow-md); display: none; padding: 6px; }
+        .autocomplete-suggestion { padding: 14px 16px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; color: var(--text-color); display: flex; justify-content: space-between; transition: background 0.2s; }
+        .autocomplete-suggestion:active, .autocomplete-suggestion:hover { background: var(--input-bg); }
 
-        /* === MODALES Y OVERLAYS === */
-        .sheet-overlay, .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; display: none; opacity: 0; transition: 0.3s; backdrop-filter: blur(2px); }
+        /* === MODALES Y OVERLAYS (GLASSMORPHISM) === */
+        .sheet-overlay, .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: none; opacity: 0; transition: opacity 0.3s ease; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
         .sheet-overlay.show, .modal-overlay.show { display: block; opacity: 1; }
         .modal-overlay.show { display: flex; align-items: center; justify-content: center; padding: 20px;}
         
-        .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: var(--card-bg); border-radius: 24px 24px 0 0; z-index: 2001; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .bottom-sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: var(--card-bg); border-radius: 28px 28px 0 0; z-index: 2001; padding: 24px 24px calc(24px + env(safe-area-inset-bottom)); transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.15); }
         .bottom-sheet.show { bottom: 0; }
-        .sheet-handle { width: 40px; height: 5px; background: var(--border-color); border-radius: 5px; margin: 0 auto 20px auto; }
-        .sheet-menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .sheet-handle { width: 44px; height: 6px; background: var(--border-color); border-radius: 6px; margin: 0 auto 24px auto; }
+        .sheet-menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
         
-        .modal-card { background: var(--card-bg); width: 100%; max-width: 450px; border-radius: 20px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transform: scale(0.95); transition: 0.2s; max-height: 90vh; overflow-y: auto;}
-        .modal-overlay.show .modal-card { transform: scale(1); }
-        .modal-header { font-size: 20px; font-weight: 800; margin-bottom: 20px; color: var(--text-color); }
-        .modal-actions { display: flex; gap: 12px; margin-top: 20px; }
+        .modal-card { background: var(--card-bg); width: 100%; max-width: 450px; border-radius: 24px; padding: 28px; box-shadow: var(--shadow-md); transform: scale(0.95); opacity: 0; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-height: 90vh; overflow-y: auto;}
+        .modal-overlay.show .modal-card { transform: scale(1); opacity: 1; }
+        .modal-header { font-size: 22px; font-weight: 800; margin-bottom: 24px; color: var(--text-color); letter-spacing: -0.5px; }
+        .modal-actions { display: flex; gap: 14px; margin-top: 24px; }
 
         /* Barras de Analítica */
-        .analytics-bar-bg { width: 100%; background: var(--input-bg); border-radius: 6px; height: 14px; margin-top: 6px; overflow: hidden; }
-        .analytics-bar-fill { height: 100%; background: var(--primary); border-radius: 6px; }
+        .analytics-bar-bg { width: 100%; background: var(--input-bg); border-radius: 8px; height: 16px; margin-top: 8px; overflow: hidden; }
+        .analytics-bar-fill { height: 100%; background: var(--primary); border-radius: 8px; transition: width 1s cubic-bezier(0.16, 1, 0.3, 1); }
         
         /* Wizard Chips */
-        .wizard-chip { background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 6px; }
-        .wizard-chip.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        .wizard-chip { background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 14px 18px; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 8px; box-shadow: var(--shadow-sm); }
+        .wizard-chip:active { transform: scale(0.98); }
+        .wizard-chip.selected { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 12px var(--primary-light); }
 
         /* === TOAST NOTIFICATIONS === */
-        .toast-container { position: fixed; bottom: 130px; left: 50%; transform: translateX(-50%); z-index: 4000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; width: 90%; max-width: 350px;}
-        .toast { background: var(--toast-bg); color: var(--toast-text); padding: 14px 24px; border-radius: 30px; font-size: 14px; font-weight: 700; box-shadow: 0 4px 15px rgba(0,0,0,0.2); opacity: 0; transform: translateY(20px); transition: 0.3s; text-align: center;}
+        .toast-container { position: fixed; bottom: 140px; left: 50%; transform: translateX(-50%); z-index: 4000; display: flex; flex-direction: column; gap: 12px; pointer-events: none; width: 90%; max-width: 360px;}
+        .toast { background: var(--toast-bg); color: var(--toast-text); padding: 16px 24px; border-radius: 30px; font-size: 14px; font-weight: 700; box-shadow: var(--shadow-md); opacity: 0; transform: translateY(20px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); text-align: center; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
         .toast.show { opacity: 1; transform: translateY(0); }
-        .toast.error { background: var(--danger); color: white; }
+        .toast.error { background: var(--danger); color: white; border: none;}
 
         /* CAJA FUERTE */
-        #lock-screen { position: fixed; inset: 0; background: var(--bg-color); z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .pin-box { font-size: 36px; letter-spacing: 15px; text-align: center; width: 260px; padding: 15px; border-radius: 16px; border: 2px solid var(--border-color); background: var(--input-bg); color: var(--text-color); outline: none; font-weight: 900; margin: 20px 0; font-family: monospace; }
-        .pin-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.2); }
+        #lock-screen { position: fixed; inset: 0; background: var(--bg-color); z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+        .pin-box { font-size: 40px; letter-spacing: 18px; text-align: center; width: 280px; padding: 20px; border-radius: 20px; border: 2px solid var(--border-color); background: var(--card-bg); color: var(--text-color); outline: none; font-weight: 900; margin: 30px 0; font-family: monospace; transition: all 0.3s ease; box-shadow: var(--shadow-sm); }
+        .pin-box:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-light); transform: translateY(-2px); }
 
         @media print {
             body { padding: 0; background: white; color: black; }
@@ -235,14 +263,14 @@
 <body>
 
     <div id="lock-screen">
-        <h2 style="font-size: 28px; margin-bottom: 5px;">🔐 Mis Compras</h2>
-        <p id="lock-msg" style="text-align: center; color: var(--text-muted); font-size: 15px; max-width: 300px;">Crea un PIN de 6 dígitos para proteger tus listas y precios.</p>
+        <h2 style="font-size: 32px; margin-bottom: 8px; letter-spacing: -0.5px;">🔐 Mis Compras</h2>
+        <p id="lock-msg" style="text-align: center; color: var(--text-muted); font-size: 16px; font-weight: 500; max-width: 320px; line-height: 1.4;">Crea un PIN de 6 dígitos para proteger tus listas y precios.</p>
         
         <input type="password" inputmode="numeric" id="pin-input" class="pin-box" maxlength="6" placeholder="••••••" oninput="checkPinLength(this.value)" autocomplete="off">
         
-        <button class="btn btn-primary" id="btn-unlock" style="width: 220px; padding: 15px; font-size: 16px;" onclick="submitPin()">Aceptar</button>
+        <button class="btn btn-primary" id="btn-unlock" style="width: 240px; padding: 18px; font-size: 18px; border-radius: 16px;" onclick="submitPin()">Aceptar</button>
         
-        <button onclick="factoryResetApp()" style="margin-top: 40px; background: transparent; border: none; color: var(--danger); font-size: 12px; font-weight: bold; text-decoration: underline; cursor: pointer; padding: 10px;">⚠️ Olvidé mi PIN (Borrar App)</button>
+        <button onclick="factoryResetApp()" style="margin-top: 50px; background: transparent; border: none; color: var(--danger); font-size: 14px; font-weight: bold; text-decoration: underline; cursor: pointer; padding: 12px; transition: opacity 0.2s;">⚠️ Olvidé mi PIN (Borrar App)</button>
     </div>
     
     <input type="file" id="file-import-input" accept=".json,.compras,.txt,application/json,text/plain,*/*" style="display:none" onchange="handleFileImport(event)">
@@ -272,13 +300,13 @@
                     </div>
                     
                     <div class="filter-row" style="justify-content: space-between; margin-top: 4px;">
-                        <select id="sort-filter" class="form-select" style="width: auto; padding: 4px 8px; font-size: 12px; margin: 0; min-width: 130px;" onchange="renderAll()">
+                        <select id="sort-filter" class="form-select" style="width: auto; padding: 6px 12px; border-radius: 8px; font-size: 13px; margin: 0; min-width: 140px; background: var(--input-bg);" onchange="renderAll()">
                             <option value="default">↕️ Orden Original</option>
                             <option value="az">🔤 A - Z</option>
                             <option value="za">🔤 Z - A</option>
                             <option value="qty">🔢 Mayor Cantidad</option>
                         </select>
-                        <span id="items-count-label">0 / 0</span>
+                        <span id="items-count-label" style="background: var(--chip-bg); padding: 4px 10px; border-radius: 12px;">0 / 0</span>
                     </div>
                     
                     <div class="category-chips" id="category-chips-list"></div>
@@ -290,17 +318,17 @@
 
         <div id="view-settings" class="view-panel">
             
-            <div class="config-card" style="border-color: var(--danger); background: var(--alert-bg);">
+            <div class="config-card" style="border: 1px solid rgba(255,59,48,0.3); background: var(--alert-bg);">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <h3 style="margin:0; border:none; color:var(--danger); padding-bottom:0;">🗑️ Eliminar Lista Actual</h3>
-                    <button class="btn btn-danger" style="padding: 8px 12px; font-size:13px;" onclick="deleteCurrentList()">Borrar</button>
+                    <button class="btn btn-danger" style="padding: 10px 16px; font-size:14px; border-radius: 10px;" onclick="deleteCurrentList()">Borrar</button>
                 </div>
             </div>
 
             <div class="config-card">
                 <h3>👁️ Pasillos Visibles</h3>
                 <div id="settings-categories-visibility"></div>
-                <div style="display: flex; gap: 8px; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color);">
+                <div style="display: flex; gap: 10px; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border-color);">
                     <input type="text" id="new-cat-name" class="form-input" placeholder="Nuevo pasillo" onfocus="this.select()" style="margin:0;">
                     <button class="btn btn-secondary" onclick="addNewCategory()">Crear</button>
                 </div>
@@ -308,20 +336,20 @@
 
             <div class="config-card">
                 <h3>📥 Exportar y Respaldo</h3>
-                <button class="btn btn-outline btn-full" onclick="exportCatalogCSV()">📊 Exportar Catálogo a Excel (CSV)</button>
+                <button class="btn btn-outline btn-full" onclick="exportCatalogCSV()">📊 Exportar Catálogo (CSV)</button>
             </div>
 
             <div class="sticky-header">
-                <div class="search-card" style="padding: 12px;">
-                    <h3 style="margin: 0 0 8px 0; font-size: 14px; color: var(--text-muted);">Filtrar Catálogo:</h3>
+                <div class="search-card" style="padding: 16px;">
+                    <h3 style="margin: 0 0 10px 0; font-size: 15px; color: var(--text-muted); font-weight: 700;">Filtrar Catálogo:</h3>
                     <div class="category-chips" id="category-chips-settings"></div>
                 </div>
             </div>
 
             <div class="config-card" style="margin-top: 5px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <p style="font-size: 12px; color: var(--text-muted); margin:0; font-weight: 500;">💡 Mantén pulsado <b>☰</b> para ordenar.</p>
-                    <button class="btn btn-outline" style="padding: 6px 12px; font-size:13px;" onclick="toggleQuickEdit()" id="btn-quick-edit">✏️ Edición Masiva</button>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                    <p style="font-size: 13px; color: var(--text-muted); margin:0; font-weight: 500; line-height: 1.4;">💡 Mantén pulsado <b>☰</b> para ordenar.</p>
+                    <button class="btn btn-outline" style="padding: 8px 14px; font-size:13px; border-radius: 10px;" onclick="toggleQuickEdit()" id="btn-quick-edit">✏️ Edición Masiva</button>
                 </div>
                 <div id="settings-prices-container"></div>
             </div>
@@ -339,12 +367,12 @@
                 <div class="total-box">
                     <label>COMPRA REAL</label>
                     <span class="real-val" id="checked-total-usd">$0.00</span>
-                    <span id="checked-total-bs" style="font-size:11px; color:var(--text-muted); font-weight:600;">0.00 Bs</span>
+                    <span id="checked-total-bs" style="font-size:12px; color:var(--text-muted); font-weight:600;">0.00 Bs</span>
                 </div>
                 <div class="total-box">
                     <label>TOTAL LISTA</label>
                     <span id="list-total-usd">$0.00</span>
-                    <span id="list-total-bs" style="font-size:11px; color:var(--text-muted); font-weight:600;">0.00 Bs</span>
+                    <span id="list-total-bs" style="font-size:12px; color:var(--text-muted); font-weight:600;">0.00 Bs</span>
                 </div>
             </div>
         </div>
@@ -367,43 +395,43 @@
     <div class="sheet-overlay" id="sheet-overlay" onclick="toggleMenu()"></div>
     <div class="bottom-sheet" id="bottom-sheet">
         <div class="sheet-handle"></div>
-        <h3 style="margin-top:0; text-align:center; font-size:18px; font-weight:800; margin-bottom: 20px;">Opciones Avanzadas</h3>
+        <h3 style="margin-top:0; text-align:center; font-size:20px; font-weight:800; margin-bottom: 24px; letter-spacing: -0.3px;">Opciones Avanzadas</h3>
         <div class="sheet-menu">
             <button class="btn btn-primary" style="grid-column: span 2;" onclick="openClosePurchaseModal(); toggleMenu();">✅ Cerrar Compra (Archivar)</button>
-            <button class="btn btn-outline" style="border-color:#d4ac0d; color:#d4ac0d;" onclick="openTemplatesModal(); toggleMenu();">⭐ Mis Plantillas</button>
+            <button class="btn btn-outline" style="border-color:#d4ac0d; color:#d4ac0d; background: rgba(212, 172, 13, 0.05);" onclick="openTemplatesModal(); toggleMenu();">⭐ Mis Plantillas</button>
             <button class="btn btn-outline" onclick="shareListAsFile();">📁 Exportar Lista (Archivo)</button>
-            <button class="btn btn-outline" style="border-color:var(--primary); color:var(--primary);" onclick="openAnalytics(); toggleMenu();">📊 Analítica de Gastos</button>
+            <button class="btn btn-outline" style="border-color:var(--primary); color:var(--primary); background: var(--primary-light);" onclick="openAnalytics(); toggleMenu();">📊 Analítica de Gastos</button>
             <button class="btn btn-outline" onclick="openPurchaseHistory(); toggleMenu();">📚 Compras Pasadas</button>
             <button class="btn btn-outline" onclick="toggleDarkMode(); toggleMenu();"><span id="dark-icon">🌙</span> Tema Oscuro</button>
             <button class="btn btn-outline" onclick="undoAction(); toggleMenu();">↩️ Deshacer</button>
             <button class="btn btn-outline" onclick="openBackupModal(); toggleMenu();">📦 Backups Técnicos</button>
-            <button class="btn btn-outline" style="border-color: #8e44ad; color: #8e44ad;" onclick="refreshOnline(); toggleMenu();">🔄 Actualizar App</button>
+            <button class="btn btn-outline" style="border-color: #8e44ad; color: #8e44ad; background: rgba(142, 68, 173, 0.05);" onclick="refreshOnline(); toggleMenu();">🔄 Actualizar App</button>
             <button class="btn btn-outline-danger" onclick="factoryResetCatalog();">⚠️ Restablecer Catálogo</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="wizard-modal">
         <div class="modal-card" style="display:flex; flex-direction:column; height: 85vh;">
-            <div class="modal-header" id="wizard-title" style="margin-bottom:10px;">📝 Nueva Lista de Compras</div>
-            <input type="text" id="wizard-list-name" class="form-input" placeholder="Nombre de la lista (Ej: Quincena)" style="margin-bottom:15px;">
+            <div class="modal-header" id="wizard-title" style="margin-bottom:12px;">📝 Nueva Lista de Compras</div>
+            <input type="text" id="wizard-list-name" class="form-input" placeholder="Nombre de la lista (Ej: Quincena)" style="margin-bottom:18px;">
             
-            <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <button class="btn btn-outline" style="flex:1; font-size:12px; padding:8px;" onclick="wizardSelectAll()">Seleccionar Todo</button>
-                <button class="btn btn-outline" style="flex:1; font-size:12px; padding:8px;" onclick="wizardClearAll()">Ninguno</button>
+            <div style="display:flex; gap:12px; margin-bottom:18px;">
+                <button class="btn btn-outline" style="flex:1; font-size:13px; padding:10px; border-radius: 10px;" onclick="wizardSelectAll()">Seleccionar Todo</button>
+                <button class="btn btn-outline" style="flex:1; font-size:13px; padding:10px; border-radius: 10px;" onclick="wizardClearAll()">Ninguno</button>
             </div>
             
-            <div style="display:flex; gap:6px;">
+            <div style="display:flex; gap:8px;">
                 <input type="text" id="wizard-search" class="form-input" style="flex:1;" placeholder="🔍 Buscar o escribir uno nuevo..." oninput="renderWizardChips()">
-                <button class="btn-icon" style="margin-bottom:12px; background:var(--card-bg); border:1px solid var(--border-color);" onclick="closeModals(); openItemModal(null);">✏️ Manual</button>
+                <button class="btn-icon" style="margin-bottom:14px; background:var(--card-bg); border:1px solid var(--border-color); box-shadow: var(--shadow-sm);" onclick="closeModals(); openItemModal(null);">✏️ Manual</button>
             </div>
 
-            <button class="btn btn-secondary btn-full" id="wizard-add-btn" style="display:none; margin-bottom:10px;" onclick="wizardAddNewInline()">+ Crear rápido: "<span id="wizard-new-name"></span>"</button>
+            <button class="btn btn-secondary btn-full" id="wizard-add-btn" style="display:none; margin-bottom:14px;" onclick="wizardAddNewInline()">+ Crear rápido: "<span id="wizard-new-name"></span>"</button>
             
-            <p style="font-size:12px; color:var(--text-muted); margin-bottom: 5px;">Toca los productos que necesitas:</p>
-            <div id="wizard-chips-container" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; align-content: flex-start; padding-bottom:10px;">
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom: 8px; font-weight: 600;">Toca los productos que necesitas:</p>
+            <div id="wizard-chips-container" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; align-content: flex-start; padding-bottom:12px;">
                 </div>
             
-            <div class="modal-actions" style="margin-top:10px;">
+            <div class="modal-actions" style="margin-top:14px;">
                 <button class="btn btn-outline" style="flex:1;" onclick="closeModals()">Cancelar</button>
                 <button class="btn btn-primary" style="flex:2;" id="wizard-execute-btn" onclick="executeWizardAction()">Crear Lista (<span id="wizard-count">0</span>)</button>
             </div>
@@ -413,9 +441,9 @@
     <div class="modal-overlay" id="templates-modal">
         <div class="modal-card" style="max-height: 85vh; overflow-y: auto;">
             <div class="modal-header">⭐ Mis Plantillas</div>
-            <p style="font-size:13px; color:var(--text-muted); margin-top:-10px; margin-bottom: 20px;">Guarda tus listas frecuentes o carga la Lista Original.</p>
-            <button class="btn btn-secondary btn-full" style="margin-bottom: 15px;" onclick="saveCurrentListAsTemplate()">💾 Guardar Lista Actual como Plantilla</button>
-            <div id="templates-container" style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;"></div>
+            <p style="font-size:14px; color:var(--text-muted); margin-top:-14px; margin-bottom: 24px; line-height: 1.4;">Guarda tus listas frecuentes o carga la Lista Original.</p>
+            <button class="btn btn-secondary btn-full" style="margin-bottom: 18px;" onclick="saveCurrentListAsTemplate()">💾 Guardar Lista Actual como Plantilla</button>
+            <div id="templates-container" style="display:flex; flex-direction:column; gap:14px; margin-bottom:24px;"></div>
             <button class="btn btn-outline btn-full" onclick="closeModals()">Cerrar</button>
         </div>
     </div>
@@ -423,19 +451,19 @@
     <div class="modal-overlay" id="close-purchase-modal">
         <div class="modal-card">
             <div class="modal-header">✅ Cerrar Compra</div>
-            <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Lugar / Supermercado</label>
+            <label style="font-size:13px; font-weight:800; color:var(--text-muted); margin-bottom:6px; display:block;">Lugar / Supermercado</label>
             <input type="text" id="close-location" class="form-input" placeholder="Ej: Central Madeirense, Farmatodo...">
-            <div style="background:var(--bg-color); padding:10px; border-radius:10px; margin-bottom:15px;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span style="font-size:12px; font-weight:bold;">Total a pagar:</span><span style="font-size:14px; font-weight:900;" id="close-total-target-usd">$0.00</span></div>
-                <div style="display:flex; justify-content:space-between; color:var(--text-muted);"><span style="font-size:11px;">En bolívares:</span><span style="font-size:12px; font-weight:bold;" id="close-total-target-bs">0.00 Bs</span></div>
+            <div style="background:var(--input-bg); padding:16px; border-radius:14px; margin-bottom:20px; border: 1px solid var(--border-color);">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="font-size:14px; font-weight:bold;">Total a pagar:</span><span style="font-size:18px; font-weight:900; color: var(--primary);" id="close-total-target-usd">$0.00</span></div>
+                <div style="display:flex; justify-content:space-between; color:var(--text-muted);"><span style="font-size:12px;">En bolívares:</span><span style="font-size:14px; font-weight:bold;" id="close-total-target-bs">0.00 Bs</span></div>
             </div>
-            <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:8px; display:block;">Métodos de Pago Utilizados</label>
-            <div id="close-payments-container" style="display:flex; flex-direction:column; gap:10px; margin-bottom:10px;"></div>
-            <button class="btn btn-outline btn-full" style="font-size:13px; padding:8px; border-style:dashed;" onclick="addPaymentRow()">+ Añadir otro método de pago</button>
-            <div style="text-align:right; font-size:13px; font-weight:800; margin-top:10px; color:var(--danger);" id="close-remaining-text">Falta por asignar: $0.00</div>
-            <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:8px; display:block; margin-top:20px;">¿Qué hacer con los productos FALTANTES?</label>
-            <select id="close-action-pending" class="form-select">
-                <option value="keep">Borrar los ya comprados y dejar los que faltan</option>
+            <label style="font-size:13px; font-weight:800; color:var(--text-muted); margin-bottom:10px; display:block;">Métodos de Pago Utilizados</label>
+            <div id="close-payments-container" style="display:flex; flex-direction:column; gap:12px; margin-bottom:12px;"></div>
+            <button class="btn btn-outline btn-full" style="font-size:14px; padding:12px; border-style:dashed; border-width: 2px;" onclick="addPaymentRow()">+ Añadir otro método de pago</button>
+            <div style="text-align:right; font-size:14px; font-weight:800; margin-top:14px; color:var(--danger);" id="close-remaining-text">Falta por asignar: $0.00</div>
+            <label style="font-size:13px; font-weight:800; color:var(--text-muted); margin-bottom:8px; display:block; margin-top:24px;">¿Qué hacer con los productos FALTANTES?</label>
+            <select id="close-action-pending" class="form-select" style="padding: 12px;">
+                <option value="keep">Borrar los comprados y dejar los que faltan</option>
                 <option value="reset">Resetear todo el carrito a 0 (Mantener todo)</option>
             </select>
             <div class="modal-actions">
@@ -448,8 +476,8 @@
     <div class="modal-overlay" id="reset-modal">
         <div class="modal-card">
             <div class="modal-header">⚠️ Restablecer Catálogo</div>
-            <p style="font-size:14px; color:var(--text-muted); margin-top:-10px; margin-bottom: 20px; line-height: 1.4;">Elige cómo deseas restablecer <b>esta lista</b>. Los productos y pasillos nuevos que hayas creado se mantendrán.</p>
-            <div style="display:flex; flex-direction:column; gap:12px;">
+            <p style="font-size:15px; color:var(--text-muted); margin-top:-12px; margin-bottom: 24px; line-height: 1.5;">Elige cómo deseas restablecer <b>esta lista</b>. Los productos y pasillos nuevos que hayas creado se mantendrán.</p>
+            <div style="display:flex; flex-direction:column; gap:14px;">
                 <button class="btn btn-primary" onclick="executeFactoryReset('default')">Restaurar con Cantidades Originales</button>
                 <button class="btn btn-secondary" onclick="executeFactoryReset('zero')">Vaciar Lista (Borrar Todos los Productos)</button>
                 <button class="btn btn-outline" onclick="closeModals()">Cancelar</button>
@@ -463,62 +491,62 @@
             <input type="hidden" id="edit-id">
             
             <div class="autocomplete-wrapper">
-                <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Nombre del Producto</label>
+                <label style="font-size:13px; font-weight:800; color:var(--text-muted); margin-bottom:6px; display:block;">Nombre del Producto</label>
                 <input type="text" id="edit-name" class="form-input" style="text-align:left;" onfocus="this.select()" oninput="handleAutocomplete(this.value)" autocomplete="off">
                 <div class="autocomplete-suggestions" id="autocomplete-list"></div>
             </div>
 
-            <div style="display:flex; gap:12px;">
+            <div style="display:flex; gap:14px;">
                 <div style="flex:1;">
-                    <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Pasillo</label>
-                    <select id="edit-cat" class="form-select" style="text-align-last:left;"></select>
+                    <label style="font-size:13px; font-weight:800; color:var(--text-muted); margin-bottom:6px; display:block;">Pasillo</label>
+                    <select id="edit-cat" class="form-select" style="text-align-last:left; padding: 12px;"></select>
                 </div>
                 <div style="flex:1;">
-                    <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Etiqueta</label>
-                    <select id="edit-tag" class="form-select" style="text-align-last:left;" onchange="handleTagChange(this)"></select>
+                    <label style="font-size:13px; font-weight:800; color:var(--text-muted); margin-bottom:6px; display:block;">Etiqueta</label>
+                    <select id="edit-tag" class="form-select" style="text-align-last:left; padding: 12px;" onchange="handleTagChange(this)"></select>
                 </div>
             </div>
 
-            <div style="display:flex; gap:12px;">
+            <div style="display:flex; gap:14px;">
                 <div style="flex:1;">
-                    <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Cant. Default</label>
+                    <label style="font-size:13px; font-weight:800; color:var(--text-muted); margin-bottom:6px; display:block;">Cant. Default</label>
                     <input type="number" inputmode="decimal" id="edit-qty" class="form-input" step="any" onfocus="this.select()">
                 </div>
                 <div style="flex:1;">
-                    <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Precio Ref ($)</label>
+                    <label style="font-size:13px; font-weight:800; color:var(--text-muted); margin-bottom:6px; display:block;">Precio Ref ($)</label>
                     <input type="number" inputmode="decimal" id="edit-price" class="form-input" step="0.01" onfocus="this.select()" oninput="syncEditPrice('bs')">
                 </div>
             </div>
 
-            <div style="display:flex; gap:12px; align-items: flex-end;">
+            <div style="display:flex; gap:14px; align-items: flex-end;">
                 <div style="flex:1;">
-                    <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Precio (Bs)</label>
+                    <label style="font-size:13px; font-weight:800; color:var(--text-muted); margin-bottom:6px; display:block;">Precio (Bs)</label>
                     <input type="number" inputmode="decimal" id="edit-price-bs" class="form-input" step="0.01" onfocus="this.select()" oninput="syncEditPrice('usd')">
                 </div>
-                <div style="flex:1; padding-bottom: 12px;">
-                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight: 700; cursor:pointer;">
-                        <input type="checkbox" id="edit-iva" style="transform: scale(1.2); margin:0;"> Lleva IVA (16%)
+                <div style="flex:1; padding-bottom: 14px;">
+                    <label style="display:flex; align-items:center; gap:10px; font-size:14px; font-weight: 700; cursor:pointer;">
+                        <input type="checkbox" id="edit-iva" style="transform: scale(1.3); margin:0; accent-color: var(--primary);"> Lleva IVA (16%)
                     </label>
                 </div>
             </div>
 
-            <label style="display:flex; align-items:center; gap:8px; font-size:14px; font-weight: 700; cursor:pointer; margin-bottom: 15px; padding: 10px; background: var(--input-bg); border-radius: 10px;">
-                <input type="checkbox" id="edit-mark-bought" style="transform: scale(1.3); margin:0;"> Marcar como comprado de una vez
+            <label style="display:flex; align-items:center; gap:10px; font-size:15px; font-weight: 700; cursor:pointer; margin-bottom: 18px; padding: 14px; background: var(--input-bg); border-radius: 12px; border: 1px solid var(--border-color); transition: background 0.2s;">
+                <input type="checkbox" id="edit-mark-bought" style="transform: scale(1.4); margin:0; accent-color: var(--primary);"> Marcar como comprado de una vez
             </label>
             
-            <div class="modal-actions" style="margin-top: 10px;">
+            <div class="modal-actions" style="margin-top: 14px;">
                 <button class="btn btn-outline" style="flex:1;" onclick="closeModals()">Cancelar</button>
                 <button class="btn btn-primary" style="flex:1;" onclick="saveItemEdits()">Guardar</button>
             </div>
-            <button class="btn btn-outline-danger btn-full" style="margin-top:12px;" id="btn-delete-item-modal" onclick="deleteItemFromModal()">🗑️ Eliminar / Tachar Producto</button>
+            <button class="btn btn-outline-danger btn-full" style="margin-top:16px;" id="btn-delete-item-modal" onclick="deleteItemFromModal()">🗑️ Eliminar / Tachar Producto</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="analytics-modal">
         <div class="modal-card">
             <div class="modal-header">📊 Resumen de Compras</div>
-            <p style="font-size:13px; color:var(--text-muted); margin-top:-10px;">Desglose de tu carrito actual</p>
-            <div id="analytics-container" style="display:flex; flex-direction:column; gap:16px; margin-bottom:20px;"></div>
+            <p style="font-size:14px; color:var(--text-muted); margin-top:-14px; margin-bottom: 24px;">Desglose de tu carrito actual</p>
+            <div id="analytics-container" style="display:flex; flex-direction:column; gap:18px; margin-bottom:24px;"></div>
             <button class="btn btn-primary btn-full" onclick="closeModals()">Cerrar Gráficos</button>
         </div>
     </div>
@@ -526,7 +554,7 @@
     <div class="modal-overlay" id="purchase-history-modal">
         <div class="modal-card" style="max-height: 85vh; overflow-y: auto;">
             <div class="modal-header">📚 Compras Archivadas</div>
-            <div id="purchase-history-container" style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;"></div>
+            <div id="purchase-history-container" style="display:flex; flex-direction:column; gap:16px; margin-bottom:24px;"></div>
             <button class="btn btn-outline btn-full" onclick="closeModals()">Cerrar</button>
         </div>
     </div>
@@ -537,7 +565,7 @@
                 <span>🧾 Recibo de Compra</span>
                 <button class="btn-icon" style="color:var(--danger); background: var(--alert-bg);" id="btn-delete-single-purchase">🗑️</button>
             </div>
-            <div id="purchase-details-container" style="margin-bottom:20px;"></div>
+            <div id="purchase-details-container" style="margin-bottom:24px;"></div>
             <button class="btn btn-primary btn-full" onclick="closeDetailsModal()">Volver al Historial</button>
         </div>
     </div>
@@ -545,21 +573,21 @@
     <div class="modal-overlay" id="backup-modal">
         <div class="modal-card" style="max-height: 85vh; overflow-y: auto;">
             <div class="modal-header">📦 Backups e Importación</div>
-            <div style="display: flex; gap: 8px; margin-bottom: 20px;">
-                <button type="button" class="btn btn-primary btn-full" onclick="createNewBackup()">💾 Crear Respaldo Rápido (Local)</button>
-                <button type="button" class="btn btn-outline" style="border-color:var(--primary); color:var(--primary); font-size:20px; padding:8px;" onclick="downloadFullBackup()">⬇️</button>
+            <div style="display: flex; gap: 10px; margin-bottom: 24px;">
+                <button type="button" class="btn btn-primary btn-full" onclick="createNewBackup()">💾 Crear Respaldo Rápido</button>
+                <button type="button" class="btn btn-outline" style="border-color:var(--primary); color:var(--primary); font-size:22px; padding:10px; border-radius:14px;" onclick="downloadFullBackup()">⬇️</button>
             </div>
-            <div id="backups-list-container" style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;"></div>
+            <div id="backups-list-container" style="display:flex; flex-direction:column; gap:14px; margin-bottom:24px;"></div>
             
-            <div style="border-top:1px solid var(--border-color); padding-top:20px; margin-top:10px;">
+            <div style="border-top:1px solid var(--border-color); padding-top:24px; margin-top:14px;">
                 <button class="btn btn-secondary btn-full" onclick="triggerFileImport()">📁 Cargar Archivo (.compras / .json)</button>
-                <p style="text-align:center; font-size:12px; color:var(--text-muted); margin-top:10px;">Si la lista es muy grande, envíala o impórtala como archivo para evitar problemas en WhatsApp.</p>
+                <p style="text-align:center; font-size:13px; color:var(--text-muted); margin-top:14px; line-height:1.4;">Si la lista es muy grande, envíala o impórtala como archivo para evitar problemas en WhatsApp.</p>
                 
-                <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block; margin-top:15px;">O Importar Código Texto:</label>
+                <label style="font-size:13px; font-weight:800; color:var(--text-muted); margin-bottom:6px; display:block; margin-top:20px;">O Importar Código Texto:</label>
                 <input type="text" id="manual-import-string" class="form-input" placeholder="Pegar código antiguo aquí..." style="text-align:left;" onfocus="this.select()">
                 <button class="btn btn-outline btn-full" onclick="importManualBackup()">Importar Código</button>
             </div>
-            <button class="btn btn-outline-danger btn-full" style="margin-top:12px;" onclick="closeModals()">Cerrar</button>
+            <button class="btn btn-outline-danger btn-full" style="margin-top:16px;" onclick="closeModals()">Cerrar</button>
         </div>
     </div>
 
@@ -783,7 +811,7 @@
         function loadDefaultData() {
             // Inicializa totalmente en blanco con el nombre requerido
             appData.lists = [{ 
-                id: 1, name: "Mercado Predeterminado", 
+                id: 1, name: "Mercado", 
                 items: [], // Lista vacía
                 categories: JSON.parse(JSON.stringify(defaultCategories)) 
             }];
@@ -855,7 +883,7 @@
             toast.textContent = message;
             container.appendChild(toast);
             setTimeout(() => toast.classList.add('show'), 10);
-            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 2500);
         }
 
         function saveToHistory() {
@@ -905,7 +933,7 @@
             matches.forEach(m => {
                 let div = document.createElement("div");
                 div.className = "autocomplete-suggestion";
-                div.innerHTML = `<span>${m.name}</span><span style="color:var(--text-muted); font-size:11px;">$${(m.est || m.real).toFixed(2)}</span>`;
+                div.innerHTML = `<span>${m.name}</span><span style="color:var(--text-muted); font-size:12px;">$${(m.est || m.real).toFixed(2)}</span>`;
                 div.onclick = () => {
                     document.getElementById("edit-name").value = m.name;
                     document.getElementById("edit-cat").value = m.cat;
@@ -1090,7 +1118,6 @@
             let baseItems = Array.from(baseMap.values());
 
             if (mode === 'zero') {
-                // Modificado a petición para que deje el listado de productos totalmente en blanco
                 state.items = [];
             } else {
                 state.items = baseItems.map(item => ({...item, est_qty: item.est_qty || item.qty, real: item.est}));
@@ -1125,6 +1152,7 @@
             document.getElementById(`view-${view}`).classList.add('active');
             document.getElementById('nav-list').classList.remove('active'); document.getElementById('nav-settings').classList.remove('active');
             document.getElementById(`nav-${view}`).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             renderAll();
         }
         function toggleMenu() { document.getElementById('sheet-overlay').classList.toggle('show'); document.getElementById('bottom-sheet').classList.toggle('show'); }
@@ -1158,13 +1186,13 @@
             if (visibilityContainer) {
                 visibilityContainer.style.display = "grid";
                 visibilityContainer.style.gridTemplateColumns = "repeat(auto-fill, minmax(140px, 1fr))";
-                visibilityContainer.style.gap = "8px";
+                visibilityContainer.style.gap = "10px";
                 
                 visibilityContainer.innerHTML = state.categories.map(c => `
-                    <label class="cat-drag-row" data-id="${c.id}" style="display:flex; align-items:center; gap:6px; background:var(--input-bg); padding:6px 8px; border-radius:8px; border:1px solid var(--border-color);">
+                    <label class="cat-drag-row" data-id="${c.id}" style="display:flex; align-items:center; gap:8px; background:var(--input-bg); padding:10px; border-radius:12px; border:1px solid var(--border-color); cursor: pointer; transition: transform 0.2s;">
                         <span class="drag-handle" style="font-size:16px;">☰</span>
-                        <input type="checkbox" style="transform: scale(1.1); margin:0;" ${c.active ? 'checked' : ''} onchange="toggleCategoryActive(${c.id}, this.checked)">
-                        <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; font-size:11px; line-height: 1;">${c.name}</span>
+                        <input type="checkbox" style="transform: scale(1.2); margin:0; accent-color: var(--primary);" ${c.active ? 'checked' : ''} onchange="toggleCategoryActive(${c.id}, this.checked)">
+                        <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; font-size:12px; font-weight: 600; line-height: 1;">${c.name}</span>
                     </label>
                 `).join('');
             }
@@ -1187,12 +1215,12 @@
             }
             const catList = document.getElementById('settings-categories-visibility');
             if(catList) {
-                Sortable.create(catList, { handle: '.drag-handle', animation: 150, onEnd: function (evt) {
+                Sortable.create(catList, { handle: '.drag-handle', animation: 200, easing: "cubic-bezier(1, 0, 0, 1)", onEnd: function (evt) {
                     let movedItem = state.categories.splice(evt.oldIndex, 1)[0]; state.categories.splice(evt.newIndex, 0, movedItem); saveToLocalStorage(); renderAll(); }
                 });
             }
             document.querySelectorAll('.settings-items-container').forEach(container => {
-                Sortable.create(container, { handle: '.drag-handle', animation: 150, onEnd: function (evt) {
+                Sortable.create(container, { handle: '.drag-handle', animation: 200, easing: "cubic-bezier(1, 0, 0, 1)", onEnd: function (evt) {
                     let catId = Number(evt.from.dataset.catId); 
                     let newOrderIds = Array.from(evt.from.children).map(el => String(el.dataset.id));
                     let otherItems = state.items.filter(i => i.cat !== catId); 
@@ -1297,20 +1325,20 @@
         function renderTemplates() {
             const container = document.getElementById("templates-container");
             if(appData.templates.length === 0) {
-                container.innerHTML = `<p style="text-align:center; font-size:13px; color:var(--text-muted);">No tienes plantillas guardadas actualmente.</p>`;
+                container.innerHTML = `<p style="text-align:center; font-size:14px; color:var(--text-muted);">No tienes plantillas guardadas actualmente.</p>`;
                 return;
             }
             let html = "";
             appData.templates.forEach(t => {
                 html += `
-                <div style="display:flex; justify-content:space-between; align-items:center; background:var(--input-bg); padding:12px; border-radius:10px; border:1px solid var(--border-color);">
+                <div style="display:flex; justify-content:space-between; align-items:center; background:var(--input-bg); padding:16px; border-radius:14px; border:1px solid var(--border-color);">
                     <div>
-                        <div style="font-size:14px; font-weight:800; color:var(--text-color);">${t.name}</div>
-                        <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">🛒 ${t.items.length} productos</div>
+                        <div style="font-size:15px; font-weight:800; color:var(--text-color);">${t.name}</div>
+                        <div style="font-size:12px; color:var(--text-muted); margin-top:4px; font-weight: 500;">🛒 ${t.items.length} productos</div>
                     </div>
-                    <div style="display:flex; gap:6px;">
-                        <button class="btn-icon" style="color:var(--primary); font-size:12px; font-weight:bold; padding: 6px 12px; background:var(--card-bg);" onclick="loadTemplate('${t.id}')">📂 Cargar</button>
-                        ${t.id !== 'default_template' ? `<button class="btn-icon" style="color:var(--danger);" onclick="deleteTemplate('${t.id}')">✕</button>` : ''}
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn-icon" style="color:var(--primary); font-size:13px; font-weight:bold; padding: 8px 14px; background:var(--card-bg); border-radius: 10px;" onclick="loadTemplate('${t.id}')">📂 Cargar</button>
+                        ${t.id !== 'default_template' ? `<button class="btn-icon" style="color:var(--danger); border-radius: 10px;" onclick="deleteTemplate('${t.id}')">✕</button>` : ''}
                     </div>
                 </div>`;
             });
@@ -1425,31 +1453,31 @@
             catsToRender.forEach(category => {
                 let catItems = state.items.filter(i => i.cat == category.id);
                 let html = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin: 15px 0 10px 0; border-bottom: 2px solid var(--border-color); padding-bottom:5px;">
-                    <h4 style="margin:0; color:var(--text-color); font-size:15px; font-weight:800;">${category.name}</h4>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin: 20px 0 12px 0; border-bottom: 2px solid var(--border-color); padding-bottom:8px;">
+                    <h4 style="margin:0; color:var(--text-color); font-size:16px; font-weight:800;">${category.name}</h4>
                     <button class="btn-delete-cat" onclick="deleteCategory(${category.id})">🗑 Borrar Pasillo</button>
                 </div>
                 <div class="settings-items-container" data-cat-id="${category.id}">`;
 
                 catItems.forEach(item => {
-                    let ivaHtml = item.iva ? ' <span style="font-size:10px; color:var(--secondary); font-weight:900;">+IVA</span>' : '';
+                    let ivaHtml = item.iva ? ' <span style="font-size:11px; color:var(--secondary); font-weight:900;">+IVA</span>' : '';
                     
                     if (state.isQuickEditMode) {
                         html += `
-                        <div class="edit-item-row" style="flex-direction:column; align-items:stretch; gap:6px; background:var(--bg-color);" data-id="${item.id}">
-                            <div style="font-weight:800; font-size:14px; color:var(--text-color); margin-bottom:2px;">${item.name}</div>
-                            <div style="display:flex; gap:6px; align-items:center;">
+                        <div class="edit-item-row" style="flex-direction:column; align-items:stretch; gap:10px; background:var(--bg-color);" data-id="${item.id}">
+                            <div style="font-weight:800; font-size:15px; color:var(--text-color); margin-bottom:4px;">${item.name}</div>
+                            <div style="display:flex; gap:10px; align-items:center;">
                                 <div style="flex:1;">
-                                    <label style="font-size:10px; color:var(--text-muted); font-weight:800; display:block; margin-bottom:2px;">Cant</label>
-                                    <input type="number" inputmode="decimal" class="form-input" style="padding:8px; margin:0; font-size:14px; text-align:center;" value="${item.est_qty}" onchange="quickEditItem('${item.id}', 'qty', this.value)">
+                                    <label style="font-size:11px; color:var(--text-muted); font-weight:800; display:block; margin-bottom:4px;">Cant</label>
+                                    <input type="number" inputmode="decimal" class="form-input" style="padding:10px; margin:0; font-size:15px; text-align:center; border-radius:10px;" value="${item.est_qty}" onchange="quickEditItem('${item.id}', 'qty', this.value)">
                                 </div>
                                 <div style="flex:1;">
-                                    <label style="font-size:10px; color:var(--text-muted); font-weight:800; display:block; margin-bottom:2px;">Precio ($)</label>
-                                    <input type="number" inputmode="decimal" class="form-input" style="padding:8px; margin:0; font-size:14px; text-align:center;" value="${item.est.toFixed(2)}" onchange="quickEditItem('${item.id}', 'price', this.value)">
+                                    <label style="font-size:11px; color:var(--text-muted); font-weight:800; display:block; margin-bottom:4px;">Precio ($)</label>
+                                    <input type="number" inputmode="decimal" class="form-input" style="padding:10px; margin:0; font-size:15px; text-align:center; border-radius:10px;" value="${item.est.toFixed(2)}" onchange="quickEditItem('${item.id}', 'price', this.value)">
                                 </div>
                                 <div style="flex:0.8; display:flex; flex-direction:column; justify-content:flex-end;">
-                                    <label style="font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer; height:36px; background:var(--card-bg); padding:0 8px; border-radius:8px; border:1px solid var(--border-color);">
-                                        <input type="checkbox" style="transform:scale(1.2); margin:0;" ${item.iva?'checked':''} onchange="quickEditItem('${item.id}', 'iva', this.checked)"> IVA
+                                    <label style="font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; height:44px; background:var(--card-bg); padding:0 10px; border-radius:10px; border:1px solid var(--border-color);">
+                                        <input type="checkbox" style="transform:scale(1.3); margin:0; accent-color: var(--primary);" ${item.iva?'checked':''} onchange="quickEditItem('${item.id}', 'iva', this.checked)"> IVA
                                     </label>
                                 </div>
                             </div>
@@ -1462,7 +1490,7 @@
                                 <p>${item.name}${ivaHtml}</p>
                                 <span>Ref: ${item.est_qty} | Est: $${item.est.toFixed(2)}</span>
                             </div>
-                            <div style="color:var(--text-muted); font-size:12px; font-weight:bold;">✏️</div>
+                            <div style="color:var(--text-muted); font-size:14px; font-weight:bold;">✏️</div>
                         </div>`;
                     }
                 });
@@ -1625,7 +1653,7 @@
                     // Chips ahora se muestran en formato lista
                     chip.innerHTML = `
                         <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;">${item.name}</span> 
-                        <span style="font-size:12px; font-weight:800; margin-left:10px;">$${(item.est||item.real).toFixed(2)}</span>
+                        <span style="font-size:14px; font-weight:800; margin-left:12px;">$${(item.est||item.real).toFixed(2)}</span>
                     `;
                     chip.onclick = () => {
                         if(isSelected) {
@@ -1826,9 +1854,9 @@
                 currentTotalUSD += p.usd;
                 
                 let html = `
-                <div style="display:flex; gap:6px; align-items:center; background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--border-color);">
+                <div style="display:flex; gap:10px; align-items:center; background:var(--input-bg); padding:14px; border-radius:14px; border:1px solid var(--border-color);">
                     <div style="flex:1;">
-                        <select class="form-select" style="margin:0; padding:6px; font-size:12px;" onchange="updatePaymentMethod(${p.id}, this.value)">
+                        <select class="form-select" style="margin:0; padding:10px; font-size:13px; border-radius: 10px;" onchange="updatePaymentMethod(${p.id}, this.value)">
                             <option value="Pago Móvil" ${p.method==='Pago Móvil'?'selected':''}>📱 Pago Móvil</option>
                             <option value="Transferencia" ${p.method==='Transferencia'?'selected':''}>🏦 Transferencia</option>
                             <option value="Efectivo Divisas" ${p.method==='Efectivo Divisas'?'selected':''}>💵 Efec Divisas</option>
@@ -1839,17 +1867,17 @@
                             <option value="Tarjeta" ${p.method==='Tarjeta'?'selected':''}>💳 Tarjeta</option>
                         </select>
                     </div>
-                    <div style="flex:1.5; display:flex; flex-direction:column; gap:6px;">
-                        <div style="display:flex; align-items:center; gap:4px; background:var(--card-bg); padding:4px; border-radius:6px; border:1px solid var(--border-color);">
-                            <span style="font-size:11px; font-weight:800; width:15px;">$</span>
-                            <input type="number" inputmode="decimal" class="form-input" style="margin:0; padding:4px; font-size:14px; text-align:right; border:none; background:transparent;" value="${p.usd.toFixed(2)}" step="0.01" onfocus="this.select()" onchange="updatePaymentAmount(${p.id}, this.value, 'usd')">
+                    <div style="flex:1.5; display:flex; flex-direction:column; gap:8px;">
+                        <div style="display:flex; align-items:center; gap:6px; background:var(--card-bg); padding:6px 10px; border-radius:10px; border:1px solid var(--border-color);">
+                            <span style="font-size:13px; font-weight:800; width:15px; color:var(--text-muted);">+$</span>
+                            <input type="number" inputmode="decimal" class="form-input" style="margin:0; padding:4px; font-size:15px; text-align:right; border:none; background:transparent;" value="${p.usd.toFixed(2)}" step="0.01" onfocus="this.select()" onchange="updatePaymentAmount(${p.id}, this.value, 'usd')">
                         </div>
-                        <div style="display:flex; align-items:center; gap:4px; background:var(--card-bg); padding:4px; border-radius:6px; border:1px solid var(--border-color);">
-                            <span style="font-size:11px; font-weight:800; width:15px;">Bs</span>
-                            <input type="number" inputmode="decimal" class="form-input" style="margin:0; padding:4px; font-size:14px; text-align:right; border:none; background:transparent;" value="${(p.usd * appData.rate).toFixed(2)}" step="0.01" onfocus="this.select()" onchange="updatePaymentAmount(${p.id}, this.value, 'bs')">
+                        <div style="display:flex; align-items:center; gap:6px; background:var(--card-bg); padding:6px 10px; border-radius:10px; border:1px solid var(--border-color);">
+                            <span style="font-size:13px; font-weight:800; width:15px; color:var(--text-muted);">Bs</span>
+                            <input type="number" inputmode="decimal" class="form-input" style="margin:0; padding:4px; font-size:15px; text-align:right; border:none; background:transparent;" value="${(p.usd * appData.rate).toFixed(2)}" step="0.01" onfocus="this.select()" onchange="updatePaymentAmount(${p.id}, this.value, 'bs')">
                         </div>
                     </div>
-                    ${closePayments.length > 1 ? `<button class="btn-icon" style="color:var(--danger); padding:8px;" onclick="removePaymentRow(${p.id})">✕</button>` : ''}
+                    ${closePayments.length > 1 ? `<button class="btn-icon" style="color:var(--danger); padding:10px;" onclick="removePaymentRow(${p.id})">✕</button>` : ''}
                 </div>`;
                 container.innerHTML += html;
             });
@@ -1916,7 +1944,7 @@
         function openPurchaseHistory() {
             const container = document.getElementById("purchase-history-container");
             if(appData.purchaseHistory.length === 0) {
-                container.innerHTML = `<p style="text-align:center; font-size:13px; color:var(--text-muted); margin-top: 20px;">No tienes compras archivadas.</p>`;
+                container.innerHTML = `<p style="text-align:center; font-size:14px; color:var(--text-muted); margin-top: 24px;">No tienes compras archivadas.</p>`;
             } else {
                 let html = "";
                 [...appData.purchaseHistory].reverse().forEach(p => {
@@ -1929,22 +1957,22 @@
                     }
 
                     html += `
-                    <div style="background:var(--input-bg); border:1px solid var(--border-color); border-radius:12px; padding:15px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                            <span style="font-size:12px; color:var(--text-muted); font-weight: 600;">${p.date}</span>
-                            <span style="font-size:10px; background:var(--primary); color:white; padding:3px 8px; border-radius:12px; font-weight: bold;">${p.listName}</span>
+                    <div style="background:var(--input-bg); border:1px solid var(--border-color); border-radius:16px; padding:18px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                            <span style="font-size:13px; color:var(--text-muted); font-weight: 700;">${p.date}</span>
+                            <span style="font-size:11px; background:var(--primary); color:white; padding:4px 10px; border-radius:12px; font-weight: bold;">${p.listName}</span>
                         </div>
-                        <div style="font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom: 8px;">${loc} | ${payText}</div>
+                        <div style="font-size:14px; font-weight:700; color:var(--text-muted); margin-bottom: 12px; line-height: 1.4;">${loc} <br> ${payText}</div>
                         <div style="display:flex; justify-content:space-between; align-items:flex-end;">
-                            <span style="font-size:13px; font-weight:800;">🛒 ${p.itemsCount} Artículos</span>
+                            <span style="font-size:14px; font-weight:800; color:var(--text-color);">🛒 ${p.itemsCount} Artículos</span>
                             <div style="text-align:right;">
-                                <div style="font-size:18px; font-weight:900; color:var(--text-color);">$${p.totalUSD.toFixed(2)}</div>
-                                <div style="font-size:12px; color:var(--text-muted); font-weight: 600;">${p.totalBs.toFixed(2)} Bs</div>
+                                <div style="font-size:20px; font-weight:900; color:var(--text-color);">$${p.totalUSD.toFixed(2)}</div>
+                                <div style="font-size:13px; color:var(--text-muted); font-weight: 600;">${p.totalBs.toFixed(2)} Bs</div>
                             </div>
                         </div>
-                        <div style="margin-top:12px; display:flex; gap:8px;">
-                            <button class="btn btn-primary" style="flex:1; padding:8px; font-size:12px;" onclick="viewPurchaseDetails(${p.id})">👁️ Ver Detalles</button>
-                            <button class="btn btn-outline-danger" style="flex:none; padding:8px 14px; font-size:12px;" onclick="deletePurchase(${p.id})">🗑️</button>
+                        <div style="margin-top:16px; display:flex; gap:10px;">
+                            <button class="btn btn-primary" style="flex:1; padding:10px; font-size:13px;" onclick="viewPurchaseDetails(${p.id})">👁️ Ver Detalles</button>
+                            <button class="btn btn-outline-danger" style="flex:none; padding:10px 16px; font-size:14px; border-radius: 12px;" onclick="deletePurchase(${p.id})">🗑️</button>
                         </div>
                     </div>`;
                 });
@@ -1964,23 +1992,23 @@
                 payText = `💳 ${p.paymentMethod || 'N/A'}`;
             }
 
-            let html = `<div style="margin-bottom:15px; border-bottom:1px solid var(--border-color); padding-bottom:12px;">
-                            <div style="font-size:18px; font-weight:900;">${p.listName}</div>
-                            <div style="font-size:13px; color:var(--text-muted); font-weight:600;">${p.date}</div>
-                            <div style="font-size:13px; color:var(--text-muted); font-weight:600; margin-top:5px;">📍 ${p.location || 'N/A'}</div>
-                            <div style="font-size:13px; color:var(--text-color); margin-top:5px; background:var(--input-bg); padding:6px; border-radius:6px;">${payText}</div>
+            let html = `<div style="margin-bottom:20px; border-bottom:1px solid var(--border-color); padding-bottom:16px;">
+                            <div style="font-size:20px; font-weight:900;">${p.listName}</div>
+                            <div style="font-size:14px; color:var(--text-muted); font-weight:600; margin-top: 4px;">${p.date}</div>
+                            <div style="font-size:14px; color:var(--text-muted); font-weight:600; margin-top:6px;">📍 ${p.location || 'N/A'}</div>
+                            <div style="font-size:14px; color:var(--text-color); margin-top:10px; background:var(--input-bg); padding:12px; border-radius:10px; line-height:1.5;">${payText}</div>
                         </div>`;
             
             p.items.forEach(i => {
                 let sub = (i.qty * i.real) * (i.iva ? 1.16 : 1);
-                let iva = i.iva ? '<span style="font-size:9px; color:var(--secondary);">+IVA</span>' : '';
-                html += `<div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px; border-bottom:1px dashed var(--border-color); padding-bottom:6px;">
-                            <div><span style="font-weight:800; color:var(--primary);">${i.qty}x</span> ${i.name} ${iva}</div>
+                let iva = i.iva ? '<span style="font-size:10px; color:var(--secondary); font-weight: bold; margin-left: 4px;">+IVA</span>' : '';
+                html += `<div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:15px; border-bottom:1px dashed var(--border-color); padding-bottom:8px;">
+                            <div style="flex:1; padding-right: 10px;"><span style="font-weight:900; color:var(--primary); margin-right: 6px;">${i.qty}x</span> <span style="font-weight: 600;">${i.name}</span> ${iva}</div>
                             <div style="font-weight:800;">$${sub.toFixed(2)}</div>
                          </div>`;
             });
-            html += `<div style="text-align:right; margin-top:20px; font-size:20px; font-weight:900; color:var(--primary);">Total: $${p.totalUSD.toFixed(2)}</div>`;
-            html += `<div style="text-align:right; font-size:14px; font-weight:700; color:var(--text-muted);">Total: ${p.totalBs.toFixed(2)} Bs</div>`;
+            html += `<div style="text-align:right; margin-top:24px; font-size:24px; font-weight:900; color:var(--primary);">Total: $${p.totalUSD.toFixed(2)}</div>`;
+            html += `<div style="text-align:right; font-size:15px; font-weight:700; color:var(--text-muted); margin-top: 4px;">Total: ${p.totalBs.toFixed(2)} Bs</div>`;
             
             document.getElementById("btn-delete-single-purchase").onclick = () => deletePurchase(p.id, true);
             document.getElementById("purchase-details-container").innerHTML = html;
@@ -2005,20 +2033,20 @@
             const container = document.getElementById("analytics-container");
             
             if(checkedItems.length === 0) {
-                container.innerHTML = `<p style="text-align:center; font-size:13px; color:var(--text-muted); margin-top:20px;">El carrito está vacío. Tilda productos para analizar tus gastos.</p>`;
+                container.innerHTML = `<p style="text-align:center; font-size:14px; color:var(--text-muted); margin-top:24px;">El carrito está vacío. Tilda productos para analizar tus gastos.</p>`;
             } else {
                 let totalUSD = checkedItems.reduce((acc, i) => acc + (i.qty * i.real) * (i.iva ? 1.16 : 1), 0);
-                let html = `<div style="text-align:center; margin-bottom:20px;"><span style="font-size:13px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Total Gastado</span><div style="font-size:32px; font-weight:900; color:var(--text-color);">$${totalUSD.toFixed(2)}</div></div>`;
+                let html = `<div style="text-align:center; margin-bottom:24px;"><span style="font-size:14px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing: 0.5px;">Total Gastado</span><div style="font-size:36px; font-weight:900; color:var(--text-color); margin-top: 4px;">$${totalUSD.toFixed(2)}</div></div>`;
                 
                 state.categories.filter(c => c.active).forEach(c => {
                     let catTotal = checkedItems.filter(i => i.cat === c.id).reduce((acc, i) => acc + (i.qty * i.real) * (i.iva ? 1.16 : 1), 0);
                     if(catTotal > 0) {
                         let pct = (catTotal / totalUSD) * 100;
                         html += `
-                        <div style="margin-bottom:12px;">
-                            <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:800;">
+                        <div style="margin-bottom:16px;">
+                            <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:800; margin-bottom: 6px;">
                                 <span>${c.name.replace(/^\d+\.\s*/, '')}</span>
-                                <span>$${catTotal.toFixed(2)} <span style="color:var(--text-muted); font-size:12px;">(${pct.toFixed(1)}%)</span></span>
+                                <span>$${catTotal.toFixed(2)} <span style="color:var(--text-muted); font-size:13px; font-weight: 600;">(${pct.toFixed(1)}%)</span></span>
                             </div>
                             <div class="analytics-bar-bg"><div class="analytics-bar-fill" style="width:${pct}%;"></div></div>
                         </div>`;
@@ -2184,13 +2212,13 @@
 
         function renderBackupList() {
             const container = document.getElementById("backups-list-container");
-            if (appData.backups.length === 0) { container.innerHTML = `<p style="text-align:center; font-size:13px; color:var(--text-muted); margin-top:20px;">No hay respaldos locales guardados.</p>`; return; }
+            if (appData.backups.length === 0) { container.innerHTML = `<p style="text-align:center; font-size:14px; color:var(--text-muted); margin-top:24px;">No hay respaldos locales guardados.</p>`; return; }
             let html = "";
             for (let i = appData.backups.length - 1; i >= 0; i--) {
                 let b = appData.backups[i];
-                html += `<div style="display:flex; justify-content:space-between; align-items:center; background:var(--input-bg); padding:12px; border-radius:10px;">
-                    <span style="font-size:13px; font-weight:800; color:var(--text-color);">${b.date}</span>
-                    <div style="display:flex; gap:6px;"><button class="btn-icon" onclick="copyCodeToClipboard('${b.code}')">📋</button><button class="btn-icon" style="color:var(--secondary);" onclick="restoreFromCode('${b.code}', true)">🔄</button><button class="btn-icon" style="color:var(--danger);" onclick="deleteLocalBackup(${b.id})">✕</button></div></div>`;
+                html += `<div style="display:flex; justify-content:space-between; align-items:center; background:var(--input-bg); padding:16px; border-radius:14px; border: 1px solid var(--border-color); margin-bottom: 10px;">
+                    <span style="font-size:14px; font-weight:800; color:var(--text-color);">${b.date}</span>
+                    <div style="display:flex; gap:8px;"><button class="btn-icon" onclick="copyCodeToClipboard('${b.code}')">📋</button><button class="btn-icon" style="color:var(--secondary);" onclick="restoreFromCode('${b.code}', true)">🔄</button><button class="btn-icon" style="color:var(--danger);" onclick="deleteLocalBackup(${b.id})">✕</button></div></div>`;
             }
             container.innerHTML = html;
         }
