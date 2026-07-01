@@ -570,9 +570,6 @@
 
     <!-- SCRIPTS EN LA PARTE INFERIOR PARA PERMITIR CARGA OFFLINE INSTANTÁNEA -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js" async defer></script>
-    
-    <!-- Librería CryptoJS para cifrado de grado militar (AES) -->
-    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.js"></script>
 
     <script>
         // --- CONSTANTES Y LISTADO ORIGINAL ---
@@ -679,25 +676,29 @@
             { cat: 6, name: "Protector Solar / Labial", est: 8.00, tag: '🛒 Supermercado', iva: true }
         ];
 
-        // --- SISTEMA DE CIFRADO CAJA FUERTE (AES-256 de Grado Militar) ---
+        // --- SISTEMA DE CIFRADO CAJA FUERTE (Nativo Offline) ---
         const Cipher = {
             encrypt: function(text, pin) {
-                // Cifra el texto usando el PIN como llave con el algoritmo AES
-                return CryptoJS.AES.encrypt(text, pin).toString();
-            },
-            decrypt: function(encryptedBase64, pin) {
-                try {
-                    // Intenta descifrar usando la llave (PIN)
-                    let bytes = CryptoJS.AES.decrypt(encryptedBase64, pin);
-                    let originalText = bytes.toString(CryptoJS.enc.Utf8);
-                    
-                    // Si el texto resultante está vacío, el PIN era incorrecto
-                    if (!originalText) throw new Error("PIN Incorrecto");
-                    return originalText;
-                } catch (e) {
-                    // Si falla el descifrado, lanza un error para que la app lo detecte
-                    throw new Error("Fallo de descifrado");
+                let utf8Bytes = new TextEncoder().encode(text);
+                let pinBytes = new TextEncoder().encode(pin);
+                let xorBytes = new Uint8Array(utf8Bytes.length);
+                for(let i=0; i<utf8Bytes.length; i++) {
+                    xorBytes[i] = utf8Bytes[i] ^ pinBytes[i % pinBytes.length];
                 }
+                let binary = '';
+                for (let i = 0; i < xorBytes.byteLength; i++) binary += String.fromCharCode(xorBytes[i]);
+                return btoa(binary);
+            },
+            decrypt: function(b64, pin) {
+                let binary = atob(b64);
+                let xorBytes = new Uint8Array(binary.length);
+                for(let i=0; i<binary.length; i++) xorBytes[i] = binary.charCodeAt(i);
+                let pinBytes = new TextEncoder().encode(pin);
+                let utf8Bytes = new Uint8Array(xorBytes.length);
+                for(let i=0; i<xorBytes.length; i++) {
+                    utf8Bytes[i] = xorBytes[i] ^ pinBytes[i % pinBytes.length];
+                }
+                return new TextDecoder().decode(utf8Bytes);
             }
         };
 
@@ -773,7 +774,7 @@
                     document.getElementById("lock-screen").style.display = 'none';
                     postInitApp();
                 } catch(err) {
-                    showToast("PIN Incorrecto o Cifrado No Válido", true);
+                    showToast("PIN Incorrecto", true);
                     document.getElementById("pin-input").value = "";
                 }
             }
