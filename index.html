@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- CANDADO DE SEGURIDAD (CSP) - Bloquea conexiones externas no autorizadas y fugas de datos -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; connect-src 'self' https://bcv-api.rafnixg.dev https://pydolarvenezuela-api.vercel.io; img-src 'self' data:;">
+    
     <title>Compras Pro</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2c3e50">
-    
-    <!-- LIBRERÍA PARA DRAG & DROP -->
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
     <style>
         /* === VARIABLES DE TEMA === */
@@ -216,9 +216,14 @@
         .toast.show { opacity: 1; transform: translateY(0); }
         .toast.error { background: var(--danger); color: white; }
 
+        /* CAJA FUERTE */
+        #lock-screen { position: fixed; inset: 0; background: var(--bg-color); z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .pin-box { font-size: 36px; letter-spacing: 15px; text-align: center; width: 220px; padding: 15px; border-radius: 16px; border: 2px solid var(--border-color); background: var(--input-bg); color: var(--text-color); outline: none; font-weight: 900; margin: 20px 0; font-family: monospace; }
+        .pin-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.2); }
+
         @media print {
             body { padding: 0; background: white; color: black; }
-            .tabs-header, .sticky-header, .bottom-bar, .config-box, .sheet-overlay, .bottom-sheet, .modal-overlay, .toast-container { display: none !important; }
+            .tabs-header, .sticky-header, .bottom-bar, .config-box, .sheet-overlay, .bottom-sheet, .modal-overlay, .toast-container, #lock-screen { display: none !important; }
             .item-card { border: none; box-shadow: none; border-bottom: 1px solid #ccc; border-radius: 0; margin: 0; padding: 10px 0; }
             .item-card-body { display: none; }
             .check-container { display: none; }
@@ -226,6 +231,18 @@
     </style>
 </head>
 <body>
+
+    <!-- PANTALLA DE BLOQUEO (CAJA FUERTE) -->
+    <div id="lock-screen">
+        <h2 style="font-size: 28px; margin-bottom: 5px;">🔐 Mis Compras</h2>
+        <p id="lock-msg" style="text-align: center; color: var(--text-muted); font-size: 15px; max-width: 300px;">Crea un PIN de 4 dígitos para proteger tus listas y precios.</p>
+        
+        <input type="password" inputmode="numeric" id="pin-input" class="pin-box" maxlength="4" placeholder="••••" oninput="checkPinLength(this.value)" autocomplete="off">
+        
+        <button class="btn btn-primary" id="btn-unlock" style="width: 220px; padding: 15px; font-size: 16px;" onclick="submitPin()">Aceptar</button>
+        
+        <button onclick="factoryResetApp()" style="margin-top: 40px; background: transparent; border: none; color: var(--danger); font-size: 12px; font-weight: bold; text-decoration: underline; cursor: pointer; padding: 10px;">⚠️ Olvidé mi PIN (Borrar App)</button>
+    </div>
 
     <!-- PESTAÑAS (LISTAS) Y BOTONES HEADER -->
     <div class="tabs-header">
@@ -414,8 +431,8 @@
 
             <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:8px; display:block; margin-top:20px;">¿Qué hacer con los productos FALTANTES?</label>
             <select id="close-action-pending" class="form-select">
-                <option value="keep">Mantenerlos en la lista actual (No resetear)</option>
-                <option value="reset">Resetear todo el carrito a 0</option>
+                <option value="keep">Borrar los ya comprados y dejar los que faltan</option>
+                <option value="reset">Resetear todo el carrito a 0 (Mantener todo)</option>
             </select>
 
             <div class="modal-actions">
@@ -532,11 +549,11 @@
         <div class="modal-card" style="max-height: 85vh; overflow-y: auto;">
             <div class="modal-header">📦 Backups e Importación</div>
             <div style="display: flex; gap: 4px; margin-bottom: 20px;">
-                <button type="button" class="btn btn-primary btn-full" onclick="createNewBackup()">💾 Crear Respaldo de Seguridad</button>
+                <button type="button" class="btn btn-primary btn-full" onclick="createNewBackup()">💾 Crear Respaldo (Cifrado con tu PIN)</button>
             </div>
             <div id="backups-list-container" style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;"></div>
             <div style="border-top:1px solid var(--border-color); padding-top:20px; margin-top:10px;">
-                <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Importar Código (Backup Completo o Lista Externa)</label>
+                <label style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:4px; display:block;">Importar Código (Backup o Lista Externa)</label>
                 <input type="text" id="manual-import-string" class="form-input" placeholder="Pegar código aquí..." style="text-align:left;" onfocus="this.select()">
                 <button class="btn btn-secondary btn-full" onclick="importManualBackup()">Importar Datos</button>
             </div>
@@ -547,207 +564,269 @@
     <!-- CONTENEDOR DE TOASTS -->
     <div class="toast-container" id="toast-container"></div>
 
+    <!-- SCRIPTS EN LA PARTE INFERIOR PARA PERMITIR CARGA OFFLINE INSTANTÁNEA -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js" async defer></script>
+
     <script>
-        // --- CONSTANTES Y LISTADO ORIGINAL CON EMOJIS (132 Artículos) ---
+        // --- CONSTANTES Y LISTADO ORIGINAL ---
         const defaultCategories = [
-            { id: 1, name: "🥫 DESPENSA Y VÍVERES", active: true },
-            { id: 2, name: "🥩 CHARCUTERÍA Y PROTEÍNAS", active: true },
-            { id: 3, name: "🍏 FRUTAS Y VERDURAS", active: true },
-            { id: 4, name: "🧂 CONDIMENTOS Y SALSAS", active: true },
-            { id: 5, name: "🧹 LIMPIEZA Y HOGAR", active: true },
-            { id: 6, name: "🧴 CUIDADO PERSONAL Y SALUD", active: true }
+            { id: 1, name: "🥫 DESPENSA Y VÍVERES", active: true }, { id: 2, name: "🥩 CHARCUTERÍA Y PROTEÍNAS", active: true },
+            { id: 3, name: "🍏 FRUTAS Y VERDURAS", active: true }, { id: 4, name: "🧂 CONDIMENTOS Y SALSAS", active: true },
+            { id: 5, name: "🧹 LIMPIEZA Y HOGAR", active: true }, { id: 6, name: "🧴 CUIDADO PERSONAL Y SALUD", active: true }
         ];
 
         const defaultTags = [
-            { val: "🛒 Supermercado", label: "🛒 Supermercado" },
-            { val: "🏪 Farmacia/Local", label: "🏪 Farmacia/Local" },
-            { val: "📦 Mercado Libre", label: "📦 Mercado Libre" },
-            { val: "✈️ Casillero Miami", label: "✈️ Casillero Miami" },
+            { val: "🛒 Supermercado", label: "🛒 Supermercado" }, { val: "🏪 Farmacia/Local", label: "🏪 Farmacia/Local" },
+            { val: "📦 Mercado Libre", label: "📦 Mercado Libre" }, { val: "✈️ Casillero Miami", label: "✈️ Casillero Miami" },
             { val: "🔧 Repuestos", label: "🔧 Repuestos" }
         ];
 
         const defaultItems = [
-            { id: 1, cat: 1, name: "Arroz (Blanco y vaporizado)", qty: 6.00, est: 2.60 },
-            { id: 2, cat: 1, name: "Pasta (Larga y corta)", qty: 6.00, est: 1.85 },
-            { id: 3, cat: 1, name: "Harina de maíz", qty: 20.00, est: 1.30 },
-            { id: 4, cat: 1, name: "Harina de Dieta", qty: 2.00, est: 3.20 },
-            { id: 5, cat: 1, name: "Harina de trigo", qty: 2.00, est: 1.45 },
-            { id: 6, cat: 1, name: "Azúcar / Endulzante", qty: 8.00, est: 1.55 },
-            { id: 7, cat: 1, name: "Azúcar / Dieta", qty: 2.00, est: 4.20 },
-            { id: 8, cat: 1, name: "Sal", qty: 2.00, est: 0.70 },
-            { id: 9, cat: 1, name: "Caraotas 500 gr", qty: 4, est: 1.50 },
-            { id: 10, cat: 1, name: "Lentejas 400 gr", qty: 2, est: 1.50 },
-            { id: 11, cat: 1, name: "Caraotas rojas 400gr", qty: 1, est: 1.50 },
-            { id: 12, cat: 1, name: "Legumbres Arvejas 400 gr", qty: 1, est: 1.50 },
-            { id: 13, cat: 1, name: "Aceite (Vegetal, girasol, oliva)", qty: 6, est: 4.60 },
-            { id: 14, cat: 1, name: "Avena Hojuelas 1kg", qty: 2.00, est: 2.76 },
-            { id: 15, cat: 1, name: "Cereal Conflei", qty: 2, est: 3.20 },
-            { id: 16, cat: 1, name: "Café de 500 gr", qty: 2, est: 7.50 },
-            { id: 17, cat: 1, name: "Chocolate (Toddy) 400 gr", qty: 1, est: 7.00 },
-            { id: 18, cat: 1, name: "Pan de Sándwich", qty: 2, est: 1.30 },
-            { id: 19, cat: 1, name: "Galletas (Dulces y saladas)", qty: 3, est: 2.00 },
-            { id: 20, cat: 1, name: "Gelatina", qty: 2, est: 3.00 },
-            { id: 21, cat: 1, name: "Atún en lata", qty: 6, est: 2.90 },
-            { id: 22, cat: 1, name: "Sardinas", qty: 6, est: 1.40 },
-            { id: 23, cat: 1, name: "Diablitos", qty: 3, est: 2.80 },
-            { id: 24, cat: 1, name: "Maíz Cotufa 500 gr", qty: 2, est: 1.30 },
-            { id: 25, cat: 1, name: "Pasta de tomate", qty: 1, est: 4.00 },
-            { id: 26, cat: 1, name: "Salsa Para Pasta (Bolognesa y Napoli)", qty: 2, est: 4.00 },
-            { id: 27, cat: 1, name: "Guasacaca", qty: 1, est: 2.80 },
-            { id: 28, cat: 1, name: "Fororo", qty: 1, est: 1.50 },
-            { id: 29, cat: 1, name: "Maicena 200 gr", qty: 1, est: 1.80 },
-            { id: 30, cat: 2, name: "Jamón (Pierna, pavo o espalda)", qty: 1.50, est: 11.00 },
-            { id: 31, cat: 2, name: "Queso (Duro, amarillo, mozzarella)", qty: 1.50, est: 11.00 },
-            { id: 32, cat: 2, name: "Queso Blanco", qty: 6.00, est: 8.00 },
-            { id: 33, cat: 2, name: "Suero", qty: 4, est: 3.00 },
-            { id: 34, cat: 2, name: "Mantequilla", qty: 2.00, est: 6.30 },
-            { id: 35, cat: 2, name: "Rikesa", qty: 2, est: 7.00 },
-            { id: 36, cat: 2, name: "Mortadela", qty: 1.50, est: 3.80 },
-            { id: 37, cat: 2, name: "Salchichas", qty: 1, est: 4.00 },
-            { id: 38, cat: 2, name: "Huevos", qty: 6, est: 8.00 },
-            { id: 39, cat: 2, name: "Leche en Polvo", qty: 2.00, est: 16.00 },
-            { id: 40, cat: 2, name: "Leche (Líquida descremada)", qty: 2, est: 4.00 },
-            { id: 41, cat: 2, name: "Pollo / Milanesa", qty: 4.00, est: 8.30 },
-            { id: 42, cat: 2, name: "Pollo / Chupetas", qty: 2.00, est: 5.20 },
-            { id: 43, cat: 2, name: "Pollo / Alas", qty: 2.00, est: 5.20 },
-            { id: 44, cat: 2, name: "Mollejitas de Pollo", qty: 0.250, est: 4.20 },
-            { id: 45, cat: 2, name: "Carne de (Molida)", qty: 2.00, est: 12.00 },
-            { id: 46, cat: 2, name: "Carne de (Bistec)", qty: 4.00, est: 12.00 },
-            { id: 47, cat: 2, name: "Carne de (Guisar)", qty: 0.500, est: 12.00 },
-            { id: 48, cat: 2, name: "Carne de (Mechar)", qty: 0.500, est: 12.00 },
-            { id: 49, cat: 2, name: "Chuleta Ahumada", qty: 1.00, est: 9.30 },
-            { id: 50, cat: 2, name: "Chuletas Normal", qty: 1.00, est: 7.90 },
-            { id: 51, cat: 2, name: "Carne de cerdo / Pulpa", qty: 3.00, est: 9.00 },
-            { id: 52, cat: 2, name: "Huesito Ahumado", qty: 0.250, est: 6.00 },
-            { id: 53, cat: 2, name: "Filet de pescado", qty: 2.00, est: 10.00 },
-            { id: 54, cat: 2, name: "Hígado de res", qty: 0.500, est: 5.00 },
-            { id: 55, cat: 2, name: "Lagarto", qty: 1.00, est: 12.00 },
-            { id: 56, cat: 2, name: "Mondongo", qty: 0.500, est: 3.00 },
-            { id: 57, cat: 2, name: "Costilla", qty: 0.400, est: 9.00 },
-            { id: 58, cat: 3, name: "Cebolla Normal", qty: 1.87, est: 1.00 },
-            { id: 59, cat: 3, name: "Cebolla Morada", qty: 0.520, est: 3.00 },
-            { id: 60, cat: 3, name: "Ajo (Cabezas o pelado)", qty: 0.280, est: 13.27 },
-            { id: 61, cat: 3, name: "Tomates", qty: 2.70, est: 3.33 },
-            { id: 62, cat: 3, name: "Cilantro, Perejil y Albahaca", qty: 0.550, est: 1.59 },
-            { id: 63, cat: 3, name: "Pimentón", qty: 1.13, est: 5.00 },
-            { id: 64, cat: 3, name: "Cebollín / Puerro", qty: 0.645, est: 1.50 },
-            { id: 65, cat: 3, name: "Papas", qty: 3.00, est: 2.10 },
-            { id: 66, cat: 3, name: "Zanahorias", qty: 1.50, est: 1.85 },
-            { id: 67, cat: 3, name: "Remolacha", qty: 1.00, est: 2.00 },
-            { id: 68, cat: 3, name: "Plátanos (Verdes o maduros)", qty: 3.70, est: 1.10 },
-            { id: 69, cat: 3, name: "Pepino", qty: 0.630, est: 1.10 },
-            { id: 70, cat: 3, name: "Lechuga Americana", qty: 0.625, est: 1.20 },
-            { id: 71, cat: 3, name: "Repollo", qty: 0.500, est: 0.80 },
-            { id: 72, cat: 3, name: "Cambur", qty: 3.00, est: 1.25 },
-            { id: 73, cat: 3, name: "Manzanas", qty: 6, est: 1.30 },
-            { id: 74, cat: 3, name: "Limones", qty: 1.80, est: 3.00 },
-            { id: 75, cat: 3, name: "Naranjas", qty: 2.00, est: 2.00 },
-            { id: 76, cat: 3, name: "Parchitas", qty: 1.50, est: 3.00 },
-            { id: 77, cat: 3, name: "Tamarindo 250 g", qty: 2, est: 1.35 },
-            { id: 78, cat: 3, name: "Piña", qty: 2.00, est: 1.40 },
-            { id: 80, cat: 3, name: "Melón", qty: 1.00, est: 1.00 },
-            { id: 81, cat: 3, name: "Patilla", qty: 1.56, est: 0.70 },
-            { id: 82, cat: 3, name: "Lechosa", qty: 1.00, est: 1.00 },
-            { id: 83, cat: 3, name: "Fresas", qty: 1, est: 4.00 },
-            { id: 84, cat: 3, name: "Mora", qty: 1, est: 4.00 },
-            { id: 85, cat: 3, name: "Aguacate", qty: 1, est: 1.50 },
-            { id: 86, cat: 3, name: "Pulpa de frutas", qty: 10, est: 1.50 },
-            { id: 87, cat: 3, name: "Auyama", qty: 1.20, est: 0.60 },
-            { id: 88, cat: 3, name: "Ñame", qty: 0.900, est: 1.40 },
-            { id: 89, cat: 3, name: "Ocumo", qty: 0.645, est: 1.80 },
-            { id: 90, cat: 3, name: "Yuca", qty: 1.80, est: 1.50 },
-            { id: 91, cat: 3, name: "Brócoli", qty: 0.615, est: 2.40 },
-            { id: 92, cat: 3, name: "Ají", qty: 0.145, est: 3.00 },
-            { id: 93, cat: 3, name: "Guayaba", qty: 1.17, est: 1.20 },
-            { id: 94, cat: 3, name: "Romero", qty: 0.165, est: 5.00 },
-            { id: 133, cat: 3, name: "Ruda", qty: 0.165, est: 3.00 },
-            { id: 95, cat: 4, name: "Mayonesa 500 gr", qty: 2, est: 4.50 },
-            { id: 96, cat: 4, name: "Mostaza", qty: 1, est: 2.15 },
-            { id: 97, cat: 4, name: "Salsa de tomate (Ketchup)", qty: 2, est: 2.63 },
-            { id: 98, cat: 4, name: "Vinagre", qty: 1, est: 3.00 },
-            { id: 99, cat: 4, name: "Salsa de Soya", qty: 1, est: 3.60 },
-            { id: 100, cat: 4, name: "Salsa Inglesa", qty: 1, est: 3.60 },
-            { id: 101, cat: 4, name: "Salsa de Ajo", qty: 1, est: 3.60 },
-            { id: 102, cat: 4, name: "Especias (Pimienta, comino, etc)", qty: 4, est: 1.00 },
-            { id: 103, cat: 4, name: "Sopa Maggi", qty: 2, est: 1.70 },
-            { id: 104, cat: 4, name: "Cubito Maggi", qty: 1, est: 3.10 },
-            { id: 105, cat: 5, name: "Jabón de ropa en Polvo 400 gr", qty: 10, est: 1.50 },
-            { id: 106, cat: 5, name: "Suavizante de telas 180 ml", qty: 1, est: 2.50 },
-            { id: 107, cat: 5, name: "Blanqueador (Cloro)", qty: 2, est: 1.60 },
-            { id: 108, cat: 5, name: "Jabón azul (en barra)", qty: 4, est: 1.10 },
-            { id: 109, cat: 5, name: "Lavaplatos Crema", qty: 3, est: 5.00 },
-            { id: 110, cat: 5, name: "Desinfectante para pisos", qty: 4, est: 2.00 },
-            { id: 111, cat: 5, name: "Jabón líquido", qty: 1, est: 2.50 },
-            { id: 112, cat: 5, name: "Cera de piso", qty: 1, est: 3.50 },
-            { id: 113, cat: 5, name: "Esponjas de cocina", qty: 1, est: 3.80 },
-            { id: 114, cat: 5, name: "Brillo de alambre", qty: 1, est: 1.50 },
-            { id: 115, cat: 5, name: "Bolsas de basura", qty: 4, est: 1.50 },
-            { id: 116, cat: 5, name: "Limpiador de inodoros ciclón", qty: 1, est: 5.00 },
-            { id: 117, cat: 5, name: "Servilletas de papel", qty: 1, est: 1.50 },
-            { id: 118, cat: 5, name: "Coletos", qty: 2, est: 2.50 },
-            { id: 119, cat: 5, name: "Paños de Cocina", qty: 2, est: 2.00 },
-            { id: 120, cat: 6, name: "Jabón de baño (Barra o líquida)", qty: 12, est: 2.50 },
-            { id: 121, cat: 6, name: "Champú", qty: 3, est: 7.00 },
-            { id: 122, cat: 6, name: "Acondicionador", qty: 1, est: 7.00 },
-            { id: 123, cat: 6, name: "Crema dental", qty: 3, est: 6.00 },
-            { id: 124, cat: 6, name: "Crema dental Niño", qty: 1, est: 2.00 },
-            { id: 125, cat: 6, name: "Enjuague bucal", qty: 1, est: 4.50 },
-            { id: 126, cat: 6, name: "Desodorante", qty: 4, est: 3.00 },
-            { id: 127, cat: 6, name: "Papel higiénico", qty: 2, est: 3.66 },
-            { id: 128, cat: 6, name: "Toallitas húmedas / Pañuelos", qty: 10, est: 1.30 },
-            { id: 129, cat: 6, name: "Pañales", qty: 3, est: 6.60 },
-            { id: 130, cat: 6, name: "Máquinas de afeitar", qty: 3, est: 4.50 },
-            { id: 131, cat: 6, name: "Crema corporal / Protector solar", qty: 3, est: 7.00 },
-            { id: 132, cat: 6, name: "Protección femenina", qty: 2, est: 2.00 }
+            { id: 1, cat: 1, name: "Arroz (Blanco y vaporizado)", qty: 6.00, est: 2.60 }, { id: 2, cat: 1, name: "Pasta (Larga y corta)", qty: 6.00, est: 1.85 },
+            { id: 3, cat: 1, name: "Harina de maíz", qty: 20.00, est: 1.30 }, { id: 4, cat: 1, name: "Harina de Dieta", qty: 2.00, est: 3.20 },
+            { id: 5, cat: 1, name: "Harina de trigo", qty: 2.00, est: 1.45 }, { id: 6, cat: 1, name: "Azúcar / Endulzante", qty: 8.00, est: 1.55 },
+            { id: 7, cat: 1, name: "Azúcar / Dieta", qty: 2.00, est: 4.20 }, { id: 8, cat: 1, name: "Sal", qty: 2.00, est: 0.70 },
+            { id: 9, cat: 1, name: "Caraotas 500 gr", qty: 4, est: 1.50 }, { id: 10, cat: 1, name: "Lentejas 400 gr", qty: 2, est: 1.50 },
+            { id: 11, cat: 1, name: "Caraotas rojas 400gr", qty: 1, est: 1.50 }, { id: 12, cat: 1, name: "Legumbres Arvejas 400 gr", qty: 1, est: 1.50 },
+            { id: 13, cat: 1, name: "Aceite (Vegetal, girasol, oliva)", qty: 6, est: 4.60 }, { id: 14, cat: 1, name: "Avena Hojuelas 1kg", qty: 2.00, est: 2.76 },
+            { id: 15, cat: 1, name: "Cereal Conflei", qty: 2, est: 3.20 }, { id: 16, cat: 1, name: "Café de 500 gr", qty: 2, est: 7.50 },
+            { id: 17, cat: 1, name: "Chocolate (Toddy) 400 gr", qty: 1, est: 7.00 }, { id: 18, cat: 1, name: "Pan de Sándwich", qty: 2, est: 1.30 },
+            { id: 19, cat: 1, name: "Galletas (Dulces y saladas)", qty: 3, est: 2.00 }, { id: 20, cat: 1, name: "Gelatina", qty: 2, est: 3.00 },
+            { id: 21, cat: 1, name: "Atún en lata", qty: 6, est: 2.90 }, { id: 22, cat: 1, name: "Sardinas", qty: 6, est: 1.40 },
+            { id: 23, cat: 1, name: "Diablitos", qty: 3, est: 2.80 }, { id: 24, cat: 1, name: "Maíz Cotufa 500 gr", qty: 2, est: 1.30 },
+            { id: 25, cat: 1, name: "Pasta de tomate", qty: 1, est: 4.00 }, { id: 26, cat: 1, name: "Salsa Para Pasta (Bolognesa y Napoli)", qty: 2, est: 4.00 },
+            { id: 27, cat: 1, name: "Guasacaca", qty: 1, est: 2.80 }, { id: 28, cat: 1, name: "Fororo", qty: 1, est: 1.50 },
+            { id: 29, cat: 1, name: "Maicena 200 gr", qty: 1, est: 1.80 }, { id: 30, cat: 2, name: "Jamón (Pierna, pavo o espalda)", qty: 1.50, est: 11.00 },
+            { id: 31, cat: 2, name: "Queso (Duro, amarillo, mozzarella)", qty: 1.50, est: 11.00 }, { id: 32, cat: 2, name: "Queso Blanco", qty: 6.00, est: 8.00 },
+            { id: 33, cat: 2, name: "Suero", qty: 4, est: 3.00 }, { id: 34, cat: 2, name: "Mantequilla", qty: 2.00, est: 6.30 },
+            { id: 35, cat: 2, name: "Rikesa", qty: 2, est: 7.00 }, { id: 36, cat: 2, name: "Mortadela", qty: 1.50, est: 3.80 },
+            { id: 37, cat: 2, name: "Salchichas", qty: 1, est: 4.00 }, { id: 38, cat: 2, name: "Huevos", qty: 6, est: 8.00 },
+            { id: 39, cat: 2, name: "Leche en Polvo", qty: 2.00, est: 16.00 }, { id: 40, cat: 2, name: "Leche (Líquida descremada)", qty: 2, est: 4.00 },
+            { id: 41, cat: 2, name: "Pollo / Milanesa", qty: 4.00, est: 8.30 }, { id: 42, cat: 2, name: "Pollo / Chupetas", qty: 2.00, est: 5.20 },
+            { id: 43, cat: 2, name: "Pollo / Alas", qty: 2.00, est: 5.20 }, { id: 44, cat: 2, name: "Mollejitas de Pollo", qty: 0.250, est: 4.20 },
+            { id: 45, cat: 2, name: "Carne de (Molida)", qty: 2.00, est: 12.00 }, { id: 46, cat: 2, name: "Carne de (Bistec)", qty: 4.00, est: 12.00 },
+            { id: 47, cat: 2, name: "Carne de (Guisar)", qty: 0.500, est: 12.00 }, { id: 48, cat: 2, name: "Carne de (Mechar)", qty: 0.500, est: 12.00 },
+            { id: 49, cat: 2, name: "Chuleta Ahumada", qty: 1.00, est: 9.30 }, { id: 50, cat: 2, name: "Chuletas Normal", qty: 1.00, est: 7.90 },
+            { id: 51, cat: 2, name: "Carne de cerdo / Pulpa", qty: 3.00, est: 9.00 }, { id: 52, cat: 2, name: "Huesito Ahumado", qty: 0.250, est: 6.00 },
+            { id: 53, cat: 2, name: "Filet de pescado", qty: 2.00, est: 10.00 }, { id: 54, cat: 2, name: "Hígado de res", qty: 0.500, est: 5.00 },
+            { id: 55, cat: 2, name: "Lagarto", qty: 1.00, est: 12.00 }, { id: 56, cat: 2, name: "Mondongo", qty: 0.500, est: 3.00 },
+            { id: 57, cat: 2, name: "Costilla", qty: 0.400, est: 9.00 }, { id: 58, cat: 3, name: "Cebolla Normal", qty: 1.87, est: 1.00 },
+            { id: 59, cat: 3, name: "Cebolla Morada", qty: 0.520, est: 3.00 }, { id: 60, cat: 3, name: "Ajo (Cabezas o pelado)", qty: 0.280, est: 13.27 },
+            { id: 61, cat: 3, name: "Tomates", qty: 2.70, est: 3.33 }, { id: 62, cat: 3, name: "Cilantro, Perejil y Albahaca", qty: 0.550, est: 1.59 },
+            { id: 63, cat: 3, name: "Pimentón", qty: 1.13, est: 5.00 }, { id: 64, cat: 3, name: "Cebollín / Puerro", qty: 0.645, est: 1.50 },
+            { id: 65, cat: 3, name: "Papas", qty: 3.00, est: 2.10 }, { id: 66, cat: 3, name: "Zanahorias", qty: 1.50, est: 1.85 },
+            { id: 67, cat: 3, name: "Remolacha", qty: 1.00, est: 2.00 }, { id: 68, cat: 3, name: "Plátanos (Verdes o maduros)", qty: 3.70, est: 1.10 },
+            { id: 69, cat: 3, name: "Pepino", qty: 0.630, est: 1.10 }, { id: 70, cat: 3, name: "Lechuga Americana", qty: 0.625, est: 1.20 },
+            { id: 71, cat: 3, name: "Repollo", qty: 0.500, est: 0.80 }, { id: 72, cat: 3, name: "Cambur", qty: 3.00, est: 1.25 },
+            { id: 73, cat: 3, name: "Manzanas", qty: 6, est: 1.30 }, { id: 74, cat: 3, name: "Limones", qty: 1.80, est: 3.00 },
+            { id: 75, cat: 3, name: "Naranjas", qty: 2.00, est: 2.00 }, { id: 76, cat: 3, name: "Parchitas", qty: 1.50, est: 3.00 },
+            { id: 77, cat: 3, name: "Tamarindo 250 g", qty: 2, est: 1.35 }, { id: 78, cat: 3, name: "Piña", qty: 2.00, est: 1.40 },
+            { id: 80, cat: 3, name: "Melón", qty: 1.00, est: 1.00 }, { id: 81, cat: 3, name: "Patilla", qty: 1.56, est: 0.70 },
+            { id: 82, cat: 3, name: "Lechosa", qty: 1.00, est: 1.00 }, { id: 83, cat: 3, name: "Fresas", qty: 1, est: 4.00 },
+            { id: 84, cat: 3, name: "Mora", qty: 1, est: 4.00 }, { id: 85, cat: 3, name: "Aguacate", qty: 1, est: 1.50 },
+            { id: 86, cat: 3, name: "Pulpa de frutas", qty: 10, est: 1.50 }, { id: 87, cat: 3, name: "Auyama", qty: 1.20, est: 0.60 },
+            { id: 88, cat: 3, name: "Ñame", qty: 0.900, est: 1.40 }, { id: 89, cat: 3, name: "Ocumo", qty: 0.645, est: 1.80 },
+            { id: 90, cat: 3, name: "Yuca", qty: 1.80, est: 1.50 }, { id: 91, cat: 3, name: "Brócoli", qty: 0.615, est: 2.40 },
+            { id: 92, cat: 3, name: "Ají", qty: 0.145, est: 3.00 }, { id: 93, cat: 3, name: "Guayaba", qty: 1.17, est: 1.20 },
+            { id: 94, cat: 3, name: "Romero", qty: 0.165, est: 5.00 }, { id: 133, cat: 3, name: "Ruda", qty: 0.165, est: 3.00 },
+            { id: 95, cat: 4, name: "Mayonesa 500 gr", qty: 2, est: 4.50 }, { id: 96, cat: 4, name: "Mostaza", qty: 1, est: 2.15 },
+            { id: 97, cat: 4, name: "Salsa de tomate (Ketchup)", qty: 2, est: 2.63 }, { id: 98, cat: 4, name: "Vinagre", qty: 1, est: 3.00 },
+            { id: 99, cat: 4, name: "Salsa de Soya", qty: 1, est: 3.60 }, { id: 100, cat: 4, name: "Salsa Inglesa", qty: 1, est: 3.60 },
+            { id: 101, cat: 4, name: "Salsa de Ajo", qty: 1, est: 3.60 }, { id: 102, cat: 4, name: "Especias (Pimienta, comino, etc)", qty: 4, est: 1.00 },
+            { id: 103, cat: 4, name: "Sopa Maggi", qty: 2, est: 1.70 }, { id: 104, cat: 4, name: "Cubito Maggi", qty: 1, est: 3.10 },
+            { id: 105, cat: 5, name: "Jabón de ropa en Polvo 400 gr", qty: 10, est: 1.50 }, { id: 106, cat: 5, name: "Suavizante de telas 180 ml", qty: 1, est: 2.50 },
+            { id: 107, cat: 5, name: "Blanqueador (Cloro)", qty: 2, est: 1.60 }, { id: 108, cat: 5, name: "Jabón azul (en barra)", qty: 4, est: 1.10 },
+            { id: 109, cat: 5, name: "Lavaplatos Crema", qty: 3, est: 5.00 }, { id: 110, cat: 5, name: "Desinfectante para pisos", qty: 4, est: 2.00 },
+            { id: 111, cat: 5, name: "Jabón líquido", qty: 1, est: 2.50 }, { id: 112, cat: 5, name: "Cera de piso", qty: 1, est: 3.50 },
+            { id: 113, cat: 5, name: "Esponjas de cocina", qty: 1, est: 3.80 }, { id: 114, cat: 5, name: "Brillo de alambre", qty: 1, est: 1.50 },
+            { id: 115, cat: 5, name: "Bolsas de basura", qty: 4, est: 1.50 }, { id: 116, cat: 5, name: "Limpiador de inodoros ciclón", qty: 1, est: 5.00 },
+            { id: 117, cat: 5, name: "Servilletas de papel", qty: 1, est: 1.50 }, { id: 118, cat: 5, name: "Coletos", qty: 2, est: 2.50 },
+            { id: 119, cat: 5, name: "Paños de Cocina", qty: 2, est: 2.00 }, { id: 120, cat: 6, name: "Jabón de baño (Barra o líquida)", qty: 12, est: 2.50 },
+            { id: 121, cat: 6, name: "Champú", qty: 3, est: 7.00 }, { id: 122, cat: 6, name: "Acondicionador", qty: 1, est: 7.00 },
+            { id: 123, cat: 6, name: "Crema dental", qty: 3, est: 6.00 }, { id: 124, cat: 6, name: "Crema dental Niño", qty: 1, est: 2.00 },
+            { id: 125, cat: 6, name: "Enjuague bucal", qty: 1, est: 4.50 }, { id: 126, cat: 6, name: "Desodorante", qty: 4, est: 3.00 },
+            { id: 127, cat: 6, name: "Papel higiénico", qty: 2, est: 3.66 }, { id: 128, cat: 6, name: "Toallitas húmedas / Pañuelos", qty: 10, est: 1.30 },
+            { id: 129, cat: 6, name: "Pañales", qty: 3, est: 6.60 }, { id: 130, cat: 6, name: "Máquinas de afeitar", qty: 3, est: 4.50 },
+            { id: 131, cat: 6, name: "Crema corporal / Protector solar", qty: 3, est: 7.00 }, { id: 132, cat: 6, name: "Protección femenina", qty: 2, est: 2.00 }
         ];
 
         const extendedDictionaryItems = [
-            { cat: 1, name: "Garbanzos 400 gr", est: 1.80, tag: '🛒 Supermercado', iva: false },
-            { cat: 1, name: "Aceite de Oliva", est: 8.00, tag: '🛒 Supermercado', iva: false },
-            { cat: 1, name: "Cereal de Chocolate", est: 4.50, tag: '🛒 Supermercado', iva: false },
-            { cat: 1, name: "Casabe", est: 1.50, tag: '🛒 Supermercado', iva: false },
-            { cat: 1, name: "Sopa en Sobre (Maggi/Knorr)", est: 1.20, tag: '🛒 Supermercado', iva: false },
-            { cat: 1, name: "Miel", est: 5.00, tag: '🛒 Supermercado', iva: false },
-            { cat: 1, name: "Quinoa", est: 3.50, tag: '🛒 Supermercado', iva: false },
-            { cat: 2, name: "Queso Guayanés / Telita", est: 6.50, tag: '🛒 Supermercado', iva: false },
-            { cat: 2, name: "Chorizo de Ajo / Ahumado", est: 5.50, tag: '🛒 Supermercado', iva: false },
-            { cat: 2, name: "Salchichón", est: 7.00, tag: '🛒 Supermercado', iva: false },
-            { cat: 2, name: "Tocino / Tocineta", est: 6.00, tag: '🛒 Supermercado', iva: false },
-            { cat: 2, name: "Carne Molida Especial / Magra", est: 14.00, tag: '🛒 Supermercado', iva: false },
-            { cat: 3, name: "Célery (Apio España)", est: 2.00, tag: '🛒 Supermercado', iva: false },
-            { cat: 3, name: "Berenjena", est: 1.50, tag: '🛒 Supermercado', iva: false },
-            { cat: 3, name: "Mandarinas", est: 2.50, tag: '🛒 Supermercado', iva: false },
-            { cat: 3, name: "Durazno / Melocotón", est: 3.50, tag: '🛒 Supermercado', iva: false },
-            { cat: 3, name: "Mango", est: 1.00, tag: '🛒 Supermercado', iva: false },
-            { cat: 3, name: "Uvas", est: 6.00, tag: '🛒 Supermercado', iva: false },
-            { cat: 3, name: "Champiñones", est: 4.50, tag: '🛒 Supermercado', iva: false },
-            { cat: 3, name: "Jengibre", est: 3.00, tag: '🛒 Supermercado', iva: false },
-            { cat: 4, name: "Salsa Teriyaki / BBQ", est: 4.50, tag: '🛒 Supermercado', iva: false },
-            { cat: 4, name: "Orégano / Laurel", est: 1.00, tag: '🛒 Supermercado', iva: false },
-            { cat: 4, name: "Curry / Paprika", est: 1.50, tag: '🛒 Supermercado', iva: false },
-            { cat: 4, name: "Adobo / Cubito", est: 1.50, tag: '🛒 Supermercado', iva: false },
-            { cat: 5, name: "Cloro Jabonoso", est: 2.00, tag: '🛒 Supermercado', iva: true },
-            { cat: 5, name: "Desengrasante", est: 3.50, tag: '🛒 Supermercado', iva: true },
-            { cat: 5, name: "Ambientador en Spray", est: 3.00, tag: '🛒 Supermercado', iva: true },
-            { cat: 5, name: "Bolsas Herméticas (Ziploc)", est: 2.50, tag: '🛒 Supermercado', iva: true },
-            { cat: 5, name: "Papel de Aluminio / Envoplast", est: 3.00, tag: '🛒 Supermercado', iva: true },
-            { cat: 5, name: "Envases Plásticos", est: 1.00, tag: '🛒 Supermercado', iva: true },
-            { cat: 5, name: "Escoba / Recogedor", est: 4.00, tag: '🛒 Supermercado', iva: true },
-            { cat: 6, name: "Enjuague bucal Infantil", est: 3.50, tag: '🛒 Supermercado', iva: true },
-            { cat: 6, name: "Hilo Dental", est: 2.00, tag: '🛒 Supermercado', iva: true },
-            { cat: 6, name: "Hisopos", est: 1.00, tag: '🛒 Supermercado', iva: true },
-            { cat: 6, name: "Gel Fijador / Cera", est: 4.00, tag: '🛒 Supermercado', iva: true },
-            { cat: 6, name: "Crema de Peinar", est: 5.00, tag: '🛒 Supermercado', iva: true },
+            { cat: 1, name: "Garbanzos 400 gr", est: 1.80, tag: '🛒 Supermercado', iva: false }, { cat: 1, name: "Aceite de Oliva", est: 8.00, tag: '🛒 Supermercado', iva: false },
+            { cat: 1, name: "Cereal de Chocolate", est: 4.50, tag: '🛒 Supermercado', iva: false }, { cat: 1, name: "Casabe", est: 1.50, tag: '🛒 Supermercado', iva: false },
+            { cat: 1, name: "Sopa en Sobre (Maggi/Knorr)", est: 1.20, tag: '🛒 Supermercado', iva: false }, { cat: 1, name: "Miel", est: 5.00, tag: '🛒 Supermercado', iva: false },
+            { cat: 1, name: "Quinoa", est: 3.50, tag: '🛒 Supermercado', iva: false }, { cat: 2, name: "Queso Guayanés / Telita", est: 6.50, tag: '🛒 Supermercado', iva: false },
+            { cat: 2, name: "Chorizo de Ajo / Ahumado", est: 5.50, tag: '🛒 Supermercado', iva: false }, { cat: 2, name: "Salchichón", est: 7.00, tag: '🛒 Supermercado', iva: false },
+            { cat: 2, name: "Tocino / Tocineta", est: 6.00, tag: '🛒 Supermercado', iva: false }, { cat: 2, name: "Carne Molida Especial / Magra", est: 14.00, tag: '🛒 Supermercado', iva: false },
+            { cat: 3, name: "Célery (Apio España)", est: 2.00, tag: '🛒 Supermercado', iva: false }, { cat: 3, name: "Berenjena", est: 1.50, tag: '🛒 Supermercado', iva: false },
+            { cat: 3, name: "Mandarinas", est: 2.50, tag: '🛒 Supermercado', iva: false }, { cat: 3, name: "Durazno / Melocotón", est: 3.50, tag: '🛒 Supermercado', iva: false },
+            { cat: 3, name: "Mango", est: 1.00, tag: '🛒 Supermercado', iva: false }, { cat: 3, name: "Uvas", est: 6.00, tag: '🛒 Supermercado', iva: false },
+            { cat: 3, name: "Champiñones", est: 4.50, tag: '🛒 Supermercado', iva: false }, { cat: 3, name: "Jengibre", est: 3.00, tag: '🛒 Supermercado', iva: false },
+            { cat: 4, name: "Salsa Teriyaki / BBQ", est: 4.50, tag: '🛒 Supermercado', iva: false }, { cat: 4, name: "Orégano / Laurel", est: 1.00, tag: '🛒 Supermercado', iva: false },
+            { cat: 4, name: "Curry / Paprika", est: 1.50, tag: '🛒 Supermercado', iva: false }, { cat: 4, name: "Adobo / Cubito", est: 1.50, tag: '🛒 Supermercado', iva: false },
+            { cat: 5, name: "Cloro Jabonoso", est: 2.00, tag: '🛒 Supermercado', iva: true }, { cat: 5, name: "Desengrasante", est: 3.50, tag: '🛒 Supermercado', iva: true },
+            { cat: 5, name: "Ambientador en Spray", est: 3.00, tag: '🛒 Supermercado', iva: true }, { cat: 5, name: "Bolsas Herméticas (Ziploc)", est: 2.50, tag: '🛒 Supermercado', iva: true },
+            { cat: 5, name: "Papel de Aluminio / Envoplast", est: 3.00, tag: '🛒 Supermercado', iva: true }, { cat: 5, name: "Envases Plásticos", est: 1.00, tag: '🛒 Supermercado', iva: true },
+            { cat: 5, name: "Escoba / Recogedor", est: 4.00, tag: '🛒 Supermercado', iva: true }, { cat: 6, name: "Enjuague bucal Infantil", est: 3.50, tag: '🛒 Supermercado', iva: true },
+            { cat: 6, name: "Hilo Dental", est: 2.00, tag: '🛒 Supermercado', iva: true }, { cat: 6, name: "Hisopos", est: 1.00, tag: '🛒 Supermercado', iva: true },
+            { cat: 6, name: "Gel Fijador / Cera", est: 4.00, tag: '🛒 Supermercado', iva: true }, { cat: 6, name: "Crema de Peinar", est: 5.00, tag: '🛒 Supermercado', iva: true },
             { cat: 6, name: "Protector Solar / Labial", est: 8.00, tag: '🛒 Supermercado', iva: true }
         ];
 
+        // --- SISTEMA DE CIFRADO CAJA FUERTE (Vigenere-XOR Base64) ---
+        const Cipher = {
+            encrypt: function(text, pin) {
+                let utf8Bytes = new TextEncoder().encode(text);
+                let pinBytes = new TextEncoder().encode(pin);
+                let xorBytes = new Uint8Array(utf8Bytes.length);
+                for(let i=0; i<utf8Bytes.length; i++) {
+                    xorBytes[i] = utf8Bytes[i] ^ pinBytes[i % pinBytes.length];
+                }
+                let binary = '';
+                for (let i = 0; i < xorBytes.byteLength; i++) binary += String.fromCharCode(xorBytes[i]);
+                return btoa(binary);
+            },
+            decrypt: function(b64, pin) {
+                let binary = atob(b64);
+                let xorBytes = new Uint8Array(binary.length);
+                for(let i=0; i<binary.length; i++) xorBytes[i] = binary.charCodeAt(i);
+                let pinBytes = new TextEncoder().encode(pin);
+                let utf8Bytes = new Uint8Array(xorBytes.length);
+                for(let i=0; i<xorBytes.length; i++) {
+                    utf8Bytes[i] = xorBytes[i] ^ pinBytes[i % pinBytes.length];
+                }
+                return new TextDecoder().decode(utf8Bytes);
+            }
+        };
+
         // --- SISTEMA BASE Y ESTADOS ---
+        let sessionPin = null;
+        let legacyDataCache = null;
         let appData = { lists: [], currentListId: 1, backups: [], purchaseHistory: [], customDictionary: [], userAddedDefaults: [], userAddedCategories: [], customTags: [], rate: 40.00, darkMode: false };
         let state = { items: [], categories: [], currentView: 'list', selectedCatFilter: 'all', listFilterMode: 'all', isQuickEditMode: false };
         let undoStack = [];
         let globalDictionary = [];
         let closePayments = []; 
         let wizardSelectedItems = [];
+
+        // --- ESCUDO ANTI-VENENO (Sanitización) ---
+        function sanitize(str) {
+            if(typeof str !== 'string') return str;
+            let temp = document.createElement('div');
+            temp.textContent = str;
+            return temp.innerHTML;
+        }
+
+        // --- INICIALIZACIÓN Y CAJA FUERTE ---
+        function checkPinLength(val) {
+            if (val.length === 4) {
+                document.getElementById('btn-unlock').focus();
+            }
+        }
+
+        function initApp() {
+            let encryptedData = localStorage.getItem('compras_pro_secure_v1');
+            let legacyData = localStorage.getItem('compras_pro_appData_v19');
+
+            if (encryptedData) {
+                document.getElementById("lock-msg").textContent = "Ingresa tu PIN para desbloquear";
+                document.getElementById("lock-screen").dataset.mode = 'login';
+                document.getElementById("pin-input").focus();
+            } else if (legacyData) {
+                legacyDataCache = legacyData;
+                document.getElementById("lock-screen").dataset.mode = 'setup';
+                document.getElementById("pin-input").focus();
+            } else {
+                document.getElementById("lock-screen").dataset.mode = 'setup';
+                document.getElementById("pin-input").focus();
+            }
+        }
+
+        function submitPin() {
+            let pin = document.getElementById("pin-input").value;
+            if(pin.length < 4) return showToast("El PIN debe tener 4 números", true);
+
+            let mode = document.getElementById("lock-screen").dataset.mode;
+
+            if (mode === 'setup') {
+                sessionPin = pin;
+                if (legacyDataCache) {
+                    try {
+                        let parsed = JSON.parse(legacyDataCache);
+                        appData = { ...appData, ...parsed };
+                    } catch(e) { loadDefaultData(); }
+                } else {
+                    loadDefaultData();
+                }
+                document.getElementById("lock-screen").style.display = 'none';
+                postInitApp();
+                saveToLocalStorage(); 
+            } else {
+                let encryptedData = localStorage.getItem('compras_pro_secure_v1');
+                try {
+                    let jsonStr = Cipher.decrypt(encryptedData, pin);
+                    let parsed = JSON.parse(jsonStr);
+                    appData = { ...appData, ...parsed };
+                    sessionPin = pin; 
+                    document.getElementById("lock-screen").style.display = 'none';
+                    postInitApp();
+                } catch(err) {
+                    showToast("PIN Incorrecto", true);
+                    document.getElementById("pin-input").value = "";
+                }
+            }
+        }
+
+        function loadDefaultData() {
+            appData.lists = [{ 
+                id: 1, name: "Mercado Principal", 
+                items: JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false, tag: '🛒 Supermercado', iva: false})), 
+                categories: JSON.parse(JSON.stringify(defaultCategories)) 
+            }];
+            appData.currentListId = 1;
+        }
+
+        function factoryResetApp() {
+            if (confirm("⚠️ PELIGRO: Esto borrará permanentemente TODAS tus listas, historial y catálogos. Se te pedirá crear un PIN nuevo y empezarás desde cero. ¿Estás absolutamente seguro?")) {
+                localStorage.removeItem('compras_pro_secure_v1');
+                localStorage.removeItem('compras_pro_appData_v19');
+                window.location.reload(true);
+            }
+        }
+
+        function postInitApp() {
+            appData.purchaseHistory = appData.purchaseHistory || [];
+            appData.customDictionary = appData.customDictionary || [];
+            appData.userAddedDefaults = appData.userAddedDefaults || [];
+            appData.userAddedCategories = appData.userAddedCategories || [];
+            appData.customTags = appData.customTags || [];
+            
+            state.listFilterMode = 'all';
+            buildDictionary();
+            renderTagSelect();
+            applyDarkMode(appData.darkMode);
+            loadCurrentList();
+        }
+
+        function loadCurrentList() {
+            let list = appData.lists.find(l => l.id === appData.currentListId) || appData.lists[0];
+            state.items = list.items; state.categories = list.categories; state.selectedCatFilter = 'all';
+            document.getElementById('exchange-rate').value = appData.rate.toFixed(2);
+            renderAll();
+        }
+
+        function saveToLocalStorage() {
+            let listIdx = appData.lists.findIndex(l => l.id === appData.currentListId);
+            if(listIdx > -1) { appData.lists[listIdx].items = state.items; appData.lists[listIdx].categories = state.categories; }
+            appData.rate = parseFloat(document.getElementById('exchange-rate').value) || 1;
+            
+            let jsonStr = JSON.stringify(appData);
+            let encrypted = Cipher.encrypt(jsonStr, sessionPin);
+            localStorage.setItem('compras_pro_secure_v1', encrypted);
+            
+            localStorage.removeItem('compras_pro_appData_v19');
+            
+            buildDictionary();
+        }
 
         function showToast(message, isError = false) {
             const container = document.getElementById("toast-container");
@@ -771,46 +850,6 @@
             saveToLocalStorage(); renderAll(); showToast("Acción deshecha");
         }
 
-        function initApp() {
-            try {
-                let savedAppData = localStorage.getItem('compras_pro_appData_v19');
-                if (savedAppData) {
-                    let parsed = JSON.parse(savedAppData);
-                    appData = { ...appData, ...parsed };
-                    appData.purchaseHistory = appData.purchaseHistory || [];
-                    appData.customDictionary = appData.customDictionary || [];
-                    appData.userAddedDefaults = appData.userAddedDefaults || [];
-                    appData.userAddedCategories = appData.userAddedCategories || [];
-                    appData.customTags = appData.customTags || [];
-                } else {
-                    appData.lists = [{ 
-                        id: 1, name: "Mercado Principal", 
-                        items: JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false, tag: '🛒 Supermercado', iva: false})), 
-                        categories: JSON.parse(JSON.stringify(defaultCategories)) 
-                    }];
-                    appData.currentListId = 1;
-                    appData.purchaseHistory = [];
-                    appData.customDictionary = [];
-                    appData.userAddedDefaults = [];
-                    appData.userAddedCategories = [];
-                    appData.customTags = [];
-                }
-            } catch(err) {
-                console.error("Error cargando datos locales, inicializando limpios.", err);
-                appData.lists = [{ 
-                    id: 1, name: "Mercado Principal", 
-                    items: JSON.parse(JSON.stringify(defaultItems)).map(i => ({...i, est_qty: i.qty, real: i.est, checked: false, tag: '🛒 Supermercado', iva: false})), 
-                    categories: JSON.parse(JSON.stringify(defaultCategories)) 
-                }];
-            }
-            
-            state.listFilterMode = 'all';
-            buildDictionary();
-            renderTagSelect();
-            applyDarkMode(appData.darkMode);
-            loadCurrentList();
-        }
-
         function applyDarkMode(isDark) {
             if(isDark) document.documentElement.setAttribute('data-theme', 'dark');
             else document.documentElement.removeAttribute('data-theme');
@@ -818,21 +857,6 @@
         }
 
         function toggleDarkMode() { appData.darkMode = !appData.darkMode; applyDarkMode(appData.darkMode); saveToLocalStorage(); }
-
-        function loadCurrentList() {
-            let list = appData.lists.find(l => l.id === appData.currentListId) || appData.lists[0];
-            state.items = list.items; state.categories = list.categories; state.selectedCatFilter = 'all';
-            document.getElementById('exchange-rate').value = appData.rate.toFixed(2);
-            renderAll();
-        }
-
-        function saveToLocalStorage() {
-            let listIdx = appData.lists.findIndex(l => l.id === appData.currentListId);
-            if(listIdx > -1) { appData.lists[listIdx].items = state.items; appData.lists[listIdx].categories = state.categories; }
-            appData.rate = parseFloat(document.getElementById('exchange-rate').value) || 1;
-            localStorage.setItem('compras_pro_appData_v19', JSON.stringify(appData));
-            buildDictionary();
-        }
 
         // --- DICCIONARIO INTELIGENTE Y CATÁLOGO ---
         function buildDictionary() {
@@ -891,7 +915,7 @@
             let nameLower = item.name.toLowerCase();
             let idx = appData.userAddedDefaults.findIndex(d => d.name.toLowerCase() === nameLower);
             
-            let defaultId = idx > -1 ? appData.userAddedDefaults[idx].id : Date.now();
+            let defaultId = idx > -1 ? appData.userAddedDefaults[idx].id : Date.now() + Math.random();
             
             let newItem = { 
                 id: defaultId, 
@@ -912,6 +936,18 @@
                 appData.userAddedDefaults.push(newItem);
             }
             buildDictionary();
+        }
+
+        function addToCustomDictionary(cat, name, est, tag, qty, iva) {
+            let existsInDefaults = defaultItems.some(d => d.name.toLowerCase() === name.toLowerCase());
+            let existsInUser = appData.userAddedDefaults.some(d => d.name.toLowerCase() === name.toLowerCase());
+            let existsInExtended = extendedDictionaryItems.some(d => d.name.toLowerCase() === name.toLowerCase());
+            
+            if (!existsInDefaults && !existsInUser && !existsInExtended) {
+                let newItem = { id: Date.now() + Math.random(), cat, name, est, qty, est_qty: qty, real: est, tag, iva, checked: false };
+                appData.userAddedDefaults.push(newItem);
+                buildDictionary();
+            }
         }
 
         // --- SISTEMA DE ETIQUETAS DINAMICAS ---
@@ -935,13 +971,14 @@
             if(select.value === '_new_') {
                 let newTag = prompt("Ingresa la nueva etiqueta (Ej: 🥩 Carnicería):");
                 if(newTag && newTag.trim() !== '') {
+                    newTag = sanitize(newTag.trim());
                     appData.customTags = appData.customTags || [];
-                    if(!appData.customTags.includes(newTag.trim()) && !defaultTags.some(d => d.val === newTag.trim())) {
-                        appData.customTags.push(newTag.trim());
+                    if(!appData.customTags.includes(newTag) && !defaultTags.some(d => d.val === newTag)) {
+                        appData.customTags.push(newTag);
                         saveToLocalStorage();
                     }
                     renderTagSelect();
-                    select.value = newTag.trim();
+                    select.value = newTag;
                 } else {
                     select.selectedIndex = 0;
                 }
@@ -960,7 +997,7 @@
             if (confirm(`¿Borrar permanentemente la lista "${appData.lists.find(l=>l.id===appData.currentListId).name}"?`)) {
                 appData.lists = appData.lists.filter(l => l.id !== appData.currentListId);
                 appData.currentListId = appData.lists[0].id;
-                localStorage.setItem('compras_pro_appData_v19', JSON.stringify(appData));
+                saveToLocalStorage();
                 loadCurrentList(); 
                 showToast("Lista eliminada");
             }
@@ -1088,7 +1125,6 @@
                 visibilityContainer.style.gridTemplateColumns = "repeat(auto-fill, minmax(140px, 1fr))";
                 visibilityContainer.style.gap = "8px";
                 
-                // Alineación lineal, tamaño 11px, sin saltos de linea
                 visibilityContainer.innerHTML = state.categories.map(c => `
                     <label class="cat-drag-row" data-id="${c.id}" style="display:flex; align-items:center; gap:6px; background:var(--input-bg); padding:6px 8px; border-radius:8px; border:1px solid var(--border-color);">
                         <span class="drag-handle" style="font-size:16px;">☰</span>
@@ -1102,7 +1138,7 @@
         function toggleCategoryActive(id, isActive) { saveToHistory(); let cat = state.categories.find(c => c.id === id); if (cat) cat.active = isActive; saveToLocalStorage(); renderAll();}
         
         function addNewCategory() { 
-            let input = document.getElementById("new-cat-name"); let name = input.value.trim(); if(!name) return; 
+            let input = document.getElementById("new-cat-name"); let name = sanitize(input.value.trim()); if(!name) return; 
             saveToHistory(); 
             let newCat = { id: Date.now(), name: name, active: true };
             state.categories.push(newCat); 
@@ -1112,8 +1148,7 @@
 
         function initDragAndDrop() {
             if (typeof Sortable === 'undefined') {
-                console.warn("Modo Offline: SortableJS no cargado. Reordenamiento visual desactivado hasta reconexión.");
-                return;
+                return; 
             }
             const catList = document.getElementById('settings-categories-visibility');
             if(catList) {
@@ -1228,8 +1263,7 @@
                 item.iva = value;
             }
 
-            // Actualiza el diccionario base para el futuro
-            updateDictionaryDefaults(item);
+            updateDictionaryDefaults(item); // Update master base
 
             saveToLocalStorage();
             calculateTotals();
@@ -1252,13 +1286,12 @@
                 <div class="settings-items-container" data-cat-id="${category.id}">`;
 
                 catItems.forEach(item => {
-                    let tagHtml = item.tag ? item.tag : '🛒 Supermercado';
                     let ivaHtml = item.iva ? ' <span style="font-size:10px; color:var(--secondary); font-weight:900;">+IVA</span>' : '';
                     
                     if (state.isQuickEditMode) {
                         html += `
                         <div class="edit-item-row" style="flex-direction:column; align-items:stretch; gap:6px; background:var(--bg-color);" data-id="${item.id}">
-                            <div style="font-weight:800; font-size:14px; color:var(--text-color); margin-bottom:2px;">${tagHtml} ${item.name}</div>
+                            <div style="font-weight:800; font-size:14px; color:var(--text-color); margin-bottom:2px;">${item.name}</div>
                             <div style="display:flex; gap:6px; align-items:center;">
                                 <div style="flex:1;">
                                     <label style="font-size:10px; color:var(--text-muted); font-weight:800; display:block; margin-bottom:2px;">Cant</label>
@@ -1280,7 +1313,7 @@
                         <div class="edit-item-row" data-id="${item.id}" onclick="openItemModal('${item.id}')">
                             <span class="drag-handle">☰</span>
                             <div class="edit-item-info">
-                                <p>${tagHtml} ${item.name}${ivaHtml}</p>
+                                <p>${item.name}${ivaHtml}</p>
                                 <span>Ref: ${item.est_qty} | Est: $${item.est.toFixed(2)}</span>
                             </div>
                             <div style="color:var(--text-muted); font-size:12px; font-weight:bold;">✏️</div>
@@ -1344,7 +1377,7 @@
 
         function saveItemEdits() {
             let idVal = document.getElementById("edit-id").value;
-            let name = document.getElementById("edit-name").value.trim();
+            let name = sanitize(document.getElementById("edit-name").value.trim());
             if(!name) return showToast("El nombre es obligatorio", true);
 
             saveToHistory();
@@ -1367,9 +1400,9 @@
             } else {
                 editedItem = { id: Date.now() + Math.random(), cat, tag, name, qty: nQty, est_qty: nQty, est: nPrice, real: nPrice, checked: isBought, iva: iva };
                 state.items.push(editedItem);
+                addToCustomDictionary(cat, name, nPrice, tag, nQty, iva);
             }
             
-            // Actualizar catálogo global para el futuro, respetando listas existentes
             if (editedItem) updateDictionaryDefaults(editedItem);
             
             saveToLocalStorage(); closeModals(); renderAll(); showToast("Guardado con éxito en esta lista");
@@ -1436,7 +1469,7 @@
 
             if(q !== "" && matchCount === 0) {
                 btnAdd.style.display = "block";
-                document.getElementById("wizard-new-name").textContent = q;
+                document.getElementById("wizard-new-name").textContent = sanitize(q);
             } else {
                 btnAdd.style.display = "none";
             }
@@ -1460,7 +1493,7 @@
         function wizardClearAll() { wizardSelectedItems = []; renderWizardChips(); }
 
         function wizardAddNewInline() {
-            let name = document.getElementById("wizard-search").value.trim();
+            let name = sanitize(document.getElementById("wizard-search").value.trim());
             updateDictionaryDefaults({
                 cat: 1, name: name, est: 0, real: 0, tag: '🛒 Supermercado', est_qty: 1, qty: 1, iva: false
             });
@@ -1471,7 +1504,7 @@
         }
 
         function executeCreateWizardList() {
-            let name = document.getElementById("wizard-list-name").value.trim() || ("Lista " + new Date().toLocaleDateString());
+            let name = sanitize(document.getElementById("wizard-list-name").value.trim()) || ("Lista " + new Date().toLocaleDateString());
             
             let newItems = [];
             let newCats = JSON.parse(JSON.stringify(defaultCategories));
@@ -1599,23 +1632,30 @@
                 currentTotalUSD += p.usd;
                 
                 let html = `
-                <div style="display:flex; gap:8px; align-items:center; background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--border-color);">
-                    <div style="flex:2;">
-                        <select class="form-select" style="margin:0; padding:8px; font-size:13px;" onchange="updatePaymentMethod(${p.id}, this.value)">
+                <div style="display:flex; gap:6px; align-items:center; background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--border-color);">
+                    <div style="flex:1;">
+                        <select class="form-select" style="margin:0; padding:6px; font-size:12px;" onchange="updatePaymentMethod(${p.id}, this.value)">
                             <option value="Pago Móvil" ${p.method==='Pago Móvil'?'selected':''}>📱 Pago Móvil</option>
-                            <option value="Transferencia" ${p.method==='Transferencia'?'selected':''}>🏦 Transferencia Bs</option>
-                            <option value="Efectivo Divisas" ${p.method==='Efectivo Divisas'?'selected':''}>💵 Efectivo Divisas</option>
-                            <option value="Efectivo Bs" ${p.method==='Efectivo Bs'?'selected':''}>💸 Efectivo Bs</option>
+                            <option value="Transferencia" ${p.method==='Transferencia'?'selected':''}>🏦 Transferencia</option>
+                            <option value="Efectivo Divisas" ${p.method==='Efectivo Divisas'?'selected':''}>💵 Efec Divisas</option>
+                            <option value="Efectivo Bs" ${p.method==='Efectivo Bs'?'selected':''}>💸 Efec Bs</option>
                             <option value="Zelle" ${p.method==='Zelle'?'selected':''}>🟣 Zelle</option>
                             <option value="Zinli" ${p.method==='Zinli'?'selected':''}>🟠 Zinli</option>
-                            <option value="Binance" ${p.method==='Binance'?'selected':''}>🟡 Binance (USDT)</option>
+                            <option value="Binance" ${p.method==='Binance'?'selected':''}>🟡 Binance</option>
                             <option value="Tarjeta" ${p.method==='Tarjeta'?'selected':''}>💳 Tarjeta</option>
                         </select>
                     </div>
-                    <div style="flex:1.5;">
-                        <input type="number" inputmode="decimal" class="form-input" style="margin:0; padding:8px; font-size:14px; text-align:center;" value="${p.usd.toFixed(2)}" step="0.01" onfocus="this.select()" onchange="updatePaymentAmount(${p.id}, this.value)">
+                    <div style="flex:1.5; display:flex; flex-direction:column; gap:6px;">
+                        <div style="display:flex; align-items:center; gap:4px; background:var(--card-bg); padding:4px; border-radius:6px; border:1px solid var(--border-color);">
+                            <span style="font-size:11px; font-weight:800; width:15px;">$</span>
+                            <input type="number" inputmode="decimal" class="form-input" style="margin:0; padding:4px; font-size:14px; text-align:right; border:none; background:transparent;" value="${p.usd.toFixed(2)}" step="0.01" onfocus="this.select()" onchange="updatePaymentAmount(${p.id}, this.value, 'usd')">
+                        </div>
+                        <div style="display:flex; align-items:center; gap:4px; background:var(--card-bg); padding:4px; border-radius:6px; border:1px solid var(--border-color);">
+                            <span style="font-size:11px; font-weight:800; width:15px;">Bs</span>
+                            <input type="number" inputmode="decimal" class="form-input" style="margin:0; padding:4px; font-size:14px; text-align:right; border:none; background:transparent;" value="${(p.usd * appData.rate).toFixed(2)}" step="0.01" onfocus="this.select()" onchange="updatePaymentAmount(${p.id}, this.value, 'bs')">
+                        </div>
                     </div>
-                    ${closePayments.length > 1 ? `<button class="btn-icon" style="color:var(--danger); padding:6px;" onclick="removePaymentRow(${p.id})">✕</button>` : ''}
+                    ${closePayments.length > 1 ? `<button class="btn-icon" style="color:var(--danger); padding:8px;" onclick="removePaymentRow(${p.id})">✕</button>` : ''}
                 </div>`;
                 container.innerHTML += html;
             });
@@ -1626,10 +1666,10 @@
                 textEl.textContent = "Pagos cuadrados correctamente ✅";
                 textEl.style.color = "var(--primary)";
             } else if(diff > 0) {
-                textEl.textContent = `Falta por asignar: $${diff.toFixed(2)}`;
+                textEl.textContent = `Falta por asignar: $${diff.toFixed(2)} / ${(diff * appData.rate).toFixed(2)} Bs`;
                 textEl.style.color = "var(--danger)";
             } else {
-                textEl.textContent = `Sobra asignado: $${Math.abs(diff).toFixed(2)}`;
+                textEl.textContent = `Sobra asignado: $${Math.abs(diff).toFixed(2)} / ${(Math.abs(diff) * appData.rate).toFixed(2)} Bs`;
                 textEl.style.color = "var(--secondary)";
             }
         }
@@ -1639,9 +1679,16 @@
             if(p) p.method = method;
         }
 
-        function updatePaymentAmount(id, val) {
+        function updatePaymentAmount(id, val, currency) {
             let p = closePayments.find(x => x.id === id);
-            if(p) p.usd = parseFloat(val) || 0;
+            if(p) {
+                let amount = parseFloat(val) || 0;
+                if(currency === 'bs') {
+                    p.usd = amount / appData.rate;
+                } else {
+                    p.usd = amount;
+                }
+            }
             renderClosePayments();
         }
 
@@ -1665,7 +1712,7 @@
 
         function executeClosePurchase() {
             let checkedItems = state.items.filter(i => i.checked && state.categories.find(c=>c.id===i.cat)?.active);
-            let location = document.getElementById("close-location").value || "Supermercado General";
+            let location = sanitize(document.getElementById("close-location").value) || "Supermercado General";
             let actionPending = document.getElementById("close-action-pending").value;
 
             let finalUSD = closePayments.reduce((acc, p) => acc + p.usd, 0);
@@ -1689,11 +1736,14 @@
             });
 
             if (actionPending === 'reset') {
-                state.items.forEach(item => { item.checked = false; item.qty = item.est_qty; item.real = item.est; });
-            } else {
-                state.items.forEach(item => {
-                    if(item.checked) item.checked = false; 
+                state.items.forEach(item => { 
+                    if (item.checked && state.categories.find(c=>c.id===item.cat)?.active) {
+                        item.checked = false; item.qty = item.est_qty; item.real = item.est; 
+                    }
                 });
+            } else {
+                // Borrar comprados activos de la lista actual, dejando solo los faltantes
+                state.items = state.items.filter(item => !(item.checked && state.categories.find(c=>c.id===item.cat)?.active));
             }
 
             saveToLocalStorage(); 
@@ -1846,11 +1896,13 @@
         function openBackupModal() { renderBackupList(); document.getElementById('backup-modal').classList.add('show'); }
         
         function createNewBackup() {
-            showToast("Creando backup... ⏳");
+            showToast("Creando backup cifrado... ⏳");
             setTimeout(() => {
                 try {
                     saveToLocalStorage(); 
-                    let code = btoa(unescape(encodeURIComponent(JSON.stringify(appData)))); 
+                    let jsonStr = JSON.stringify(appData);
+                    let code = Cipher.encrypt(jsonStr, sessionPin); 
+                    
                     let now = new Date();
                     let dateStr = now.toLocaleDateString('es-VE') + ' ' + now.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
                     appData.backups.push({ id: Date.now(), date: dateStr, code: code }); 
@@ -1875,10 +1927,14 @@
             }
             container.innerHTML = html;
         }
+        
         function copyCodeToClipboard(code) { navigator.clipboard.writeText(code).then(() => showToast("Código copiado")).catch(() => { let el = document.createElement('textarea'); el.value = code; document.body.appendChild(el); el.select(); document.execCommand('copy'); el.remove(); showToast("Código copiado"); }); }
+        
         function deleteLocalBackup(id) { if(confirm("¿Eliminar este respaldo global?")) { appData.backups = appData.backups.filter(b => b.id !== id); saveToLocalStorage(); renderBackupList(); } }
         
+        // MOTOR DE RESTAURACIÓN INTELIGENTE (Retrocompatible)
         function restoreFromCode(str, confirmReq) {
+            // 1. Detección de Lista Externa Directa (Compartida sin cifrado pesado)
             if(str.startsWith("APP_COMPRAS_PRO_LISTA:")) {
                 let b64 = str.split(":")[1];
                 try {
@@ -1887,29 +1943,63 @@
                         listData.id = Date.now();
                         appData.lists.push(listData);
                         appData.currentListId = listData.id;
-                        saveToLocalStorage(); loadCurrentList(); closeModals();
+                        loadCurrentList(); saveToLocalStorage(); closeModals();
                         showToast("Lista externa importada con éxito");
                         return true;
                     }
                 } catch(e) { showToast("Código de lista no válido", true); return false; }
             }
 
-            if (confirmReq && !confirm("¿Restaurar App Completa? Reemplazará todas las listas y pasillos actuales de la aplicación.")) return false;
-            try { 
-                let decrypted = JSON.parse(decodeURIComponent(escape(atob(str)))); 
-                if(decrypted.lists) { 
-                    appData.lists = decrypted.lists;
-                    appData.purchaseHistory = decrypted.purchaseHistory || appData.purchaseHistory;
-                    appData.customDictionary = decrypted.customDictionary || appData.customDictionary;
-                    appData.userAddedDefaults = decrypted.userAddedDefaults || appData.userAddedDefaults;
-                    appData.userAddedCategories = decrypted.userAddedCategories || appData.userAddedCategories || [];
-                    appData.customTags = decrypted.customTags || appData.customTags || [];
-                    appData.rate = decrypted.rate || appData.rate;
-                    
-                    saveToLocalStorage(); loadCurrentList(); closeModals(); showToast("Sistema Restaurado"); 
-                    return true; 
-                } else { showToast("Código no válido", true); return false; } 
-            } catch(err) { showToast("Error al procesar el código", true); return false; }
+            if (confirmReq && !confirm("¿Restaurar App Completa? Reemplazará todas las listas actuales por las de la copia de seguridad.")) return false;
+
+            let decryptedObj = null;
+
+            // 2. Intento 1: Es un backup antiguo (Legacy / Sin PIN)
+            try {
+                let legacyStr = decodeURIComponent(escape(atob(str)));
+                let parsed = JSON.parse(legacyStr);
+                if (parsed.lists) decryptedObj = parsed;
+            } catch(e) { /* Falla silente, no era legacy */ }
+
+            // 3. Intento 2: Es un backup cifrado con el PIN actual
+            if (!decryptedObj) {
+                try {
+                    let jsonStr = Cipher.decrypt(str, sessionPin);
+                    let parsed = JSON.parse(jsonStr);
+                    if (parsed.lists) decryptedObj = parsed;
+                } catch(e) { /* Falla silente, pin incorrecto o formato inválido */ }
+            }
+
+            // 4. Intento 3: Es un backup cifrado, pero de otro teléfono/PIN
+            if (!decryptedObj) {
+                let otherPin = prompt("🔒 Este código está cifrado o proviene de otro dispositivo.\n\nIngresa el PIN original con el que se creó:");
+                if (otherPin) {
+                    try {
+                        let jsonStr = Cipher.decrypt(str, otherPin);
+                        let parsed = JSON.parse(jsonStr);
+                        if (parsed.lists) decryptedObj = parsed;
+                    } catch(e) { /* Falla final */ }
+                }
+            }
+
+            // Aplicar los datos si logramos descifrar/leer algo válido
+            if (decryptedObj) {
+                appData.lists = decryptedObj.lists;
+                appData.purchaseHistory = decryptedObj.purchaseHistory || appData.purchaseHistory;
+                appData.customDictionary = decryptedObj.customDictionary || appData.customDictionary;
+                appData.userAddedDefaults = decryptedObj.userAddedDefaults || appData.userAddedDefaults;
+                appData.userAddedCategories = decryptedObj.userAddedCategories || appData.userAddedCategories || [];
+                appData.customTags = decryptedObj.customTags || appData.customTags || [];
+                appData.rate = decryptedObj.rate || appData.rate;
+                
+                if (!appData.currentListId && appData.lists.length > 0) appData.currentListId = appData.lists[0].id;
+                
+                loadCurrentList(); saveToLocalStorage(); closeModals(); showToast("Sistema Restaurado con Éxito"); 
+                return true;
+            } else {
+                showToast("Código no válido o PIN incorrecto", true);
+                return false;
+            }
         }
 
         function importManualBackup() { let str = document.getElementById("manual-import-string").value.trim(); if (!str) return showToast("Pega un código", true); restoreFromCode(str, true); document.getElementById("manual-import-string").value = ''; }
@@ -1976,6 +2066,17 @@
         }
 
         window.onload = initApp;
+    </script>
+    
+    <script>
+        // --- OFFLINE SUPPORT ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(() => {
+                    console.log('Para soporte offline completo como PWA instalable, debes subir un archivo sw.js en el mismo directorio.');
+                });
+            });
+        }
     </script>
 </body>
 </html>
