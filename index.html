@@ -124,6 +124,10 @@
         .item-total-price { font-size: 16px; font-weight: 900; color: var(--text-color); text-align: right;}
         .item-card.checked .item-total-price { color: var(--primary); }
 
+        /* Botón eliminar X en la lista */
+        .btn-delete-inline { background: var(--alert-bg); color: var(--danger); border: none; border-radius: 8px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-left: 6px;}
+        .btn-delete-inline:active { transform: scale(0.9); }
+
         /* Cuerpo de la Tarjeta (Inputs) */
         .item-card-body { display: flex; justify-content: space-between; align-items: center; padding-left: 38px; }
         .item-inputs-inline { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -566,6 +570,9 @@
 
     <!-- SCRIPTS EN LA PARTE INFERIOR PARA PERMITIR CARGA OFFLINE INSTANTÁNEA -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js" async defer></script>
+    
+    <!-- Librería CryptoJS para cifrado de grado militar (AES) -->
+    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.js"></script>
 
     <script>
         // --- CONSTANTES Y LISTADO ORIGINAL ---
@@ -672,29 +679,25 @@
             { cat: 6, name: "Protector Solar / Labial", est: 8.00, tag: '🛒 Supermercado', iva: true }
         ];
 
-        // --- SISTEMA DE CIFRADO CAJA FUERTE (Vigenere-XOR Base64) ---
+        // --- SISTEMA DE CIFRADO CAJA FUERTE (AES-256 de Grado Militar) ---
         const Cipher = {
             encrypt: function(text, pin) {
-                let utf8Bytes = new TextEncoder().encode(text);
-                let pinBytes = new TextEncoder().encode(pin);
-                let xorBytes = new Uint8Array(utf8Bytes.length);
-                for(let i=0; i<utf8Bytes.length; i++) {
-                    xorBytes[i] = utf8Bytes[i] ^ pinBytes[i % pinBytes.length];
-                }
-                let binary = '';
-                for (let i = 0; i < xorBytes.byteLength; i++) binary += String.fromCharCode(xorBytes[i]);
-                return btoa(binary);
+                // Cifra el texto usando el PIN como llave con el algoritmo AES
+                return CryptoJS.AES.encrypt(text, pin).toString();
             },
-            decrypt: function(b64, pin) {
-                let binary = atob(b64);
-                let xorBytes = new Uint8Array(binary.length);
-                for(let i=0; i<binary.length; i++) xorBytes[i] = binary.charCodeAt(i);
-                let pinBytes = new TextEncoder().encode(pin);
-                let utf8Bytes = new Uint8Array(xorBytes.length);
-                for(let i=0; i<xorBytes.length; i++) {
-                    utf8Bytes[i] = xorBytes[i] ^ pinBytes[i % pinBytes.length];
+            decrypt: function(encryptedBase64, pin) {
+                try {
+                    // Intenta descifrar usando la llave (PIN)
+                    let bytes = CryptoJS.AES.decrypt(encryptedBase64, pin);
+                    let originalText = bytes.toString(CryptoJS.enc.Utf8);
+                    
+                    // Si el texto resultante está vacío, el PIN era incorrecto
+                    if (!originalText) throw new Error("PIN Incorrecto");
+                    return originalText;
+                } catch (e) {
+                    // Si falla el descifrado, lanza un error para que la app lo detecte
+                    throw new Error("Fallo de descifrado");
                 }
-                return new TextDecoder().decode(utf8Bytes);
             }
         };
 
@@ -770,7 +773,7 @@
                     document.getElementById("lock-screen").style.display = 'none';
                     postInitApp();
                 } catch(err) {
-                    showToast("PIN Incorrecto", true);
+                    showToast("PIN Incorrecto o Cifrado No Válido", true);
                     document.getElementById("pin-input").value = "";
                 }
             }
@@ -1219,7 +1222,10 @@
                                 <div class="item-name">${item.name}</div>
                                 <div class="item-subtext">${tagHtml} ${ivaHtml} <span>Est: $${item.est.toFixed(2)}</span> ${inflationHTML}</div>
                             </div>
-                            <div class="item-total-price" id="subtotal-${item.id}">$${subtotal.toFixed(2)}</div>
+                            <div style="display:flex; align-items:center;">
+                                <div class="item-total-price" id="subtotal-${item.id}">$${subtotal.toFixed(2)}</div>
+                                <button class="btn-delete-inline" onclick="deleteItemDirectly('${item.id}')">✕</button>
+                            </div>
                         </div>
                         <div class="item-card-body">
                             <div class="item-inputs-inline">
@@ -1425,6 +1431,17 @@
                 showToast("Producto tachado (Cantidad a 0)");
             }
             saveToLocalStorage(); closeModals(); renderAll();
+        }
+
+        // FUNCIÓN NUEVA: Borrar desde la lista directo con la X
+        function deleteItemDirectly(id) {
+            if(confirm("¿Eliminar este producto de la lista definitivamente?")) {
+                saveToHistory();
+                state.items = state.items.filter(i => String(i.id) !== String(id));
+                saveToLocalStorage();
+                renderAll();
+                showToast("Producto eliminado");
+            }
         }
 
         // --- WIZARD PARA NUEVA LISTA ---
@@ -2066,6 +2083,17 @@
         }
 
         window.onload = initApp;
+
+        // Auto-guardado al salir o minimizar la app
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden' && sessionPin) {
+                if(document.activeElement) document.activeElement.blur(); // Fuerza onchange de inputs
+                saveToLocalStorage();
+            }
+        });
+        window.addEventListener('beforeunload', function() {
+            if (sessionPin) saveToLocalStorage();
+        });
     </script>
     
     <script>
