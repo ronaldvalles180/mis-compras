@@ -338,29 +338,27 @@
 
         <div id="view-settings" class="view-panel">
             
-            <div class="config-card" style="border: 1px solid rgba(255,59,48,0.3); background: var(--alert-bg);">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <h3 style="margin:0; border:none; color:var(--danger); padding-bottom:0;">🗑️ Eliminar Lista Actual</h3>
-                    <button class="btn btn-danger" style="padding: 10px 16px; font-size:14px; border-radius: 10px;" onclick="deleteCurrentList()">Borrar</button>
+            <!-- ELIMINAR LISTA: Ahora más pequeño y anclado al inicio (Sticky) -->
+            <div style="position: sticky; top: 60px; z-index: 95; background: var(--bg-color); padding: 12px 0 8px 0; margin-top: -5px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border: 1px solid rgba(255,59,48,0.3); background: var(--alert-bg); border-radius: 12px; padding: 10px 14px; box-shadow: var(--shadow-sm);">
+                    <span style="margin:0; color:var(--danger); font-weight: 800; font-size: 14px; letter-spacing: -0.2px;">🗑️ Eliminar Lista Actual</span>
+                    <button class="btn btn-danger" style="padding: 6px 14px; font-size:13px; border-radius: 8px; box-shadow: none;" onclick="deleteCurrentList()">Borrar</button>
                 </div>
             </div>
 
-            <div class="config-card">
-                <h3 style="margin-bottom: 10px;">👁️ Pasillos</h3>
-                <p style="font-size: 13px; color: var(--text-muted); margin: 0 0 14px 0; line-height: 1.4;">Ordena, edita nombres, oculta o elimina pasillos.</p>
-                <button class="btn btn-outline btn-full" onclick="openCategoriesModal()">🛠️ Gestionar Pasillos</button>
-            </div>
-
-            <div class="config-card">
-                <h3>📥 Exportar y Respaldo</h3>
-                <div style="display:flex; flex-direction:column; gap:10px;">
-                    <button class="btn btn-outline btn-full" onclick="exportPricesCatalog()">📤 Exportar Catálogo con Precios (.compras)</button>
-                    <button class="btn btn-outline btn-full" onclick="exportCatalogCSV()">📊 Exportar Catálogo a Excel (CSV)</button>
+            <!-- GESTIÓN DEL CATÁLOGO: Tarjeta unificada para Pasillos y Exportar -->
+            <div class="config-card" style="margin-top: 5px;">
+                <h3 style="margin-bottom: 6px;">⚙️ Gestión del Catálogo</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin: 0 0 16px 0; line-height: 1.4;">Organiza tus pasillos o guarda una copia de tus precios.</p>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-outline" style="flex: 1; border-color: var(--secondary); color: var(--secondary); background: rgba(0, 122, 255, 0.05);" onclick="openCategoriesModal()">🛠️ Pasillos</button>
+                    <button class="btn btn-outline" style="flex: 1; border-color: var(--primary); color: var(--primary); background: rgba(52, 199, 89, 0.05);" onclick="openExportModal()">📥 Exportar</button>
                 </div>
             </div>
 
-            <div class="sticky-header">
-                <div class="search-card" style="padding: 16px;">
+            <!-- BUSCADOR DE AJUSTES STICKY -->
+            <div class="sticky-header" style="top: 115px; z-index: 90; padding-top: 4px; background: var(--bg-color);">
+                <div class="search-card" style="padding: 14px;">
                     <h3 style="margin: 0 0 10px 0; font-size: 15px; color: var(--text-muted); font-weight: 700;">Filtrar Catálogo:</h3>
                     <input type="text" id="settings-search-input" class="search-input" placeholder="🔍 Buscar producto a editar..." oninput="renderSettingsPrices()" onfocus="setTimeout(()=>this.select(), 10)" style="margin-bottom: 12px; width: 100%;">
                     <div class="category-chips" id="category-chips-settings"></div>
@@ -434,6 +432,7 @@
         </div>
     </div>
 
+    <!-- Modal Tamaño de Letra -->
     <div class="modal-overlay" id="ui-size-modal">
         <div class="modal-card">
             <div class="modal-header">🔠 Tamaño de Letra</div>
@@ -447,6 +446,20 @@
         </div>
     </div>
 
+    <!-- Modal Exportar Catálogo -->
+    <div class="modal-overlay" id="export-modal">
+        <div class="modal-card">
+            <div class="modal-header">📥 Exportar Catálogo</div>
+            <p style="font-size:14px; color:var(--text-muted); margin-top:-14px; margin-bottom: 24px;">Elige el formato para guardar tu catálogo de precios.</p>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <button class="btn btn-primary" onclick="exportPricesCatalog(); closeModals();">📤 Archivo Pro (.compras)</button>
+                <button class="btn btn-secondary" onclick="exportCatalogCSV(); closeModals();">📊 Archivo Excel (.csv)</button>
+                <button class="btn btn-outline" style="margin-top:8px; border-color:transparent; background:var(--input-bg);" onclick="closeModals()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Gestión de Pasillos -->
     <div class="modal-overlay" id="categories-modal">
         <div class="modal-card" style="padding-left: 20px; padding-right: 20px;">
             <div class="modal-header">🛠️ Gestión de Pasillos</div>
@@ -908,9 +921,8 @@
             loadCurrentList();
         }
 
-        // --- SISTEMA DE ESCALADO UI (MODIFICADO: MENÚ EMERGENTE) ---
+        // --- SISTEMA DE ESCALADO UI (MENÚ EMERGENTE) ---
         function openUISizeModal() {
-            // Actualizar botones visualmente dentro del modal
             document.getElementById('btn-size-small').className = `btn ${appData.uiSize === 'small' ? 'btn-primary' : 'btn-outline'}`;
             document.getElementById('btn-size-normal').className = `btn ${(appData.uiSize === 'normal' || !appData.uiSize) ? 'btn-primary' : 'btn-outline'}`;
             document.getElementById('btn-size-large').className = `btn ${appData.uiSize === 'large' ? 'btn-primary' : 'btn-outline'}`;
@@ -1248,8 +1260,14 @@
             document.getElementById('wizard-modal').classList.remove('show');
             document.getElementById('templates-modal').classList.remove('show');
             document.getElementById('categories-modal').classList.remove('show');
+            document.getElementById('export-modal').classList.remove('show');
             document.getElementById('ui-size-modal').classList.remove('show');
             document.getElementById('autocomplete-list').style.display = 'none';
+        }
+
+        // Modal Exportación
+        function openExportModal() {
+            document.getElementById('export-modal').classList.add('show');
         }
 
         // --- Gestión de Pasillos Visibles ---
@@ -1371,7 +1389,7 @@
                     catItems.sort((a, b) => b.qty - a.qty);
                 }
 
-                let html = `<h2>${category.name} <span class="badge" id="badge-cat-${category.id}">0/0</span></h2>`;
+                let html = `<h2 class="cat-header">${category.name} <span class="badge" id="badge-cat-${category.id}">0/0</span></h2>`;
 
                 catItems.forEach(item => {
                     let rowClass = item.checked ? 'checked' : '';
@@ -1880,14 +1898,14 @@
         function handleEnterKey(event) { if (event.key === "Enter") event.target.blur(); }
         function clearSearch() { document.getElementById("search-input").value = ''; filterList(); }
         
-        // MODIFICACIÓN: MOTOR DE BÚSQUEDA LISTA (Oculta Pasillos para subir coincidencias)
+        // MOTOR DE BÚSQUEDA LISTA (Oculta Pasillos para subir coincidencias)
         function filterList() {
             if (state.currentView !== 'list') return;
             let query = document.getElementById("search-input").value.toLowerCase();
             let mode = state.listFilterMode || 'all';
 
             // Ocultar encabezados de pasillos si hay texto de búsqueda
-            let headers = document.querySelectorAll('#categories-container h2');
+            let headers = document.querySelectorAll('#categories-container .cat-header');
             headers.forEach(h2 => {
                 h2.style.display = query !== '' ? 'none' : 'flex';
             });
